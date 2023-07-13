@@ -4,7 +4,6 @@ import (
 	"errors"
 	"go-back/internal/app/domain"
 	"go-back/internal/app/repository"
-	"log"
 	"strconv"
 	"time"
 )
@@ -111,13 +110,20 @@ func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) erro
 	if p.VariantId == 0 || p.StorageId == 0 || p.Quantity == 0 || p.Added_at == (time.Time{}) {
 		return errors.New("variant_id,storage_id,quantity or added_at is empty")
 	}
-
-	err = u.repo.AddProductInStock(p)
+	isExist, err := u.repo.CheckProductsInStock(p)
 	if err != nil {
-		log.Println(err)
 		return err
+	}
+	if isExist {
+		err := u.repo.UpdateProductsInstock(p)
+		if err != nil {
+			return err
+		}
 	} else {
-		tx.Commit()
+		err := u.repo.AddProductInStock(p)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
