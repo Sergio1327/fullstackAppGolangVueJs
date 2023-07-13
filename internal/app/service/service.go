@@ -40,42 +40,63 @@ func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
 	if p.Name == "" {
 		return errors.New("product_name cannot be empty")
 	}
-	u.repo.TxBegin()
-	err = u.repo.AddProduct(p)
+	productId, err := u.repo.AddProduct(p)
 	if err != nil {
 		return err
 	} else {
 		tx.Commit()
 	}
-
+	for _, v := range p.Variants {
+		err := u.repo.AddProductVariants(productId, &v)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func (u *ProductServiceImpl) AddProductPrice(pr *domain.ProductPrice) error {
+func (u *ProductServiceImpl) AddProductPrice(p *domain.ProductPrice) error {
 	tx, err := u.repo.TxBegin()
 	defer tx.Rollback()
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
-	variantID := strconv.Itoa(pr.VariantId)
+	variantID := strconv.Itoa(p.VariantId)
 	if variantID == "" {
 		return errors.New("no product with this variant_id")
 	}
 
-	if pr.Price.IsZero() {
+	if p.Price.IsZero() {
 		return errors.New("price cant be zero or empty")
 	}
 
-	if pr.StartDate == (time.Time{}) {
+	if p.StartDate == (time.Time{}) {
 		return errors.New("date cant be empty")
 	}
 
-	err = u.repo.AddProductPrice(pr)
+	isExistsId, err := u.repo.CheckExists(p)
 	if err != nil {
 		return err
+	}
+	if p.EndDate != (time.Time{}) {
+		if isExistsId > 0 {
+			p.EndDate = time.Now()
+			err := u.repo.UpdateProductPrice(p, isExistsId)
+			if err != nil {
+				return err
+			}
+			tx.Commit()
+		} else {
+			err := u.repo.AddProductPriceWithEndDate(p)
+			if err != nil {
+				return err
+			}
+		}
 	} else {
-		tx.Commit()
+		err := u.repo.AddProductPrice(p)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

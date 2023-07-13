@@ -11,21 +11,22 @@ type Product struct {
 	Descr      string    `json:"description"`
 	Addet_at   time.Time `json:"added_at"`
 	Removed_at time.Time `json:"removed_at"`
-	Tags       []string  `json:"tags"`
+	Tags       string  `json:"tags"`
 	Variants   []Variant `json:"variants"`
 }
 
 type Variant struct {
-	ProductId    int
-	VariantId    int
-	Weight       int       `json:"weight"`
-	Unit         string    `json:"unit"`
-	Added_at     time.Time `json:"added_at"`
-	CurrentPrice decimal.Decimal
+	ProductId    int       `json:"product_id" db:"product_id"`
+	VariantId    int       `json:"variant_id" db:"variant_id"`
+	Weight       int       `json:"weight" db:"weight"`
+	Unit         string    `json:"unit" db:"unit"`
+	Added_at     time.Time `json:"added_at" db:"added_at"`
+	CurrentPrice decimal.Decimal	`db:"price"`
 	InStorages   []int
 }
 
 type ProductPrice struct {
+	PriceId int 
 	VariantId int             `json:"variant_id"`
 	StartDate time.Time       `json:"start_date"`
 	EndDate   time.Time       `json:"end_date"`
@@ -41,9 +42,9 @@ type AddProductInStock struct {
 }
 
 type ProductInfo struct {
-	ProductId int
-	Name      string
-	Descr     string
+	ProductId int    `db:"product_id"`
+	Name      string `db:"name"`
+	Descr     string `db:"description"`
 	Variants  []Variant
 }
 

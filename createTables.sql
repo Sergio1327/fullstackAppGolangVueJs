@@ -4,7 +4,7 @@ create table products(
     description text not null,
     added_at timestamptz default now(),
     removed_at timestamptz default now(),
-    tags jsonb
+    tags text
 );
 
 create table product_variants(
@@ -57,17 +57,17 @@ VALUES
     (
         'Порошок Ариэль',
         'Моющий порошок для стирки',
-        '["стирка", "моющее средство"]'
+        'стирка,моющее средство'
     ),
     (
         'Вода Hydrolife',
         'Питьевая вода',
-        '["вода", "напиток"]'
+        'вода,напиток'
     ),
     (
         'Чай Ahmad',
         'Черный чай',
-        '["чай", "напиток"]'
+        'чай,напиток'
     );
 
 INSERT INTO

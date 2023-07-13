@@ -1,3 +1,6 @@
+psql "dbname=test_db host=127.0.0.1 port=5432 user=test_db password=test_db sslmode=disable"
+sudo rm -rf ./pg/data
+
 localhost:8080/product/add 
 
 запрос:

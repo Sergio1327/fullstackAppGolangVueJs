@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"go-back/internal/app/domain"
 	"go-back/internal/app/service"
 	"log"
@@ -12,12 +11,12 @@ import (
 )
 
 type ProductHandler struct {
-	service service.ProductService
+	productService service.ProductService
 }
 
 func NewProductHandler(service service.ProductService) *ProductHandler {
 	return &ProductHandler{
-		service: service,
+		productService: service,
 	}
 }
 
@@ -25,13 +24,12 @@ func (ph *ProductHandler) AddProduct(c *gin.Context) {
 	var product domain.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, err)
-		c.String(400, fmt.Sprintf("%s", err))
 		return
 	}
 
-	err := ph.service.AddProduct(&product)
+	err := ph.productService.AddProduct(&product)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, err.Error())
 		log.Println(err)
 		return
 	}
@@ -44,7 +42,7 @@ func (ph *ProductHandler) AddProductPrice(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	err := ph.service.AddProductPrice(&productPrice)
+	err := ph.productService.AddProductPrice(&productPrice)
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 		return
@@ -58,7 +56,7 @@ func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error(), "1")
 		return
 	}
-	err := ph.service.AddProductInStock(&addProduct)
+	err := ph.productService.AddProductInStock(&addProduct)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error(), "2")
 		return
@@ -73,7 +71,7 @@ func (ph *ProductHandler) GetProductInfoById(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error(), 1)
 		return
 	}
-	productInfo, err := ph.service.GetProductInfoById(productId)
+	productInfo, err := ph.productService.GetProductInfoById(productId)
 	if err != nil {
 		c.String(http.StatusBadRequest, err.Error(), 2)
 		return
@@ -91,7 +89,7 @@ func (ph *ProductHandler) GetProductList(c *gin.Context) {
 		limit = 3
 	}
 
-	products, err := ph.service.GetProductList(tag, limit)
+	products, err := ph.productService.GetProductList(tag, limit)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -110,7 +108,7 @@ func (ph *ProductHandler) GetProductsInStock(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	stocks, err := ph.service.GetProductsInStock(productId)
+	stocks, err := ph.productService.GetProductsInStock(productId)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -123,7 +121,7 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	err := ph.service.Buy(&sale)
+	err := ph.productService.Buy(&sale)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -137,7 +135,7 @@ func (ph *ProductHandler) GetSales(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	sales, err := ph.service.GetSales(&salequery)
+	sales, err := ph.productService.GetSales(&salequery)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
