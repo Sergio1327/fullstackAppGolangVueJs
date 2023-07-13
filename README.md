@@ -1,2 +1,0 @@
-# sergey_store
-

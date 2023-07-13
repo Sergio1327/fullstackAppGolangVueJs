@@ -1,0 +1,194 @@
+package service
+
+import (
+	"errors"
+	"go-back/internal/app/domain"
+	"go-back/internal/app/repository"
+	"log"
+	"strconv"
+	"time"
+)
+
+type ProductService interface {
+	AddProduct(p *domain.Product) error
+	AddProductPrice(pr *domain.ProductPrice) error
+	AddProductInStock(p *domain.AddProductInStock) error
+	GetProductInfoById(id int) (domain.ProductInfo, error)
+	GetProductList(tag string, limit int) ([]domain.ProductInfo, error)
+	GetProductsInStock(productId int) ([]domain.Stock, error)
+	Buy(p *domain.Sale) error
+	GetSales(sq *domain.SaleQuery) ([]domain.Sale, error)
+}
+
+type ProductServiceImpl struct {
+	repo repository.ProductRepository
+}
+
+func NewProductUseCase(repo repository.ProductRepository) *ProductServiceImpl {
+	return &ProductServiceImpl{
+		repo: repo,
+	}
+}
+
+func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
+	tx, err := u.repo.TxBegin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if p.Name == "" {
+		return errors.New("product_name cannot be empty")
+	}
+	u.repo.TxBegin()
+	err = u.repo.AddProduct(p)
+	if err != nil {
+		return err
+	} else {
+		tx.Commit()
+	}
+
+	return nil
+}
+
+func (u *ProductServiceImpl) AddProductPrice(pr *domain.ProductPrice) error {
+	tx, err := u.repo.TxBegin()
+	defer tx.Rollback()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	variantID := strconv.Itoa(pr.VariantId)
+	if variantID == "" {
+		return errors.New("no product with this variant_id")
+	}
+
+	if pr.Price.IsZero() {
+		return errors.New("price cant be zero or empty")
+	}
+
+	if pr.StartDate == (time.Time{}) {
+		return errors.New("date cant be empty")
+	}
+
+	err = u.repo.AddProductPrice(pr)
+	if err != nil {
+		return err
+	} else {
+		tx.Commit()
+	}
+	return nil
+}
+
+func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) error {
+
+	tx, err := u.repo.TxBegin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if p.VariantId == 0 || p.StorageId == 0 || p.Quantity == 0 || p.Added_at == (time.Time{}) {
+		return errors.New("variant_id,storage_id,quantity or added_at is empty")
+	}
+
+	err = u.repo.AddProductInStock(p)
+	if err != nil {
+		log.Println(err)
+		return err
+	} else {
+		tx.Commit()
+	}
+
+	return nil
+}
+
+func (u *ProductServiceImpl) GetProductInfoById(id int) (domain.ProductInfo, error) {
+	if id == 0 || id < 0 {
+		return domain.ProductInfo{}, errors.New("id cannot be zero or less than 0")
+	}
+
+	productInfo, err := u.repo.GetProductInfoById(id)
+	if err != nil {
+		return domain.ProductInfo{}, err
+	}
+
+	return productInfo, nil
+}
+
+func (u *ProductServiceImpl) GetProductList(tag string, limit int) ([]domain.ProductInfo, error) {
+	if limit == 0 || limit < 0 {
+		limit = 3
+	}
+	if tag != "" {
+		products, err := u.repo.GetProductListByTag(tag, limit)
+		if err != nil {
+			return nil, err
+		}
+		return products, nil
+	} else {
+		products, err := u.repo.GetProductList(limit)
+		if err != nil {
+			return nil, err
+		}
+		return products, nil
+	}
+}
+
+func (u *ProductServiceImpl) GetProductsInStock(productId int) ([]domain.Stock, error) {
+	if productId < 0 {
+		return nil, errors.New("product_id cannot be less than 0")
+	}
+
+	if productId != 0 {
+		stocks, err := u.repo.GetProductsInStockById(productId)
+		if err != nil {
+			return nil, err
+		}
+		return stocks, nil
+	} else {
+		stocks, err := u.repo.GetProductsInStock()
+		if err != nil {
+			return nil, err
+		}
+		return stocks, nil
+	}
+}
+
+func (u *ProductServiceImpl) Buy(p *domain.Sale) error {
+	tx, err := u.repo.TxBegin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if p.VariantId == 0 || p.StorageId == 0 || p.Quantity == 0 {
+		return errors.New("variant_id,storage_id pr quantity is empy")
+	}
+	err = u.repo.Buy(p)
+	if err != nil {
+		return err
+	} else {
+		tx.Commit()
+	}
+	return nil
+}
+
+func (u *ProductServiceImpl) GetSales(sq *domain.SaleQuery) ([]domain.Sale, error) {
+	if sq.Limit == 0 {
+		sq.Limit = 3
+	}
+	if sq.ProductName == "" && sq.StorageId == 0 {
+		sales, err := u.repo.GetSales(sq)
+		if err != nil {
+			return nil, err
+		}
+		return sales, nil
+	} else {
+		sales, err := u.repo.GetSalesByFilters(sq)
+		if err != nil {
+			return nil, err
+		}
+		return sales, nil
+	}
+
+}

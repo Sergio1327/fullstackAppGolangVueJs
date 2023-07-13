@@ -1,0 +1,89 @@
+localhost:8080/product/add 
+
+запрос:
+{
+  "name": "Название 3",
+  "description": "2",
+ "added_at": "2021-07-23T14:50:20+05:00",
+  "tags": ["тег1","dsdsdsd"],
+  "variants": [
+    {
+      "weight": 100,
+      "unit": "г"
+    },
+    {
+      "weight": 200,
+      "unit": "г"
+    }
+  ]
+}
+  
+
+localhost:8080/product/price
+запрос:
+{
+    "variant_id":4,
+    "start_date":"2003-08-27T08:00:00+05:00",
+    "price":15.99
+}
+
+
+localhost:8080/product/add/stock
+запрос:
+{
+    "variant_id":4,
+    "storage_id":2,
+    "added_at":"2003-08-27T08:00:00+05:00",
+    "quantity":2
+} 
+
+
+localhost:8080/product/:id
+Возвращает в json информацию о продукте,его вариантах,актуальной цене и id складов в которых есть эти продукты
+
+
+
+localhost:8080/product_list?limit=<limit>&tag=<tag>
+example: localhost:8080/product_list?tag=напиток&limit=1
+
+
+
+localhost:8080/stock?product_id=<product_id>
+exmaple localhost:8080/stock?product_id=2
+
+
+localhost:8080/buy
+запрос:
+{
+    "variant_id":1,
+    "storage_id":3,
+    "quantity":2
+}
+
+
+
+localhost:8080/sales
+запрос:
+{
+    "start_date":"2023-07-03T19:45:00+05:00",
+    "end_date":"2023-07-12T11:31:36+05:00",
+    "limit":2,
+    "product_name":"Вода Hydrolife",
+    "storage_id":1
+}
+
+или 
+
+{
+    "start_date":"2023-07-02T19:45:00+05:00",
+    "end_date":"2023-07-12T11:32:36+05:00",
+    "limit":2,
+    "product_name":"Вода Hydrolife"
+}
+
+или
+
+{
+    "start_date":"2023-07-02T19:45:00+05:00",
+    "end_date":"2023-07-12T11:32:36+05:00"
+}
