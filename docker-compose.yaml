@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15.3
+    environment:
+      POSTGRES_USER: test_db
+      POSTGRES_PASSWORD: test_db
+      POSTGRES_DB: test_db
+      PGDATA: /data
+      TZ: 'GMT+5'
+    volumes:
+      - ./pg/data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_db"]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+    ports:
+      - "127.0.0.1:5432:5432"
