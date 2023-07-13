@@ -134,11 +134,25 @@ func (u *ProductServiceImpl) GetProductInfoById(id int) (domain.ProductInfo, err
 		return domain.ProductInfo{}, errors.New("id cannot be zero or less than 0")
 	}
 
-	productInfo, err := u.repo.GetProductInfoById(id)
+	var productInfo domain.ProductInfo
+	err := u.repo.GetProductInfo(id, &productInfo)
 	if err != nil {
 		return domain.ProductInfo{}, err
 	}
-
+	err = u.repo.GetProductVariants(id, productInfo.Variants,&productInfo)
+	if err != nil {
+		return domain.ProductInfo{}, nil
+	}
+	for _, v := range productInfo.Variants {
+		err := u.repo.GetCurrentPrice(&v)
+		if err != nil {
+			return domain.ProductInfo{}, nil
+		}
+		err = u.repo.InStorages(&v)
+		if err != nil {
+			return domain.ProductInfo{}, err
+		}
+	}
 	return productInfo, nil
 }
 

@@ -25,6 +25,11 @@ type ProductRepository interface {
 	UpdateProductsInstock(p *domain.AddProductInStock) error
 	AddProductInStock(p *domain.AddProductInStock) error
 
+	GetProductInfo(id int, p *domain.ProductInfo) error
+	GetProductVariants(id int, v []domain.Variant, p *domain.ProductInfo) error
+	GetCurrentPrice(v *domain.Variant) error
+	InStorages(v *domain.Variant) error
+
 	GetProductInfoById(id int) (domain.ProductInfo, error)
 	GetProductListByTag(tag string, limit int) ([]domain.ProductInfo, error)
 	GetProductList(limit int) ([]domain.ProductInfo, error)
@@ -142,6 +147,43 @@ func (r *PostgresProductRepository) AddProductInStock(p *domain.AddProductInStoc
 		return err
 	}
 	return nil
+}
+
+func (r *PostgresProductRepository) GetProductInfo(id int, p *domain.ProductInfo) error {
+	err := r.db.Get(p, "select name,description from products where product_id=$1", id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *PostgresProductRepository) GetProductVariants(id int, v []domain.Variant, p *domain.ProductInfo) error {
+	err := r.db.Select(&v, "select variant_id,weight,unit from product_variants where product_id=$1", id)
+	if err != nil {
+		return err
+	}
+	p.Variants = v
+	return nil
+}
+
+func (r *PostgresProductRepository) GetCurrentPrice(v *domain.Variant) error {
+	err := r.db.Get(v, "select price from product_prices where variant_id=$1 and start_date<$2 and (end_date is null or end_date>$2)",
+		v.VariantId, time.Now())
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *PostgresProductRepository) InStorages(v *domain.Variant) error {
+	var inStorages []int
+	err := r.db.Select(&inStorages, "SELECT storage_id FROM products_in_storage WHERE variant_id = $1", v.VariantId)
+	if err != nil {
+		return err
+	}
+	v.InStorages = inStorages
+	return nil
+
 }
 
 func (r *PostgresProductRepository) GetProductInfoById(id int) (domain.ProductInfo, error) {
