@@ -167,7 +167,7 @@ func (r *PostgresProductRepository) GetProductVariants(id int, v []domain.Varian
 }
 
 func (r *PostgresProductRepository) GetCurrentPrice(v *domain.Variant) error {
-	err := r.db.Get(v, "select price from product_prices where variant_id=$1 and start_date<$2 and (end_date is null or end_date>$2)",
+	err := r.db.Get(&v.CurrentPrice, "select price from product_prices where variant_id=$1 and start_date<$2 and (end_date is null or end_date>$2)",
 		v.VariantId, time.Now())
 	if err != nil {
 		return err

@@ -135,20 +135,21 @@ func (u *ProductServiceImpl) GetProductInfoById(id int) (domain.ProductInfo, err
 	}
 
 	var productInfo domain.ProductInfo
+	productInfo.ProductId = id
 	err := u.repo.GetProductInfo(id, &productInfo)
 	if err != nil {
 		return domain.ProductInfo{}, err
 	}
-	err = u.repo.GetProductVariants(id, productInfo.Variants,&productInfo)
+	err = u.repo.GetProductVariants(id, productInfo.Variants, &productInfo)
 	if err != nil {
 		return domain.ProductInfo{}, nil
 	}
-	for _, v := range productInfo.Variants {
-		err := u.repo.GetCurrentPrice(&v)
+	for i := range productInfo.Variants {
+		err := u.repo.GetCurrentPrice(&productInfo.Variants[i])
 		if err != nil {
 			return domain.ProductInfo{}, nil
 		}
-		err = u.repo.InStorages(&v)
+		err = u.repo.InStorages(&productInfo.Variants[i])
 		if err != nil {
 			return domain.ProductInfo{}, err
 		}
