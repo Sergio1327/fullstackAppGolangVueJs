@@ -11,22 +11,22 @@ type Product struct {
 	Descr      string    `json:"description"`
 	Addet_at   time.Time `json:"added_at"`
 	Removed_at time.Time `json:"removed_at"`
-	Tags       string  `json:"tags"`
+	Tags       string    `json:"tags"`
 	Variants   []Variant `json:"variants"`
 }
 
 type Variant struct {
-	ProductId    int       `json:"product_id" db:"product_id"`
-	VariantId    int       `json:"variant_id" db:"variant_id"`
-	Weight       int       `json:"weight" db:"weight"`
-	Unit         string    `json:"unit" db:"unit"`
-	Added_at     time.Time `json:"added_at" db:"added_at"`
-	CurrentPrice decimal.Decimal	`db:"price"`
+	ProductId    int             `json:"product_id" db:"product_id"`
+	VariantId    int             `json:"variant_id" db:"variant_id"`
+	Weight       int             `json:"weight" db:"weight"`
+	Unit         string          `json:"unit" db:"unit"`
+	Added_at     time.Time       `json:"added_at" db:"added_at"`
+	CurrentPrice decimal.Decimal `db:"price"`
 	InStorages   []int
 }
 
 type ProductPrice struct {
-	PriceId int 
+	PriceId   int
 	VariantId int             `json:"variant_id"`
 	StartDate time.Time       `json:"start_date"`
 	EndDate   time.Time       `json:"end_date"`
@@ -34,11 +34,10 @@ type ProductPrice struct {
 }
 
 type AddProductInStock struct {
-	VariantId  int       `json:"variant_id"`
-	StorageId  int       `json:"storage_id"`
-	Added_at   time.Time `json:"added_at"`
-	Removed_at time.Time `json:"removed_at"`
-	Quantity   int       `json:"quantity"`
+	VariantId int       `json:"variant_id" db:"variant_id"`
+	StorageId int       `json:"storage_id" db:"storage_id"`
+	Added_at  time.Time `json:"added_at" db:"added_at" `
+	Quantity  int       `json:"quantity" db:"quantity"`
 }
 
 type ProductInfo struct {
@@ -49,13 +48,9 @@ type ProductInfo struct {
 }
 
 type Stock struct {
-	StorageName string
-	ProductID   int
-	ProductName string
-	VariantID   int
-	VariantUnit string
-	Weight      int
-	Quantity    int
+	StorageID   int	`db:"storage_id"`
+	StorageName string	`db:"name"`
+	ProductVariants    []AddProductInStock	
 }
 
 type Sale struct {

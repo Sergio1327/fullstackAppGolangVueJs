@@ -32,9 +32,11 @@ type ProductRepository interface {
 
 	GetProductsByTag(tag string, limit int) ([]domain.ProductInfo, error)
 	GetProducts(limit int) ([]domain.ProductInfo, error)
-	
-	GetProductsInStock() ([]domain.Stock, error)
-	GetProductsInStockById(id int) ([]domain.Stock, error)
+
+	GetStocks() ([]domain.Stock, error)
+	GetStocksByProductId(id int) ([]domain.Stock, error)
+	GetStocksVariants(storageId int) ([]domain.AddProductInStock, error)
+
 	Buy(s *domain.Sale) error
 	GetSales(sq *domain.SaleQuery) ([]domain.Sale, error)
 	GetSalesByFilters(sq *domain.SaleQuery) ([]domain.Sale, error)
@@ -91,7 +93,6 @@ func (r *PostgresProductRepository) CheckExists(p *domain.ProductPrice) (int, er
 	}
 	log.Println(isExists)
 	return isExists, nil
-
 }
 
 func (r *PostgresProductRepository) UpdateProductPrice(p *domain.ProductPrice, id int) error {
@@ -183,7 +184,6 @@ func (r *PostgresProductRepository) InStorages(v *domain.Variant) error {
 	}
 	v.InStorages = inStorages
 	return nil
-
 }
 
 func (r *PostgresProductRepository) GetProductsByTag(tag string, limit int) ([]domain.ProductInfo, error) {
@@ -204,118 +204,18 @@ func (r *PostgresProductRepository) GetProducts(limit int) ([]domain.ProductInfo
 	return products, nil
 }
 
-func (r *PostgresProductRepository) GetProductListByTag(tag string, limit int) ([]domain.ProductInfo, error) {
-	var products []domain.ProductInfo
-	rows, err := r.db.Query(`select product_id,name,description from products where $1 = any (select jsonb_array_elements_text(tags)) limit $2`,
-		tag, limit)
-	if err != nil {
-		log.Println(err, 1)
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var product domain.ProductInfo
-		err := rows.Scan(&product.ProductId, &product.Name, &product.Descr)
-		if err != nil {
-			log.Println(err, 2)
-			return nil, err
-		}
-		vRows, err := r.db.Query("select variant_id,weight,unit from product_variants where product_id=$1", product.ProductId)
-		if err != nil {
-			log.Println(err, 3)
-			return nil, err
-		}
-		defer vRows.Close()
-		for vRows.Next() {
-			var variant domain.Variant
-			err := vRows.Scan(&variant.VariantId, &variant.Weight, &variant.Unit)
-			if err != nil {
-				log.Println(4)
-				return nil, err
-			}
-
-			err = r.db.QueryRow("select price from product_prices where variant_id=$1 and start_date<$2 and(end_date>$2 or end_date is null)",
-				variant.VariantId, time.Now()).Scan(&variant.CurrentPrice)
-			if err != nil {
-				log.Println(5)
-				return nil, err
-			}
-
-			product.Variants = append(product.Variants, variant)
-
-		}
-		products = append(products, product)
-	}
-	return products, nil
-}
-
-func (r *PostgresProductRepository) GetProductList(limit int) ([]domain.ProductInfo, error) {
-	var products []domain.ProductInfo
-	rows, err := r.db.Queryx("select product_id,name,description from products limit $1", limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var product domain.ProductInfo
-		err := rows.Scan(&product.ProductId, &product.Name, &product.Descr)
-		if err != nil {
-			return nil, err
-		}
-		vRows, err := r.db.Query("select variant_id,weight,unit from product_variants where product_id=$1", product.ProductId)
-		if err != nil {
-			return nil, err
-		}
-		defer vRows.Close()
-		for vRows.Next() {
-			var variant domain.Variant
-			err := vRows.Scan(&variant.VariantId, &variant.Weight, &variant.Unit)
-			if err != nil {
-				return nil, err
-			}
-
-			err = r.db.QueryRow("select price from product_prices where variant_id=$1 and start_date<$2 and(end_date>$2 or end_date is null)",
-				variant.VariantId, time.Now()).Scan(&variant.CurrentPrice)
-			if err != nil {
-				return nil, err
-			}
-
-			product.Variants = append(product.Variants, variant)
-
-		}
-		products = append(products, product)
-	}
-	return products, nil
-}
-
-func (r *PostgresProductRepository) GetProductsInStock() ([]domain.Stock, error) {
+func (r *PostgresProductRepository) GetStocks() ([]domain.Stock, error) {
 	var stocks []domain.Stock
-	rows, err := r.db.Query(`
-	select s.name AS storage_name, p.product_id, p.name AS product_name, pv.variant_id, pv.unit AS variant_unit, pv.weight, pis.quantity
-	from storages s
-	inner join products_in_storage pis ON s.storage_id = pis.storage_id
-	inner join product_variants pv ON pis.variant_id = pv.variant_id
-	inner join products p ON pv.product_id = p.product_id`)
+	err := r.db.Select(&stocks, "select  storage_id,name from storages")
 	if err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var stock domain.Stock
-		err := rows.Scan(&stock.StorageName, &stock.ProductID, &stock.ProductName, &stock.VariantID, &stock.VariantUnit, &stock.Weight, &stock.Quantity)
-		if err != nil {
-			return nil, err
-		}
-		stocks = append(stocks, stock)
 	}
 	return stocks, nil
 }
-
-func (r *PostgresProductRepository) GetProductsInStockById(id int) ([]domain.Stock, error) {
+func (r *PostgresProductRepository) GetStocksByProductId(id int) ([]domain.Stock, error) {
 	var stocks []domain.Stock
-	rows, err := r.db.Query(`
-	select s.name AS storage_name, p.product_id, p.name AS product_name, pv.variant_id, pv.unit AS variant_unit, pv.weight, pis.quantity
+	err := r.db.Select(&stocks, `
+	select s.storage_id ,s.name 
 	from storages s
 	inner join products_in_storage pis ON s.storage_id = pis.storage_id
 	inner join product_variants pv ON pis.variant_id = pv.variant_id
@@ -324,17 +224,15 @@ func (r *PostgresProductRepository) GetProductsInStockById(id int) ([]domain.Sto
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var stock domain.Stock
-		err := rows.Scan(&stock.StorageName, &stock.ProductID, &stock.ProductName, &stock.VariantID, &stock.VariantUnit, &stock.Weight, &stock.Quantity)
-		if err != nil {
-			return nil, err
-		}
-		stocks = append(stocks, stock)
-	}
 	return stocks, nil
+}
+func (r *PostgresProductRepository) GetStocksVariants(storageId int) ([]domain.AddProductInStock, error) {
+	var v []domain.AddProductInStock
+	err := r.db.Select(&v, "select variant_id,storage_id,added_at,quantity from products_in_storage where storage_id=$1 ", storageId)
+	if err != nil {
+		return nil, err
+	}
+	return v, err
 }
 
 func (r *PostgresProductRepository) Buy(s *domain.Sale) error {

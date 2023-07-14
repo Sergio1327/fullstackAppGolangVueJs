@@ -214,19 +214,35 @@ func (u *ProductServiceImpl) GetProductsInStock(productId int) ([]domain.Stock, 
 	if productId < 0 {
 		return nil, errors.New("product_id cannot be less than 0")
 	}
-
-	if productId != 0 {
-		stocks, err := u.repo.GetProductsInStockById(productId)
+	if productId == 0 {
+		stocks, err := u.repo.GetStocks()
 		if err != nil {
 			return nil, err
 		}
+		for i, v := range stocks {
+			variants, err := u.repo.GetStocksVariants(v.StorageID)
+			if err != nil {
+				return nil, err
+			}
+			stocks[i].ProductVariants = variants
+		}
+
 		return stocks, nil
 	} else {
-		stocks, err := u.repo.GetProductsInStock()
+		stocks, err := u.repo.GetStocksByProductId(productId)
 		if err != nil {
 			return nil, err
 		}
+		for i, v := range stocks {
+			variants, err := u.repo.GetStocksVariants(v.StorageID)
+			if err != nil {
+				return nil, err
+			}
+			stocks[i].ProductVariants = variants
+		}
+
 		return stocks, nil
+
 	}
 }
 
