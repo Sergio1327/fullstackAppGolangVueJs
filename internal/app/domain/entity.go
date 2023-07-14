@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+//Структрура продукта
 type Product struct {
 	ProductID  int       `json:"product_id"`
 	Name       string    `json:"name"`
@@ -14,7 +15,7 @@ type Product struct {
 	Tags       string    `json:"tags"`
 	Variants   []Variant `json:"variants"`
 }
-
+//Вариант Продукта
 type Variant struct {
 	ProductId    int             `json:"product_id" db:"product_id"`
 	VariantId    int             `json:"variant_id" db:"variant_id"`
@@ -24,7 +25,7 @@ type Variant struct {
 	CurrentPrice decimal.Decimal `db:"price"`
 	InStorages   []int
 }
-
+//Структура для вставки цены продукта
 type ProductPrice struct {
 	PriceId   int
 	VariantId int             `json:"variant_id"`
@@ -33,6 +34,7 @@ type ProductPrice struct {
 	Price     decimal.Decimal `json:"price"`
 }
 
+//Структура для вставки продукта на склад
 type AddProductInStock struct {
 	VariantId int       `json:"variant_id" db:"variant_id"`
 	StorageId int       `json:"storage_id" db:"storage_id"`
@@ -46,13 +48,13 @@ type ProductInfo struct {
 	Descr     string `db:"description"`
 	Variants  []Variant
 }
-
+//струкьуоа склада
 type Stock struct {
 	StorageID       int    `db:"storage_id"`
 	StorageName     string `db:"name"`
 	ProductVariants []AddProductInStock
 }
-
+//Структура продажи
 type Sale struct {
 	SaleId      int             `db:"sales_id"`
 	ProductName string          `db:"name"`

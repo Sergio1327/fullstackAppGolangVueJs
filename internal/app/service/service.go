@@ -30,7 +30,7 @@ func NewProductUseCase(repo repository.ProductRepository) *ProductServiceImpl {
 		repo: repo,
 	}
 }
-
+//логика добавление продукта в базу
 func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
@@ -55,6 +55,8 @@ func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
 	return nil
 }
 
+
+//логика проверки цены и вставки в базу
 func (u *ProductServiceImpl) AddProductPrice(p *domain.ProductPrice) error {
 	tx, err := u.repo.TxBegin()
 	defer tx.Rollback()
@@ -101,7 +103,7 @@ func (u *ProductServiceImpl) AddProductPrice(p *domain.ProductPrice) error {
 	}
 	return nil
 }
-
+//Логика проверка продукта на складе и обновления или добавления на базу
 func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) error {
 
 	tx, err := u.repo.TxBegin()
@@ -132,7 +134,7 @@ func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) erro
 
 	return nil
 }
-
+//Логика получения всей информации о продукте и его вариантах по id 
 func (u *ProductServiceImpl) GetProductInfoById(id int) (domain.ProductInfo, error) {
 	if id == 0 || id < 0 {
 		return domain.ProductInfo{}, errors.New("id cannot be zero or less than 0")
@@ -161,6 +163,8 @@ func (u *ProductServiceImpl) GetProductInfoById(id int) (domain.ProductInfo, err
 	return productInfo, nil
 }
 
+
+//Логика получения списка продуктов по тегу и лимиту
 func (u *ProductServiceImpl) GetProductList(tag string, limit int) ([]domain.ProductInfo, error) {
 	if limit == 0 || limit < 0 {
 		limit = 3
@@ -214,6 +218,8 @@ func (u *ProductServiceImpl) GetProductList(tag string, limit int) ([]domain.Pro
 	}
 }
 
+
+//Логика получения всех складов и продуктов в ней или фильтрация по продукту
 func (u *ProductServiceImpl) GetProductsInStock(productId int) ([]domain.Stock, error) {
 	if productId < 0 {
 		return nil, errors.New("product_id cannot be less than 0")
@@ -249,7 +255,7 @@ func (u *ProductServiceImpl) GetProductsInStock(productId int) ([]domain.Stock, 
 
 	}
 }
-
+//Лоигка записи о покупке в базу
 func (u *ProductServiceImpl) Buy(p *domain.Sale) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
@@ -273,6 +279,8 @@ func (u *ProductServiceImpl) Buy(p *domain.Sale) error {
 	return nil
 }
 
+
+//Получение списка всех продаж или списка продаж по фильтрам	
 func (u *ProductServiceImpl) GetSales(sq *domain.SaleQuery) ([]domain.Sale, error) {
 	if sq.Limit == 0 {
 		sq.Limit = 3

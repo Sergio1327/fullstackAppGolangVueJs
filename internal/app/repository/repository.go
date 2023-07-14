@@ -62,6 +62,7 @@ func NewPostgresProductRepository(db *sqlx.DB) *PostgresProductRepository {
 	}
 }
 
+//вставка названия,описания,времени добавления и тегов в базу
 func (r *PostgresProductRepository) AddProduct(p *domain.Product) (int, error) {
 	var productId int
 	err := r.db.QueryRow("insert into products(name,description,added_at,tags) values ($1,$2,$3,$4) returning product_id",
@@ -72,7 +73,7 @@ func (r *PostgresProductRepository) AddProduct(p *domain.Product) (int, error) {
 	}
 	return productId, nil
 }
-
+//Добавление вариантов продукта в продукт по его id
 func (r *PostgresProductRepository) AddProductVariants(id int, v *domain.Variant) error {
 	_, err := r.db.Exec("insert into product_variants(product_id,weight,unit)values($1,$2,$3)", id, v.Weight, v.Unit)
 	if err != nil {
@@ -80,7 +81,7 @@ func (r *PostgresProductRepository) AddProductVariants(id int, v *domain.Variant
 	}
 	return nil
 }
-
+//Проверка наличия цен варианта продукта в указаный диапазон времени
 func (r *PostgresProductRepository) CheckExists(p *domain.ProductPrice) (int, error) {
 	var isExists int
 	err := r.db.Get(&isExists,
@@ -96,7 +97,7 @@ func (r *PostgresProductRepository) CheckExists(p *domain.ProductPrice) (int, er
 	log.Println(isExists)
 	return isExists, nil
 }
-
+//Обновление цены варианта продукта
 func (r *PostgresProductRepository) UpdateProductPrice(p *domain.ProductPrice, id int) error {
 	_, err := r.db.Exec("update product_prices set end_date=$1 where price_id=$2",
 		p.EndDate, id)
@@ -105,7 +106,7 @@ func (r *PostgresProductRepository) UpdateProductPrice(p *domain.ProductPrice, i
 	}
 	return nil
 }
-
+//Добавление цены варианта продукта в опеределенный диапазон времени
 func (r *PostgresProductRepository) AddProductPriceWithEndDate(p *domain.ProductPrice) error {
 	_, err := r.db.Exec("insert into product_prices(variant_id,price,start_date,end_date) values($1,$2,$3,$4)",
 		p.VariantId, p.Price, p.StartDate, p.EndDate)
@@ -115,6 +116,8 @@ func (r *PostgresProductRepository) AddProductPriceWithEndDate(p *domain.Product
 	}
 	return nil
 }
+
+//Вставка цены варианта продукта в базу
 func (r *PostgresProductRepository) AddProductPrice(p *domain.ProductPrice) error {
 	_, err := r.db.Exec("insert into product_prices(variant_id,price,start_date) values($1,$2,$3)",
 		p.VariantId, p.Price, p.StartDate)
@@ -124,7 +127,7 @@ func (r *PostgresProductRepository) AddProductPrice(p *domain.ProductPrice) erro
 	}
 	return nil
 }
-
+//Проверка есть ли на скалде продукт
 func (r *PostgresProductRepository) CheckProductsInStock(p *domain.AddProductInStock) (bool, error) {
 	var isExists bool
 	err := r.db.Get(&isExists, "select exists(select 1 from products_in_storage where variant_id=$1 and storage_id=$2)",
@@ -134,6 +137,8 @@ func (r *PostgresProductRepository) CheckProductsInStock(p *domain.AddProductInS
 	}
 	return isExists, nil
 }
+
+//Обновление колличества продукта
 func (r *PostgresProductRepository) UpdateProductsInstock(p *domain.AddProductInStock) error {
 	_, err := r.db.Exec("update products_in_storage set quantity=$1 where variant_id=$2 and storage_id=$3",
 		p.Quantity, p.VariantId, p.StorageId)
@@ -142,7 +147,7 @@ func (r *PostgresProductRepository) UpdateProductsInstock(p *domain.AddProductIn
 	}
 	return nil
 }
-
+//Добавление продукта на склад
 func (r *PostgresProductRepository) AddProductInStock(p *domain.AddProductInStock) error {
 	_, err := r.db.Exec("insert into products_in_storage(variant_id,storage_id,added_at,quantity) values ($1,$2,$3,$4)",
 		p.VariantId, p.StorageId, p.Added_at, p.Quantity)
@@ -152,6 +157,8 @@ func (r *PostgresProductRepository) AddProductInStock(p *domain.AddProductInStoc
 	return nil
 }
 
+
+//Получени информации о продукте
 func (r *PostgresProductRepository) GetProductInfo(id int, p *domain.ProductInfo) error {
 	err := r.db.Get(p, "select name,description from products where product_id=$1", id)
 	if err != nil {
@@ -160,6 +167,7 @@ func (r *PostgresProductRepository) GetProductInfo(id int, p *domain.ProductInfo
 	return nil
 }
 
+//Получение вариантов продукта по его id
 func (r *PostgresProductRepository) GetProductVariants(id int, v []domain.Variant, p *domain.ProductInfo) error {
 	err := r.db.Select(&v, "select variant_id,weight,unit from product_variants where product_id=$1", id)
 	if err != nil {
@@ -168,7 +176,7 @@ func (r *PostgresProductRepository) GetProductVariants(id int, v []domain.Varian
 	p.Variants = v
 	return nil
 }
-
+//Получение актуальной цены
 func (r *PostgresProductRepository) GetCurrentPrice(v *domain.Variant) error {
 	err := r.db.Get(&v.CurrentPrice, "select price from product_prices where variant_id=$1 and start_date<$2 and (end_date is null or end_date>$2)",
 		v.VariantId, time.Now())
@@ -178,6 +186,8 @@ func (r *PostgresProductRepository) GetCurrentPrice(v *domain.Variant) error {
 	return nil
 }
 
+
+//Нахождение id складов в которых находится продукт
 func (r *PostgresProductRepository) InStorages(v *domain.Variant) error {
 	var inStorages []int
 	err := r.db.Select(&inStorages, "SELECT storage_id FROM products_in_storage WHERE variant_id = $1", v.VariantId)
@@ -188,6 +198,7 @@ func (r *PostgresProductRepository) InStorages(v *domain.Variant) error {
 	return nil
 }
 
+//Поиск информации о продукте по его тегу
 func (r *PostgresProductRepository) GetProductsByTag(tag string, limit int) ([]domain.ProductInfo, error) {
 	var products []domain.ProductInfo
 	err := r.db.Select(&products, "select product_id,name,description from products where $1 = any (string_to_array(tags,',')) limit $2", tag, limit)
@@ -197,6 +208,8 @@ func (r *PostgresProductRepository) GetProductsByTag(tag string, limit int) ([]d
 	return products, nil
 }
 
+
+//Получение списка продуктов с лимитом
 func (r *PostgresProductRepository) GetProducts(limit int) ([]domain.ProductInfo, error) {
 	var products []domain.ProductInfo
 	err := r.db.Select(&products, "select product_id,name,description from products limit $1", limit)
@@ -206,6 +219,8 @@ func (r *PostgresProductRepository) GetProducts(limit int) ([]domain.ProductInfo
 	return products, nil
 }
 
+
+//Получение информации о складах
 func (r *PostgresProductRepository) GetStocks() ([]domain.Stock, error) {
 	var stocks []domain.Stock
 	err := r.db.Select(&stocks, "select  storage_id,name from storages")
@@ -214,6 +229,9 @@ func (r *PostgresProductRepository) GetStocks() ([]domain.Stock, error) {
 	}
 	return stocks, nil
 }
+
+
+//Получение информации о складах где есть определенный продукт
 func (r *PostgresProductRepository) GetStocksByProductId(id int) ([]domain.Stock, error) {
 	var stocks []domain.Stock
 	err := r.db.Select(&stocks, `
@@ -228,6 +246,8 @@ func (r *PostgresProductRepository) GetStocksByProductId(id int) ([]domain.Stock
 	}
 	return stocks, nil
 }
+
+//Получение вариантов продукта на складе
 func (r *PostgresProductRepository) GetStocksVariants(storageId int) ([]domain.AddProductInStock, error) {
 	var v []domain.AddProductInStock
 	err := r.db.Select(&v, "select variant_id,storage_id,added_at,quantity from products_in_storage where storage_id=$1 ", storageId)
@@ -237,6 +257,8 @@ func (r *PostgresProductRepository) GetStocksVariants(storageId int) ([]domain.A
 	return v, err
 }
 
+
+//Получение цены
 func (r *PostgresProductRepository) GetPrice(id int) (decimal.Decimal, error) {
 	var price decimal.Decimal
 	err := r.db.Get(&price, "select price from product_prices where variant_id = $1", id)
@@ -246,6 +268,8 @@ func (r *PostgresProductRepository) GetPrice(id int) (decimal.Decimal, error) {
 	return price, nil
 }
 
+
+//Запись о покупке в базу
 func (r *PostgresProductRepository) Buy(s *domain.Sale) error {
 	_, err := r.db.Exec("insert into sales(variant_id,storage_id,sold_at,quantity,total_price) values($1,$2,$3,$4,$5)",
 		s.VariantId, s.StorageId, s.SoldAt, s.Quantity, s.TotalPrice)
@@ -255,6 +279,8 @@ func (r *PostgresProductRepository) Buy(s *domain.Sale) error {
 	return nil
 }
 
+
+//Получение списка всех продаж
 func (r *PostgresProductRepository) GetSales(sq *domain.SaleQuery) ([]domain.Sale, error) {
 	var sales []domain.Sale
 	query := `select sales.sales_id, sales.variant_id, sales.storage_id, sales.sold_at, sales.quantity, sales.total_price,
@@ -272,6 +298,7 @@ func (r *PostgresProductRepository) GetSales(sq *domain.SaleQuery) ([]domain.Sal
 	return sales, nil
 }
 
+//Получение списка продаж по фильтрам
 func (r *PostgresProductRepository) GetSalesByFilters(sq *domain.SaleQuery) ([]domain.Sale, error) {
 	var sales []domain.Sale
 	query := `select sales.sales_id, sales.variant_id, sales.storage_id, sales.sold_at, sales.quantity, sales.total_price,

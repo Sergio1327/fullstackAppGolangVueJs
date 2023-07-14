@@ -20,6 +20,8 @@ func NewProductHandler(service service.ProductService) *ProductHandler {
 	}
 }
 
+//во всех обработчиках происходит проверка условий парсинга данных для реализации логики
+
 func (ph *ProductHandler) AddProduct(c *gin.Context) {
 	var product domain.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
