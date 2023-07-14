@@ -162,15 +162,49 @@ func (u *ProductServiceImpl) GetProductList(tag string, limit int) ([]domain.Pro
 		limit = 3
 	}
 	if tag != "" {
-		products, err := u.repo.GetProductListByTag(tag, limit)
+		products, err := u.repo.GetProductsByTag(tag, limit)
 		if err != nil {
 			return nil, err
 		}
+		for i := range products {
+			err := u.repo.GetProductVariants(products[i].ProductId, products[i].Variants, &products[i])
+			if err != nil {
+				return nil, err
+			}
+			variants := products[i].Variants
+			for j := range variants {
+				err := u.repo.GetCurrentPrice(&variants[j])
+				if err != nil {
+					return nil, err
+				}
+				err = u.repo.InStorages(&variants[j])
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 		return products, nil
 	} else {
-		products, err := u.repo.GetProductList(limit)
+		products, err := u.repo.GetProducts(limit)
 		if err != nil {
 			return nil, err
+		}
+		for i := range products {
+			err := u.repo.GetProductVariants(products[i].ProductId, products[i].Variants, &products[i])
+			if err != nil {
+				return nil, err
+			}
+			variants := products[i].Variants
+			for j := range variants {
+				err := u.repo.GetCurrentPrice(&variants[j])
+				if err != nil {
+					return nil, err
+				}
+				err = u.repo.InStorages(&variants[j])
+				if err != nil {
+					return nil, err
+				}
+			}
 		}
 		return products, nil
 	}
