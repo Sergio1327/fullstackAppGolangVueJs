@@ -48,19 +48,19 @@ type ProductInfo struct {
 }
 
 type Stock struct {
-	StorageID   int	`db:"storage_id"`
-	StorageName string	`db:"name"`
-	ProductVariants    []AddProductInStock	
+	StorageID       int    `db:"storage_id"`
+	StorageName     string `db:"name"`
+	ProductVariants []AddProductInStock
 }
 
 type Sale struct {
-	SaleId      int
-	VariantId   int `json:"variant_id"`
-	StorageId   int `json:"storage_id"`
-	SoldAt      time.Time
-	Quantity    int `json:"quantity"`
-	TotalPrice  decimal.Decimal
-	ProductName string
+	SaleId      int             `db:"sales_id"`
+	ProductName string          `db:"name"`
+	VariantId   int             `json:"variant_id" db:"variant_id"`
+	StorageId   int             `json:"storage_id" db:"storage_id"`
+	SoldAt      time.Time       `db:"sold_at"`
+	Quantity    int             `json:"quantity" db:"quantity"`
+	TotalPrice  decimal.Decimal `db:"total_price"`
 }
 type SaleQuery struct {
 	StartDate   time.Time `json:"start_date"`

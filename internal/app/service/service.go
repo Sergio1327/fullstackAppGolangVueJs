@@ -6,6 +6,8 @@ import (
 	"go-back/internal/app/repository"
 	"strconv"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type ProductService interface {
@@ -42,8 +44,6 @@ func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
 	productId, err := u.repo.AddProduct(p)
 	if err != nil {
 		return err
-	} else {
-		tx.Commit()
 	}
 	for _, v := range p.Variants {
 		err := u.repo.AddProductVariants(productId, &v)
@@ -51,6 +51,7 @@ func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
 			return err
 		}
 	}
+	tx.Commit()
 	return nil
 }
 
@@ -90,6 +91,7 @@ func (u *ProductServiceImpl) AddProductPrice(p *domain.ProductPrice) error {
 			if err != nil {
 				return err
 			}
+			tx.Commit()
 		}
 	} else {
 		err := u.repo.AddProductPrice(p)
@@ -119,11 +121,13 @@ func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) erro
 		if err != nil {
 			return err
 		}
+		tx.Commit()
 	} else {
 		err := u.repo.AddProductInStock(p)
 		if err != nil {
 			return err
 		}
+		tx.Commit()
 	}
 
 	return nil
@@ -254,13 +258,17 @@ func (u *ProductServiceImpl) Buy(p *domain.Sale) error {
 	defer tx.Rollback()
 
 	if p.VariantId == 0 || p.StorageId == 0 || p.Quantity == 0 {
-		return errors.New("variant_id,storage_id pr quantity is empy")
+		return errors.New("variant_id,storage_id or quantity is empy")
 	}
+	p.SoldAt = time.Now()
+	price, err := u.repo.GetPrice(p.VariantId)
+	if err != nil {
+		return err
+	}
+	p.TotalPrice = price.Mul(decimal.NewFromInt(int64(p.Quantity)))
 	err = u.repo.Buy(p)
 	if err != nil {
 		return err
-	} else {
-		tx.Commit()
 	}
 	return nil
 }

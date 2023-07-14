@@ -38,6 +38,8 @@ type ProductRepository interface {
 	GetStocksVariants(storageId int) ([]domain.AddProductInStock, error)
 
 	Buy(s *domain.Sale) error
+	GetPrice(id int) (decimal.Decimal, error)
+
 	GetSales(sq *domain.SaleQuery) ([]domain.Sale, error)
 	GetSalesByFilters(sq *domain.SaleQuery) ([]domain.Sale, error)
 }
@@ -235,15 +237,17 @@ func (r *PostgresProductRepository) GetStocksVariants(storageId int) ([]domain.A
 	return v, err
 }
 
-func (r *PostgresProductRepository) Buy(s *domain.Sale) error {
-	s.SoldAt = time.Now()
+func (r *PostgresProductRepository) GetPrice(id int) (decimal.Decimal, error) {
 	var price decimal.Decimal
-	err := r.db.QueryRow("select price from product_prices where variant_id=$1", s.VariantId).Scan(&price)
+	err := r.db.Get(&price, "select price from product_prices where variant_id = $1", id)
 	if err != nil {
-		return err
+		return decimal.Decimal{}, nil
 	}
-	s.TotalPrice = price.Mul(decimal.NewFromInt(int64(s.Quantity)))
-	_, err = r.db.Exec("insert into sales(variant_id,storage_id,sold_at,quantity,total_price) values($1,$2,$3,$4,$5)",
+	return price, nil
+}
+
+func (r *PostgresProductRepository) Buy(s *domain.Sale) error {
+	_, err := r.db.Exec("insert into sales(variant_id,storage_id,sold_at,quantity,total_price) values($1,$2,$3,$4,$5)",
 		s.VariantId, s.StorageId, s.SoldAt, s.Quantity, s.TotalPrice)
 	if err != nil {
 		return err
@@ -260,19 +264,9 @@ func (r *PostgresProductRepository) GetSales(sq *domain.SaleQuery) ([]domain.Sal
 	inner join products AS products ON products.product_id = product_variants.product_id
 	where sales.sold_at >= $1 AND sales.sold_at <= $2 limit $3`
 
-	rows, err := r.db.Queryx(query, sq.StartDate, sq.EndDate, sq.Limit)
+	err := r.db.Select(&sales, query, sq.StartDate, sq.EndDate, sq.Limit)
 	if err != nil {
-		log.Println(err)
 		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var sale domain.Sale
-		err := rows.Scan(&sale.SaleId, &sale.VariantId, &sale.StorageId, &sale.SoldAt, &sale.Quantity, &sale.TotalPrice, &sale.ProductName)
-		if err != nil {
-			return nil, err
-		}
-		sales = append(sales, sale)
 	}
 
 	return sales, nil
@@ -286,7 +280,6 @@ func (r *PostgresProductRepository) GetSalesByFilters(sq *domain.SaleQuery) ([]d
 	inner join product_variants AS product_variants ON product_variants.variant_id = sales.variant_id
 	inner join products AS products ON products.product_id = product_variants.product_id
 	where sales.sold_at >= $1 AND sales.sold_at <= $2`
-
 	args := []interface{}{sq.StartDate, sq.EndDate}
 	if sq.StorageId != 0 && sq.ProductName == "" {
 		args = append(args, sq.StorageId)
@@ -298,22 +291,10 @@ func (r *PostgresProductRepository) GetSalesByFilters(sq *domain.SaleQuery) ([]d
 		args = append(args, sq.StorageId, sq.ProductName)
 		query += ` and storage_id = $3 and products.name = $4 limit $5`
 	}
-
 	args = append(args, sq.Limit)
-	rows, err := r.db.Queryx(query, args...)
-	if err != nil {
-		log.Println(err)
-		return nil, err
+	err := r.db.Select(&sales, query, args...)
+	if err!=nil{
+		return nil,err
 	}
-	defer rows.Close()
-	for rows.Next() {
-		var sale domain.Sale
-		err := rows.Scan(&sale.SaleId, &sale.VariantId, &sale.StorageId, &sale.SoldAt, &sale.Quantity, &sale.TotalPrice, &sale.ProductName)
-		if err != nil {
-			return nil, err
-		}
-		sales = append(sales, sale)
-	}
-
 	return sales, nil
 }
