@@ -11,14 +11,14 @@ import (
 )
 
 type ProductService interface {
-	AddProduct(p *domain.Product) error
-	AddProductPrice(pr *domain.ProductPrice) error
-	AddProductInStock(p *domain.AddProductInStock) error
-	GetProductInfoById(id int) (domain.ProductInfo, error)
-	GetProductList(tag string, limit int) ([]domain.ProductInfo, error)
-	GetProductsInStock(productId int) ([]domain.Stock, error)
-	Buy(p *domain.Sale) error
-	GetSales(sq *domain.SaleQuery) ([]domain.Sale, error)
+	AddProduct(p domain.Product) error
+	AddProductPrice(pr domain.ProductPrice) error
+	AddProductInStock(p domain.AddProductInStock) error
+	FindProductInfoById(id int) (domain.ProductInfo, error)
+	LoadProductList(tag string, limit int) ([]domain.ProductInfo, error)
+	LoadProductsInStock(productId int) ([]domain.Stock, error)
+	Buy(p domain.Sale) error
+	LoadSales(sq domain.SaleQuery) ([]domain.Sale, error)
 }
 
 type ProductServiceImpl struct {
@@ -30,8 +30,9 @@ func NewProductUseCase(repo repository.ProductRepository) *ProductServiceImpl {
 		repo: repo,
 	}
 }
-//логика добавление продукта в базу
-func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
+
+// логика добавление продукта в базу
+func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return err
@@ -41,23 +42,25 @@ func (u *ProductServiceImpl) AddProduct(p *domain.Product) error {
 	if p.Name == "" {
 		return errors.New("product_name cannot be empty")
 	}
-	productId, err := u.repo.AddProduct(p)
+	productId, err := u.repo.AddProduct(*tx, p)
 	if err != nil {
 		return err
 	}
 	for _, v := range p.Variants {
-		err := u.repo.AddProductVariants(productId, &v)
+		err := u.repo.AddProductVariants(*tx, productId, v)
 		if err != nil {
 			return err
 		}
 	}
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-
-//логика проверки цены и вставки в базу
-func (u *ProductServiceImpl) AddProductPrice(p *domain.ProductPrice) error {
+// логика проверки цены и вставки в базу
+func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 	tx, err := u.repo.TxBegin()
 	defer tx.Rollback()
 	if err != nil {
@@ -80,31 +83,41 @@ func (u *ProductServiceImpl) AddProductPrice(p *domain.ProductPrice) error {
 	if err != nil {
 		return err
 	}
-	if p.EndDate != (time.Time{}) {
+	if p.EndDate.Valid {
 		if isExistsId > 0 {
-			p.EndDate = time.Now()
-			err := u.repo.UpdateProductPrice(p, isExistsId)
+			p.EndDate.Time = time.Now()
+			err := u.repo.UpdateProductPrice(*tx, p, isExistsId)
 			if err != nil {
 				return err
 			}
-			tx.Commit()
+
 		} else {
-			err := u.repo.AddProductPriceWithEndDate(p)
+			err := u.repo.AddProductPriceWithEndDate(*tx, p)
 			if err != nil {
 				return err
 			}
-			tx.Commit()
+
 		}
-	} else {
-		err := u.repo.AddProductPrice(p)
+		err := tx.Commit()
 		if err != nil {
 			return err
 		}
+	} else {
+		err := u.repo.AddProductPrice(*tx, p)
+		if err != nil {
+			return err
+		}
+		err = tx.Commit()
+		if err != nil {
+			return err
+		}
+
 	}
 	return nil
 }
-//Логика проверка продукта на складе и обновления или добавления на базу
-func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) error {
+
+// Логика проверка продукта на складе и обновления или добавления на базу
+func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error {
 
 	tx, err := u.repo.TxBegin()
 	if err != nil {
@@ -119,13 +132,13 @@ func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) erro
 		return err
 	}
 	if isExist {
-		err := u.repo.UpdateProductsInstock(p)
+		err := u.repo.UpdateProductsInstock(*tx, p)
 		if err != nil {
 			return err
 		}
 		tx.Commit()
 	} else {
-		err := u.repo.AddProductInStock(p)
+		err := u.repo.AddProductInStock(*tx, p)
 		if err != nil {
 			return err
 		}
@@ -134,103 +147,114 @@ func (u *ProductServiceImpl) AddProductInStock(p *domain.AddProductInStock) erro
 
 	return nil
 }
-//Логика получения всей информации о продукте и его вариантах по id 
-func (u *ProductServiceImpl) GetProductInfoById(id int) (domain.ProductInfo, error) {
+
+// Логика получения всей информации о продукте и его вариантах по id
+func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, error) {
 	if id == 0 || id < 0 {
 		return domain.ProductInfo{}, errors.New("id cannot be zero or less than 0")
 	}
 
-	var productInfo domain.ProductInfo
-	productInfo.ProductId = id
-	err := u.repo.GetProductInfo(id, &productInfo)
+	product, err := u.repo.LoadProductInfo(id)
 	if err != nil {
 		return domain.ProductInfo{}, err
 	}
-	err = u.repo.GetProductVariants(id, productInfo.Variants, &productInfo)
+	product.ProductId = id
+
+	product.Variants, err = u.repo.LoadProductVariants(product.ProductId)
 	if err != nil {
-		return domain.ProductInfo{}, nil
+		return domain.ProductInfo{}, err
 	}
-	for i := range productInfo.Variants {
-		err := u.repo.GetCurrentPrice(&productInfo.Variants[i])
-		if err != nil {
-			return domain.ProductInfo{}, nil
-		}
-		err = u.repo.InStorages(&productInfo.Variants[i])
+	for i, v := range product.Variants {
+		price, err := u.repo.LoadCurrentPrice(v.VariantId)
 		if err != nil {
 			return domain.ProductInfo{}, err
 		}
+		product.Variants[i].ProductId = id
+		product.Variants[i].CurrentPrice = price
+
+		inStorages, err := u.repo.InStorages(v.VariantId)
+		if err != nil {
+			return domain.ProductInfo{}, err
+		}
+		product.Variants[i].InStorages = inStorages
 	}
-	return productInfo, nil
+	return product, nil
 }
 
-
-//Логика получения списка продуктов по тегу и лимиту
-func (u *ProductServiceImpl) GetProductList(tag string, limit int) ([]domain.ProductInfo, error) {
+// Логика получения списка продуктов по тегу и лимиту
+func (u *ProductServiceImpl) LoadProductList(tag string, limit int) ([]domain.ProductInfo, error) {
 	if limit == 0 || limit < 0 {
 		limit = 3
 	}
 	if tag != "" {
-		products, err := u.repo.GetProductsByTag(tag, limit)
+		products, err := u.repo.FindProductsByTag(tag, limit)
 		if err != nil {
 			return nil, err
 		}
 		for i := range products {
-			err := u.repo.GetProductVariants(products[i].ProductId, products[i].Variants, &products[i])
+			vars, err := u.repo.LoadProductVariants(products[i].ProductId)
 			if err != nil {
 				return nil, err
 			}
+			products[i].Variants = vars
 			variants := products[i].Variants
 			for j := range variants {
-				err := u.repo.GetCurrentPrice(&variants[j])
+				price, err := u.repo.LoadCurrentPrice(variants[j].VariantId)
 				if err != nil {
 					return nil, err
 				}
-				err = u.repo.InStorages(&variants[j])
+				variants[j].ProductId = products[i].ProductId
+				variants[j].CurrentPrice = price
+				inStorages, err := u.repo.InStorages(variants[j].VariantId)
 				if err != nil {
 					return nil, err
 				}
+				variants[j].InStorages = inStorages
 			}
 		}
 		return products, nil
 	} else {
-		products, err := u.repo.GetProducts(limit)
+		products, err := u.repo.LoadProducts(limit)
 		if err != nil {
 			return nil, err
 		}
 		for i := range products {
-			err := u.repo.GetProductVariants(products[i].ProductId, products[i].Variants, &products[i])
+			vars, err := u.repo.LoadProductVariants(products[i].ProductId)
 			if err != nil {
 				return nil, err
 			}
+			products[i].Variants = vars
 			variants := products[i].Variants
 			for j := range variants {
-				err := u.repo.GetCurrentPrice(&variants[j])
+				price, err := u.repo.LoadCurrentPrice(variants[j].VariantId)
 				if err != nil {
 					return nil, err
 				}
-				err = u.repo.InStorages(&variants[j])
+				variants[j].ProductId = products[i].ProductId
+				variants[j].CurrentPrice = price
+				inStorages, err := u.repo.InStorages(variants[j].VariantId)
 				if err != nil {
 					return nil, err
 				}
+				variants[j].InStorages = inStorages
 			}
 		}
 		return products, nil
 	}
 }
 
-
-//Логика получения всех складов и продуктов в ней или фильтрация по продукту
-func (u *ProductServiceImpl) GetProductsInStock(productId int) ([]domain.Stock, error) {
+// Логика получения всех складов и продуктов в ней или фильтрация по продукту
+func (u *ProductServiceImpl) LoadProductsInStock(productId int) ([]domain.Stock, error) {
 	if productId < 0 {
 		return nil, errors.New("product_id cannot be less than 0")
 	}
 	if productId == 0 {
-		stocks, err := u.repo.GetStocks()
+		stocks, err := u.repo.LoadStocks()
 		if err != nil {
 			return nil, err
 		}
 		for i, v := range stocks {
-			variants, err := u.repo.GetStocksVariants(v.StorageID)
+			variants, err := u.repo.LoadStocksVariants(v.StorageID)
 			if err != nil {
 				return nil, err
 			}
@@ -239,12 +263,12 @@ func (u *ProductServiceImpl) GetProductsInStock(productId int) ([]domain.Stock, 
 
 		return stocks, nil
 	} else {
-		stocks, err := u.repo.GetStocksByProductId(productId)
+		stocks, err := u.repo.FindStocksByProductId(productId)
 		if err != nil {
 			return nil, err
 		}
 		for i, v := range stocks {
-			variants, err := u.repo.GetStocksVariants(v.StorageID)
+			variants, err := u.repo.LoadStocksVariants(v.StorageID)
 			if err != nil {
 				return nil, err
 			}
@@ -255,8 +279,9 @@ func (u *ProductServiceImpl) GetProductsInStock(productId int) ([]domain.Stock, 
 
 	}
 }
-//Лоигка записи о покупке в базу
-func (u *ProductServiceImpl) Buy(p *domain.Sale) error {
+
+// Логuка записи о покупке в базу
+func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return err
@@ -267,32 +292,31 @@ func (u *ProductServiceImpl) Buy(p *domain.Sale) error {
 		return errors.New("variant_id,storage_id or quantity is empy")
 	}
 	p.SoldAt = time.Now()
-	price, err := u.repo.GetPrice(p.VariantId)
+	price, err := u.repo.FindPrice(p.VariantId)
 	if err != nil {
 		return err
 	}
 	p.TotalPrice = price.Mul(decimal.NewFromInt(int64(p.Quantity)))
-	err = u.repo.Buy(p)
+	err = u.repo.Buy(*tx, p)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-
-//Получение списка всех продаж или списка продаж по фильтрам	
-func (u *ProductServiceImpl) GetSales(sq *domain.SaleQuery) ([]domain.Sale, error) {
+// Получение списка всех продаж или списка продаж по фильтрам
+func (u *ProductServiceImpl) LoadSales(sq domain.SaleQuery) ([]domain.Sale, error) {
 	if sq.Limit == 0 {
 		sq.Limit = 3
 	}
 	if sq.ProductName == "" && sq.StorageId == 0 {
-		sales, err := u.repo.GetSales(sq)
+		sales, err := u.repo.LoadSales(sq)
 		if err != nil {
 			return nil, err
 		}
 		return sales, nil
 	} else {
-		sales, err := u.repo.GetSalesByFilters(sq)
+		sales, err := u.repo.FindSalesByFilters(sq)
 		if err != nil {
 			return nil, err
 		}

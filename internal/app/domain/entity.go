@@ -1,21 +1,24 @@
 package domain
 
 import (
-	"github.com/shopspring/decimal"
+	"go-back/internal/tools/sqlnull"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
-//Структрура продукта
+// Структрура продукта
 type Product struct {
-	ProductID  int       `json:"product_id"`
-	Name       string    `json:"name"`
-	Descr      string    `json:"description"`
-	Addet_at   time.Time `json:"added_at"`
-	Removed_at time.Time `json:"removed_at"`
-	Tags       string    `json:"tags"`
-	Variants   []Variant `json:"variants"`
+	ProductID  int              `json:"product_id"`
+	Name       string           `json:"name"`
+	Descr      string           `json:"description"`
+	Addet_at   time.Time        `json:"added_at"`
+	Removed_at sqlnull.NullTime `json:"removed_at"`
+	Tags       string           `json:"tags"`
+	Variants   []Variant        `json:"variants"`
 }
-//Вариант Продукта
+
+// Вариант Продукта
 type Variant struct {
 	ProductId    int             `json:"product_id" db:"product_id"`
 	VariantId    int             `json:"variant_id" db:"variant_id"`
@@ -25,16 +28,17 @@ type Variant struct {
 	CurrentPrice decimal.Decimal `db:"price"`
 	InStorages   []int
 }
-//Структура для вставки цены продукта
+
+// Структура для вставки цены продукта
 type ProductPrice struct {
 	PriceId   int
-	VariantId int             `json:"variant_id"`
-	StartDate time.Time       `json:"start_date"`
-	EndDate   time.Time       `json:"end_date"`
-	Price     decimal.Decimal `json:"price"`
+	VariantId int              `json:"variant_id"`
+	StartDate time.Time        `json:"start_date"`
+	EndDate   sqlnull.NullTime `json:"end_date"`
+	Price     decimal.Decimal  `json:"price"`
 }
 
-//Структура для вставки продукта на склад
+// Структура для вставки продукта на склад
 type AddProductInStock struct {
 	VariantId int       `json:"variant_id" db:"variant_id"`
 	StorageId int       `json:"storage_id" db:"storage_id"`
@@ -48,13 +52,15 @@ type ProductInfo struct {
 	Descr     string `db:"description"`
 	Variants  []Variant
 }
-//струкьуоа склада
+
+// струкьуоа склада
 type Stock struct {
 	StorageID       int    `db:"storage_id"`
 	StorageName     string `db:"name"`
 	ProductVariants []AddProductInStock
 }
-//Структура продажи
+
+// Структура продажи
 type Sale struct {
 	SaleId      int             `db:"sales_id"`
 	ProductName string          `db:"name"`
