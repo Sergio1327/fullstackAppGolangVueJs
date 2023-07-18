@@ -66,7 +66,7 @@ func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 	c.JSON(http.StatusOK, "The product was succesfuly added in storage")
 }
 
-func (ph *ProductHandler) GetProductInfoById(c *gin.Context) {
+func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 	id := c.Param("id")
 	productId, err := strconv.Atoi(id)
 	if err != nil {
@@ -80,10 +80,9 @@ func (ph *ProductHandler) GetProductInfoById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, productInfo)
-
 }
 
-func (ph *ProductHandler) GetProductList(c *gin.Context) {
+func (ph *ProductHandler) LoadProductList(c *gin.Context) {
 	tag := c.Query("tag")
 	limitstr := c.Query("limit")
 	limit, err := strconv.Atoi(limitstr)
@@ -100,7 +99,7 @@ func (ph *ProductHandler) GetProductList(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
-func (ph *ProductHandler) GetProductsInStock(c *gin.Context) {
+func (ph *ProductHandler) LoadProductsInStock(c *gin.Context) {
 	id := c.Query("product_id")
 	if id == "" {
 		id = "0"
@@ -131,7 +130,7 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 	c.String(http.StatusOK, "the sale was added")
 }
 
-func (ph *ProductHandler) GetSales(c *gin.Context) {
+func (ph *ProductHandler) LoadSales(c *gin.Context) {
 	var salequery domain.SaleQuery
 	if err := c.ShouldBindJSON(&salequery); err != nil {
 		c.String(http.StatusBadRequest, err.Error())

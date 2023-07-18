@@ -7,73 +7,76 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Структрура продукта
+// Структрура продукта,пресдавляет с собой информацию о продукте который нужно внести в базу
 type Product struct {
-	ProductID  int              `json:"product_id"`
-	Name       string           `json:"name"`
-	Descr      string           `json:"description"`
-	Addet_at   time.Time        `json:"added_at"`
-	Removed_at sqlnull.NullTime `json:"removed_at"`
-	Tags       string           `json:"tags"`
-	Variants   []Variant        `json:"variants"`
+	ProductID  int              `json:"product_id"`  // Id продукта
+	Name       string           `json:"name"`        // Название продукта
+	Descr      string           `json:"description"` // Описание продукта
+	Addet_at   time.Time        `json:"added_at"`    //Дата добавления продукта
+	Removed_at sqlnull.NullTime `json:"removed_at"`  // дата удаления продукта
+	Tags       string           `json:"tags"`        //теги продукта
+	Variants   []Variant        `json:"variants"`    //	Список вариантов продукта
 }
 
-// Вариант Продукта
+// Структура варианта, продукта представляем с собой информацию о продукте который нужно внести в базу
 type Variant struct {
-	ProductId    int             `json:"product_id" db:"product_id"`
-	VariantId    int             `json:"variant_id" db:"variant_id"`
-	Weight       int             `json:"weight" db:"weight"`
-	Unit         string          `json:"unit" db:"unit"`
-	Added_at     time.Time       `json:"added_at" db:"added_at"`
-	CurrentPrice decimal.Decimal `db:"price"`
-	InStorages   []int
+	ProductId    int             `json:"product_id" db:"product_id"` //id продука
+	VariantId    int             `json:"variant_id" db:"variant_id"` //id конкретного варианта продукта
+	Weight       int             `json:"weight" db:"weight"`         // масса или вес продукта
+	Unit         string          `json:"unit" db:"unit"`             //единица измерения
+	Added_at     time.Time       `json:"added_at" db:"added_at"`     // дата добавления определенного варианта
+	CurrentPrice decimal.Decimal `db:"price"`                        //актуальная цена
+	InStorages   []int           `json:"in_storages"`                //список id складов в которых есть этот вариант
 }
 
 // Структура для вставки цены продукта
 type ProductPrice struct {
-	PriceId   int
-	VariantId int              `json:"variant_id"`
-	StartDate time.Time        `json:"start_date"`
-	EndDate   sqlnull.NullTime `json:"end_date"`
-	Price     decimal.Decimal  `json:"price"`
+	PriceId   int              //id цены продукта
+	VariantId int              `json:"variant_id"` //id варианта продука
+	StartDate time.Time        `json:"start_date"` // дата начала цены
+	EndDate   sqlnull.NullTime `json:"end_date"`   //дата конца цены
+	Price     decimal.Decimal  `json:"price"`      //цена продукта
 }
 
 // Структура для вставки продукта на склад
 type AddProductInStock struct {
-	VariantId int       `json:"variant_id" db:"variant_id"`
-	StorageId int       `json:"storage_id" db:"storage_id"`
-	Added_at  time.Time `json:"added_at" db:"added_at" `
-	Quantity  int       `json:"quantity" db:"quantity"`
+	VariantId int       `json:"variant_id" db:"variant_id"` //id варианта продукта
+	StorageId int       `json:"storage_id" db:"storage_id"` //id склада куда будет помещен этот продукт
+	Added_at  time.Time `json:"added_at" db:"added_at" `    //дата добавления продукта на склад
+	Quantity  int       `json:"quantity" db:"quantity"`     //кол-во продукта добавленного на склад
 }
 
+// Структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {
-	ProductId int    `db:"product_id"`
-	Name      string `db:"name"`
-	Descr     string `db:"description"`
-	Variants  []Variant
+	ProductId int       `db:"product_id"`  //id продукта
+	Name      string    `db:"name"`        //название продукта
+	Descr     string    `db:"description"` //описание продукта
+	Variants  []Variant //список вариантов продукта
 }
 
-// струкьуоа склада
+// структура склада
 type Stock struct {
-	StorageID       int    `db:"storage_id"`
-	StorageName     string `db:"name"`
-	ProductVariants []AddProductInStock
+	StorageID       int                 `db:"storage_id"` //id склада
+	StorageName     string              `db:"name"`       //название склада
+	ProductVariants []AddProductInStock //список продуктов на данном складе
 }
 
 // Структура продажи
 type Sale struct {
-	SaleId      int             `db:"sales_id"`
-	ProductName string          `db:"name"`
-	VariantId   int             `json:"variant_id" db:"variant_id"`
-	StorageId   int             `json:"storage_id" db:"storage_id"`
-	SoldAt      time.Time       `db:"sold_at"`
-	Quantity    int             `json:"quantity" db:"quantity"`
-	TotalPrice  decimal.Decimal `db:"total_price"`
+	SaleId      int                `db:"sales_id"`                     //id продажи
+	ProductName sqlnull.NullString `db:"name"`                         //id продукта
+	VariantId   int                `json:"variant_id" db:"variant_id"` //id варианта продукта
+	StorageId   int                `json:"storage_id" db:"storage_id"` //id склада из которого произошла продажа продукта
+	SoldAt      time.Time          `db:"sold_at"`                      //дата продажи
+	Quantity    int                `json:"quantity" db:"quantity"`     //кол-во проданного продукта
+	TotalPrice  decimal.Decimal    `db:"total_price"`                  //общая стоимость с учетом кол-ва продукта
 }
+
+// фильтры продаж по которым нужно вывести информацию
 type SaleQuery struct {
-	StartDate   time.Time `json:"start_date"`
-	EndDate     time.Time `json:"end_date"`
-	Limit       int       `json:"limit"`
-	StorageId   int       `json:"storage_id"`
-	ProductName string    `json:"product_name"`
+	StartDate   time.Time          `json:"start_date"`   //дата начала продаж(обязательные поля)
+	EndDate     time.Time          `json:"end_date"`     //дата конца прдаж (обязательные поля)
+	Limit       sqlnull.NullInt64  `json:"limit"`        //лимит вывода продаж
+	StorageId   sqlnull.NullInt64  `json:"storage_id"`   //id склада
+	ProductName sqlnull.NullString `json:"product_name"` //название продукта
 }

@@ -29,11 +29,11 @@ func main() {
 	r.POST("/product/add", handler.AddProduct)
 	r.POST("/product/price", handler.AddProductPrice)
 	r.POST("/product/add/stock", handler.AddProductInStock)
-	r.GET("/product/:id", handler.GetProductInfoById)
-	r.GET("/product_list", handler.GetProductList)
-	r.GET("/stock", handler.GetProductsInStock)
+	r.GET("/product/:id", handler.FindProductInfoById)
+	r.GET("/product_list", handler.LoadProductList)
+	r.GET("/stock", handler.LoadProductsInStock)
 	r.POST("/buy", handler.Buy)
-	r.POST("/sales", handler.GetSales)
+	r.POST("/sales", handler.LoadSales)
 
 	//запуск сервера
 	err = r.Run(":8080")

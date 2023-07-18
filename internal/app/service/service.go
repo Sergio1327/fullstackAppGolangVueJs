@@ -98,20 +98,17 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 			}
 
 		}
-		err := tx.Commit()
-		if err != nil {
-			return err
-		}
+
 	} else {
 		err := u.repo.AddProductPrice(*tx, p)
 		if err != nil {
 			return err
 		}
-		err = tx.Commit()
-		if err != nil {
-			return err
-		}
 
+	}
+	err = tx.Commit()
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -136,15 +133,17 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 		if err != nil {
 			return err
 		}
-		tx.Commit()
+
 	} else {
 		err := u.repo.AddProductInStock(*tx, p)
 		if err != nil {
 			return err
 		}
-		tx.Commit()
 	}
-
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -301,15 +300,19 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	if err != nil {
 		return err
 	}
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // Получение списка всех продаж или списка продаж по фильтрам
 func (u *ProductServiceImpl) LoadSales(sq domain.SaleQuery) ([]domain.Sale, error) {
-	if sq.Limit == 0 {
-		sq.Limit = 3
+	if !sq.Limit.Valid && sq.Limit.Int64 == 0 {
+		sq.Limit.Int64 = 3
 	}
-	if sq.ProductName == "" && sq.StorageId == 0 {
+	if !sq.ProductName.Valid && !sq.StorageId.Valid {
 		sales, err := u.repo.LoadSales(sq)
 		if err != nil {
 			return nil, err

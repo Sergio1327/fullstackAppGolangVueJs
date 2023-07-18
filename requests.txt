@@ -65,7 +65,7 @@ localhost:8080/buy
 localhost:8080/sales
 запрос:
 {
-    "start_date":"2023-07-03T19:45:00+05:00",
+    "start_date":"2023-07-02T19:45:00+05:00",
     "end_date":"2023-07-12T11:31:36+05:00",
     "limit":2,
     "product_name":"Вода Hydrolife",
@@ -76,8 +76,7 @@ localhost:8080/sales
 
 {
     "start_date":"2023-07-02T19:45:00+05:00",
-    "end_date":"2023-07-12T11:32:36+05:00",
-    "limit":2,
+    "end_date":"2023-07-20T11:31:36+05:00",
     "product_name":"Вода Hydrolife"
 }
 

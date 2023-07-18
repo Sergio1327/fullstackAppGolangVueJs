@@ -302,18 +302,20 @@ func (r *PostgresProductRepository) FindSalesByFilters(sq domain.SaleQuery) ([]d
 	inner join product_variants AS product_variants ON product_variants.variant_id = sales.variant_id
 	inner join products AS products ON products.product_id = product_variants.product_id
 	where sales.sold_at >= $1 AND sales.sold_at <= $2`
+
 	args := []interface{}{sq.StartDate, sq.EndDate}
-	if sq.StorageId != 0 && sq.ProductName == "" {
-		args = append(args, sq.StorageId)
-		query += ` and sales.storage_id = $3 limit $4 `
-	} else if sq.StorageId == 0 && sq.ProductName != "" {
-		args = append(args, sq.ProductName)
-		query += ` and products.name = $3 limit $4`
+
+	if !sq.StorageId.Valid && sq.ProductName.Valid {
+		args = append(args, sq.ProductName.String)
+		query += ` and products.name = $3 limit $4 `
+	} else if sq.StorageId.Valid && !sq.ProductName.Valid {
+		args = append(args, sq.StorageId.Int64)
+		query += ` and sales.storage_id = $3 limit $4`
 	} else {
-		args = append(args, sq.StorageId, sq.ProductName)
+		args = append(args, sq.StorageId.Int64, sq.ProductName.String)
 		query += ` and storage_id = $3 and products.name = $4 limit $5`
 	}
-	args = append(args, sq.Limit)
+	args = append(args, sq.Limit.Int64)
 	err := r.db.Select(&sales, query, args...)
 	if err != nil {
 		return nil, err
