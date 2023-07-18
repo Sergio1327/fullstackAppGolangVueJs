@@ -42,12 +42,12 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	if p.Name == "" {
 		return errors.New("product_name cannot be empty")
 	}
-	productId, err := u.repo.AddProduct(*tx, p)
+	productId, err := u.repo.AddProduct(tx, p)
 	if err != nil {
 		return err
 	}
 	for _, v := range p.Variants {
-		err := u.repo.AddProductVariants(*tx, productId, v)
+		err := u.repo.AddProductVariants(tx, productId, v)
 		if err != nil {
 			return err
 		}
@@ -86,13 +86,13 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 	if p.EndDate.Valid {
 		if isExistsId > 0 {
 			p.EndDate.Time = time.Now()
-			err := u.repo.UpdateProductPrice(*tx, p, isExistsId)
+			err := u.repo.UpdateProductPrice(tx, p, isExistsId)
 			if err != nil {
 				return err
 			}
 
 		} else {
-			err := u.repo.AddProductPriceWithEndDate(*tx, p)
+			err := u.repo.AddProductPriceWithEndDate(tx, p)
 			if err != nil {
 				return err
 			}
@@ -100,7 +100,7 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 		}
 
 	} else {
-		err := u.repo.AddProductPrice(*tx, p)
+		err := u.repo.AddProductPrice(tx, p)
 		if err != nil {
 			return err
 		}
@@ -129,13 +129,13 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 		return err
 	}
 	if isExist {
-		err := u.repo.UpdateProductsInstock(*tx, p)
+		err := u.repo.UpdateProductsInstock(tx, p)
 		if err != nil {
 			return err
 		}
 
 	} else {
-		err := u.repo.AddProductInStock(*tx, p)
+		err := u.repo.AddProductInStock(tx, p)
 		if err != nil {
 			return err
 		}
@@ -296,7 +296,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 		return err
 	}
 	p.TotalPrice = price.Mul(decimal.NewFromInt(int64(p.Quantity)))
-	err = u.repo.Buy(*tx, p)
+	err = u.repo.Buy(tx, p)
 	if err != nil {
 		return err
 	}
