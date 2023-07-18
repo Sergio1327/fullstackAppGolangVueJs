@@ -18,14 +18,14 @@ func main() {
 	}
 	defer db.Close()
 
-	//инициализация слоев 
+	//инициализация слоев
 	repo := repository.NewPostgresProductRepository(db)
 	useCase := service.NewProductUseCase(repo)
 	handler := rest.NewProductHandler(useCase)
 
 	r := gin.Default()
 
-//инициализация эндпоинтов и обработчиков
+	//инициализация эндпоинтов и обработчиков
 	r.POST("/product/add", handler.AddProduct)
 	r.POST("/product/price", handler.AddProductPrice)
 	r.POST("/product/add/stock", handler.AddProductInStock)
@@ -33,7 +33,7 @@ func main() {
 	r.GET("/product_list", handler.LoadProductList)
 	r.GET("/stock", handler.LoadProductsInStock)
 	r.POST("/buy", handler.Buy)
-	r.POST("/sales", handler.LoadSales)
+	r.POST("/sales", handler.FindSales)
 
 	//запуск сервера
 	err = r.Run(":8080")

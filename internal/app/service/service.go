@@ -16,7 +16,7 @@ type ProductService interface {
 	AddProductInStock(p domain.AddProductInStock) error
 	FindProductInfoById(id int) (domain.ProductInfo, error)
 	LoadProductList(tag string, limit int) ([]domain.ProductInfo, error)
-	LoadProductsInStock(productId int) ([]domain.Stock, error)
+	FindProductsInStock(productId int) ([]domain.Stock, error)
 	Buy(p domain.Sale) error
 	LoadSales(sq domain.SaleQuery) ([]domain.Sale, error)
 }
@@ -31,7 +31,7 @@ func NewProductUseCase(repo repository.ProductRepository) *ProductServiceImpl {
 	}
 }
 
-// логика добавление продукта в базу
+// AddProduct - логика добавление продукта в базу
 func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
@@ -59,7 +59,7 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	return nil
 }
 
-// логика проверки цены и вставки в базу
+// AddProductPrice - логика проверки цены и вставки в базу
 func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 	tx, err := u.repo.TxBegin()
 	defer tx.Rollback()
@@ -113,7 +113,7 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 	return nil
 }
 
-// Логика проверка продукта на складе и обновления или добавления на базу
+// AddProductInStock - Логика проверка продукта на складе и обновления или добавления на базу
 func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error {
 
 	tx, err := u.repo.TxBegin()
@@ -147,7 +147,7 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 	return nil
 }
 
-// Логика получения всей информации о продукте и его вариантах по id
+// FindProductInfoById - Логика получения всей информации о продукте и его вариантах по id
 func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, error) {
 	if id == 0 || id < 0 {
 		return domain.ProductInfo{}, errors.New("id cannot be zero or less than 0")
@@ -159,12 +159,12 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 	}
 	product.ProductId = id
 
-	product.Variants, err = u.repo.LoadProductVariants(product.ProductId)
+	product.Variants, err = u.repo.FindProductVariants(product.ProductId)
 	if err != nil {
 		return domain.ProductInfo{}, err
 	}
 	for i, v := range product.Variants {
-		price, err := u.repo.LoadCurrentPrice(v.VariantId)
+		price, err := u.repo.FindCurrentPrice(v.VariantId)
 		if err != nil {
 			return domain.ProductInfo{}, err
 		}
@@ -180,7 +180,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 	return product, nil
 }
 
-// Логика получения списка продуктов по тегу и лимиту
+// LoadProductList - Логика получения списка продуктов по тегу и лимиту
 func (u *ProductServiceImpl) LoadProductList(tag string, limit int) ([]domain.ProductInfo, error) {
 	if limit == 0 || limit < 0 {
 		limit = 3
@@ -191,14 +191,14 @@ func (u *ProductServiceImpl) LoadProductList(tag string, limit int) ([]domain.Pr
 			return nil, err
 		}
 		for i := range products {
-			vars, err := u.repo.LoadProductVariants(products[i].ProductId)
+			vars, err := u.repo.FindProductVariants(products[i].ProductId)
 			if err != nil {
 				return nil, err
 			}
 			products[i].Variants = vars
 			variants := products[i].Variants
 			for j := range variants {
-				price, err := u.repo.LoadCurrentPrice(variants[j].VariantId)
+				price, err := u.repo.FindCurrentPrice(variants[j].VariantId)
 				if err != nil {
 					return nil, err
 				}
@@ -218,14 +218,14 @@ func (u *ProductServiceImpl) LoadProductList(tag string, limit int) ([]domain.Pr
 			return nil, err
 		}
 		for i := range products {
-			vars, err := u.repo.LoadProductVariants(products[i].ProductId)
+			vars, err := u.repo.FindProductVariants(products[i].ProductId)
 			if err != nil {
 				return nil, err
 			}
 			products[i].Variants = vars
 			variants := products[i].Variants
 			for j := range variants {
-				price, err := u.repo.LoadCurrentPrice(variants[j].VariantId)
+				price, err := u.repo.FindCurrentPrice(variants[j].VariantId)
 				if err != nil {
 					return nil, err
 				}
@@ -242,8 +242,8 @@ func (u *ProductServiceImpl) LoadProductList(tag string, limit int) ([]domain.Pr
 	}
 }
 
-// Логика получения всех складов и продуктов в ней или фильтрация по продукту
-func (u *ProductServiceImpl) LoadProductsInStock(productId int) ([]domain.Stock, error) {
+// FindProductsInStock - Логика получения всех складов и продуктов в ней или фильтрация по продукту
+func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock, error) {
 	if productId < 0 {
 		return nil, errors.New("product_id cannot be less than 0")
 	}
@@ -279,7 +279,7 @@ func (u *ProductServiceImpl) LoadProductsInStock(productId int) ([]domain.Stock,
 	}
 }
 
-// Логuка записи о покупке в базу
+// Buy - Логuка записи о покупке в базу
 func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
@@ -307,7 +307,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	return nil
 }
 
-// Получение списка всех продаж или списка продаж по фильтрам
+// LoadSales - Получение списка всех продаж или списка продаж по фильтрам
 func (u *ProductServiceImpl) LoadSales(sq domain.SaleQuery) ([]domain.Sale, error) {
 	if !sq.Limit.Valid && sq.Limit.Int64 == 0 {
 		sq.Limit.Int64 = 3
