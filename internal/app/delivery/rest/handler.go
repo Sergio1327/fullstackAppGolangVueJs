@@ -95,7 +95,7 @@ func (ph *ProductHandler) LoadProductList(c *gin.Context) {
 		limit = 3
 	}
 
-	products, err := ph.productService.LoadProductList(tag, limit)
+	products, err := ph.productService.FindProductList(tag, limit)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

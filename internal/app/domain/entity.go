@@ -46,6 +46,9 @@ type AddProductInStock struct {
 	Quantity  int       `json:"quantity" db:"quantity"`     //кол-во продукта добавленного на склад
 }
 
+func (a *AddProductInStock) IsNullFields() {
+}
+
 // ProductInfo - Структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {
 	ProductId int       `db:"product_id"`  //id продукта

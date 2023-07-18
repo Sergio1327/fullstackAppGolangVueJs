@@ -15,7 +15,7 @@ type ProductService interface {
 	AddProductPrice(pr domain.ProductPrice) error
 	AddProductInStock(p domain.AddProductInStock) error
 	FindProductInfoById(id int) (domain.ProductInfo, error)
-	LoadProductList(tag string, limit int) ([]domain.ProductInfo, error)
+	FindProductList(tag string, limit int) ([]domain.ProductInfo, error)
 	FindProductsInStock(productId int) ([]domain.Stock, error)
 	Buy(p domain.Sale) error
 	LoadSales(sq domain.SaleQuery) ([]domain.Sale, error)
@@ -40,7 +40,7 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	defer tx.Rollback()
 
 	if p.Name == "" {
-		return errors.New("product_name cannot be empty")
+		return errors.New("имя продукта не может быть пустым")
 	}
 	productId, err := u.repo.AddProduct(tx, p)
 	if err != nil {
@@ -62,21 +62,21 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 // AddProductPrice - логика проверки цены и вставки в базу
 func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 	tx, err := u.repo.TxBegin()
-	defer tx.Rollback()
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 	variantID := strconv.Itoa(p.VariantId)
 	if variantID == "" {
-		return errors.New("no product with this variant_id")
+		return errors.New("нет варианта продукта с таким id")
 	}
 
 	if p.Price.IsZero() {
-		return errors.New("price cant be zero or empty")
+		return errors.New("цена не может быть пустой или равна 0")
 	}
 
 	if p.StartDate == (time.Time{}) {
-		return errors.New("date cant be empty")
+		return errors.New("дата не может быть пустой")
 	}
 
 	isExistsId, err := u.repo.CheckExists(p)
@@ -121,9 +121,7 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 		return err
 	}
 	defer tx.Rollback()
-	if p.VariantId == 0 || p.StorageId == 0 || p.Quantity == 0 || p.Added_at == (time.Time{}) {
-		return errors.New("variant_id,storage_id,quantity or added_at is empty")
-	}
+	p.IsNullFields()
 	isExist, err := u.repo.CheckProductsInStock(p)
 	if err != nil {
 		return err
@@ -150,7 +148,7 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 // FindProductInfoById - Логика получения всей информации о продукте и его вариантах по id
 func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, error) {
 	if id == 0 || id < 0 {
-		return domain.ProductInfo{}, errors.New("id cannot be zero or less than 0")
+		return domain.ProductInfo{}, errors.New("id не может быть меньше или равен 0")
 	}
 
 	product, err := u.repo.LoadProductInfo(id)
@@ -181,7 +179,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 }
 
 // LoadProductList - Логика получения списка продуктов по тегу и лимиту
-func (u *ProductServiceImpl) LoadProductList(tag string, limit int) ([]domain.ProductInfo, error) {
+func (u *ProductServiceImpl) FindProductList(tag string, limit int) ([]domain.ProductInfo, error) {
 	if limit == 0 || limit < 0 {
 		limit = 3
 	}
@@ -245,7 +243,7 @@ func (u *ProductServiceImpl) LoadProductList(tag string, limit int) ([]domain.Pr
 // FindProductsInStock - Логика получения всех складов и продуктов в ней или фильтрация по продукту
 func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock, error) {
 	if productId < 0 {
-		return nil, errors.New("product_id cannot be less than 0")
+		return nil, errors.New("id продукта не может быть меньше нуля")
 	}
 	if productId == 0 {
 		stocks, err := u.repo.LoadStocks()
@@ -288,7 +286,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	defer tx.Rollback()
 
 	if p.VariantId == 0 || p.StorageId == 0 || p.Quantity == 0 {
-		return errors.New("variant_id,storage_id or quantity is empy")
+		return errors.New("variant_id,storage_id или quantity являются пустыми")
 	}
 	p.SoldAt = time.Now()
 	price, err := u.repo.FindPrice(p.VariantId)
