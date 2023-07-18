@@ -253,7 +253,7 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock,
 			return nil, err
 		}
 		for i, v := range stocks {
-			variants, err := u.repo.LoadStocksVariants(v.StorageID)
+			variants, err := u.repo.FindStocksVariants(v.StorageID)
 			if err != nil {
 				return nil, err
 			}
@@ -267,7 +267,7 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock,
 			return nil, err
 		}
 		for i, v := range stocks {
-			variants, err := u.repo.LoadStocksVariants(v.StorageID)
+			variants, err := u.repo.FindStocksVariants(v.StorageID)
 			if err != nil {
 				return nil, err
 			}

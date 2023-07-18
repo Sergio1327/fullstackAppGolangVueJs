@@ -35,7 +35,7 @@ type ProductRepository interface {
 
 	LoadStocks() ([]domain.Stock, error)
 	FindStocksByProductId(id int) ([]domain.Stock, error)
-	LoadStocksVariants(storageId int) ([]domain.AddProductInStock, error)
+	FindStocksVariants(storageId int) ([]domain.AddProductInStock, error)
 
 	Buy(tx sqlx.Tx, s domain.Sale) error
 	FindPrice(id int) (decimal.Decimal, error)
@@ -246,7 +246,7 @@ func (r *PostgresProductRepository) FindStocksByProductId(id int) ([]domain.Stoc
 }
 
 // LoadStocksVariants - Получение вариантов продукта на складе
-func (r *PostgresProductRepository) LoadStocksVariants(storageId int) ([]domain.AddProductInStock, error) {
+func (r *PostgresProductRepository) FindStocksVariants(storageId int) ([]domain.AddProductInStock, error) {
 	var v []domain.AddProductInStock
 	err := r.db.Select(&v, "select variant_id,storage_id,added_at,quantity from products_in_storage where storage_id=$1 ", storageId)
 	if err != nil {
