@@ -31,7 +31,7 @@ func NewProductUseCase(repo repository.ProductRepository) *ProductServiceImpl {
 	}
 }
 
-// AddProduct - логика добавление продукта в базу
+// AddProduct логика добавление продукта в базу
 func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
@@ -59,8 +59,9 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	return nil
 }
 
-// AddProductPrice - логика проверки цены и вставки в базу
+// AddProductPrice  логика проверки цены и вставки в базу
 func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
+
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return err
@@ -78,12 +79,15 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 	if p.StartDate == (time.Time{}) {
 		return errors.New("дата не может быть пустой")
 	}
-
+	//Проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
 	isExistsId, err := u.repo.CheckExists(p)
 	if err != nil {
 		return err
 	}
+	//Если пользователь ввел дату окончания цены то
+	//прооисходит проверка есть ли записи уже в базе
 	if p.EndDate.Valid {
+		//Если записи есть то вставляется дата окончания цены
 		if isExistsId > 0 {
 			p.EndDate.Time = time.Now()
 			err := u.repo.UpdateProductPrice(tx, p, isExistsId)
@@ -92,13 +96,14 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 			}
 
 		} else {
+			//Если же нет то просто добавляется запись в базу
 			err := u.repo.AddProductPriceWithEndDate(tx, p)
 			if err != nil {
 				return err
 			}
 
 		}
-
+		//Если пользователь не ввел дату окончания то просто вставляется новая запись в базу
 	} else {
 		err := u.repo.AddProductPrice(tx, p)
 		if err != nil {
@@ -107,13 +112,10 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 
 	}
 	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
-// AddProductInStock - Логика проверка продукта на складе и обновления или добавления на базу
+// AddProductInStock Логика проверка продукта на складе и обновления или добавления на базу
 func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error {
 
 	tx, err := u.repo.TxBegin()
@@ -121,7 +123,10 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 		return err
 	}
 	defer tx.Rollback()
-	p.IsNullFields()
+	err = p.IsNullFields()
+	if err != nil {
+		return err
+	}
 	isExist, err := u.repo.CheckProductsInStock(p)
 	if err != nil {
 		return err
@@ -139,13 +144,10 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 		}
 	}
 	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
-// FindProductInfoById - Логика получения всей информации о продукте и его вариантах по id
+// FindProductInfoById  Логика получения всей информации о продукте и его вариантах по id
 func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, error) {
 	if id == 0 || id < 0 {
 		return domain.ProductInfo{}, errors.New("id не может быть меньше или равен 0")
@@ -178,7 +180,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 	return product, nil
 }
 
-// LoadProductList - Логика получения списка продуктов по тегу и лимиту
+// LoadProductList  Логика получения списка продуктов по тегу и лимиту
 func (u *ProductServiceImpl) FindProductList(tag string, limit int) ([]domain.ProductInfo, error) {
 	if limit == 0 || limit < 0 {
 		limit = 3
@@ -240,7 +242,7 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) ([]domain.Pr
 	}
 }
 
-// FindProductsInStock - Логика получения всех складов и продуктов в ней или фильтрация по продукту
+// FindProductsInStock  Логика получения всех складов и продуктов в ней или фильтрация по продукту
 func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock, error) {
 	if productId < 0 {
 		return nil, errors.New("id продукта не может быть меньше нуля")
@@ -277,7 +279,7 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock,
 	}
 }
 
-// Buy - Логuка записи о покупке в базу
+// Buy  Логuка записи о покупке в базу
 func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
@@ -285,8 +287,9 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	}
 	defer tx.Rollback()
 
-	if p.VariantId == 0 || p.StorageId == 0 || p.Quantity == 0 {
-		return errors.New("variant_id,storage_id или quantity являются пустыми")
+	err = p.IsNullFields()
+	if err != nil {
+		return err
 	}
 	p.SoldAt = time.Now()
 	price, err := u.repo.FindPrice(p.VariantId)
@@ -299,15 +302,12 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 		return err
 	}
 	err = tx.Commit()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
-// LoadSales - Получение списка всех продаж или списка продаж по фильтрам
+// LoadSales  Получение списка всех продаж или списка продаж по фильтрам
 func (u *ProductServiceImpl) LoadSales(sq domain.SaleQuery) ([]domain.Sale, error) {
-	if !sq.Limit.Valid && sq.Limit.Int64 == 0 {
+	if !sq.Limit.Valid {
 		sq.Limit.Int64 = 3
 	}
 	if !sq.ProductName.Valid && !sq.StorageId.Valid {

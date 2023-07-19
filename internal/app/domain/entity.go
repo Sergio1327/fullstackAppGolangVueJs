@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"go-back/internal/tools/sqlnull"
 	"time"
 
@@ -46,7 +47,11 @@ type AddProductInStock struct {
 	Quantity  int       `json:"quantity" db:"quantity"`     //кол-во продукта добавленного на склад
 }
 
-func (a *AddProductInStock) IsNullFields() {
+func (a *AddProductInStock) IsNullFields() error {
+	if a.StorageId == 0 || a.VariantId == 0 || a.Added_at == (time.Time{}) || a.Quantity == 0 {
+		return errors.New("поля:variant_id,storage_id,added_at,quantity не должны быть пустыми")
+	}
+	return nil
 }
 
 // ProductInfo - Структура информации о продукте о котором нужно получить информацию
@@ -75,11 +80,18 @@ type Sale struct {
 	TotalPrice  decimal.Decimal    `db:"total_price"`                  //общая стоимость с учетом кол-ва продукта
 }
 
+func (s *Sale) IsNullFields() error {
+	if s.VariantId == 0 || s.StorageId == 0 || s.Quantity == 0 {
+		return errors.New("variant_id,storage_id или quantity являются пустыми")
+	}
+	return nil
+}
+
 // SaleQuery - фильтры продаж по которым нужно вывести информацию
 type SaleQuery struct {
-	StartDate   time.Time          `json:"start_date"`   //дата начала продаж(обязательные поля)
-	EndDate     time.Time          `json:"end_date"`     //дата конца прдаж (обязательные поля)
-	Limit       sqlnull.NullInt64  `json:"limit"`        //лимит вывода продаж
-	StorageId   sqlnull.NullInt64  `json:"storage_id"`   //id склада
-	ProductName sqlnull.NullString `json:"product_name"` //название продукта
+	StartDate   time.Time          `json:"start_date" db:"sold_at"`        //дата начала продаж(обязательные поля)
+	EndDate     time.Time          `json:"end_date"  db:"sold_at"`         //дата конца прдаж (обязательные поля)
+	Limit       sqlnull.NullInt64  `json:"limit" db:"limit"`               //лимит вывода продаж
+	StorageId   sqlnull.NullInt64  `json:"storage_id" db:"storage_id"`     //id склада
+	ProductName sqlnull.NullString `json:"product_name" db:"product_name"` //название продукта
 }
