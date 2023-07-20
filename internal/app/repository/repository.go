@@ -260,7 +260,7 @@ func (r *PostgresProductRepository) FindSalesByFilters(sq domain.SaleQuery) ([]d
 		"storage_id":   sq.StorageId,
 		"limit":        sq.Limit,
 	}
-	log.Println(query)
+
 	stmt, err := r.db.PrepareNamed(query)
 	if err != nil {
 		log.Print(err.Error())

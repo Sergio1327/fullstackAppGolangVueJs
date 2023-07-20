@@ -144,10 +144,12 @@ func (ph *ProductHandler) FindSales(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
+
 	sales, err := ph.productService.LoadSales(salequery)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
+	
 	c.JSON(http.StatusOK, sales)
 }
