@@ -8,7 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Product - cтруктура продукта для записи в базу
+// Product cтруктура продукта для записи в базу
 type Product struct {
 	ProductID  int              `json:"product_id"`  // Id продукта
 	Name       string           `json:"name"`        // Название продукта
@@ -19,7 +19,7 @@ type Product struct {
 	Variants   []Variant        `json:"variants"`    //	Список вариантов продукта
 }
 
-// Variant - Структура варианта, продукта представляем с собой информацию о продукте который нужно внести в базу
+// Variant структура варианта, продукта представляем с собой информацию о продукте который нужно внести в базу
 type Variant struct {
 	ProductId    int             `json:"product_id" db:"product_id"` //id продука
 	VariantId    int             `json:"variant_id" db:"variant_id"` //id конкретного варианта продукта
@@ -30,7 +30,7 @@ type Variant struct {
 	InStorages   []int           `json:"in_storages"`                //список id складов в которых есть этот вариант
 }
 
-// ProductPrice - Структура для вставки цены продукта
+// ProductPrice структура для вставки цены продукта
 type ProductPrice struct {
 	PriceId   int              //id цены продукта
 	VariantId int              `json:"variant_id"` //id варианта продука
@@ -39,7 +39,7 @@ type ProductPrice struct {
 	Price     decimal.Decimal  `json:"price"`      //цена продукта
 }
 
-// AddProductInStock - Структура для вставки продукта на склад
+// AddProductInStock  структура для вставки продукта на склад
 type AddProductInStock struct {
 	VariantId int       `json:"variant_id" db:"variant_id"` //id варианта продукта
 	StorageId int       `json:"storage_id" db:"storage_id"` //id склада куда будет помещен этот продукт
@@ -54,7 +54,7 @@ func (a *AddProductInStock) IsNullFields() error {
 	return nil
 }
 
-// ProductInfo - Структура информации о продукте о котором нужно получить информацию
+// ProductInfo структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {
 	ProductId int       `db:"product_id"`  //id продукта
 	Name      string    `db:"name"`        //название продукта
@@ -62,14 +62,14 @@ type ProductInfo struct {
 	Variants  []Variant //список вариантов продукта
 }
 
-// Stock - структура склада
+// Stock структура склада
 type Stock struct {
 	StorageID       int                 `db:"storage_id"` //id склада
 	StorageName     string              `db:"name"`       //название склада
 	ProductVariants []AddProductInStock //список продуктов на данном складе
 }
 
-// Sale - Структура продажи
+// Sale структура продажи
 type Sale struct {
 	SaleId      int                `db:"sales_id"`                     //id продажи
 	ProductName sqlnull.NullString `db:"name"`                         //id продукта
@@ -87,7 +87,7 @@ func (s *Sale) IsNullFields() error {
 	return nil
 }
 
-// SaleQuery - фильтры продаж по которым нужно вывести информацию
+// SaleQuery  фильтры продаж по которым нужно вывести информацию
 type SaleQuery struct {
 	StartDate   time.Time          `json:"start_date" db:"sold_at"`        //дата начала продаж(обязательные поля)
 	EndDate     time.Time          `json:"end_date"  db:"sold_at"`         //дата конца прдаж (обязательные поля)

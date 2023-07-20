@@ -54,7 +54,7 @@ func (ph *ProductHandler) AddProductPrice(c *gin.Context) {
 	c.JSON(http.StatusOK, "the price was added")
 }
 
-// AddProductInStock - парсит данные в структуру и добавляет продукт в склад через product.service
+// AddProductInStock парсит данные в структуру и добавляет продукт в склад через product.service
 func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 	var addProduct domain.AddProductInStock
 	if err := c.ShouldBindJSON(&addProduct); err != nil {
@@ -150,6 +150,6 @@ func (ph *ProductHandler) FindSales(c *gin.Context) {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, sales)
 }
