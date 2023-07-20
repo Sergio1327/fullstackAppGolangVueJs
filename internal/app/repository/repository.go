@@ -249,8 +249,8 @@ func (r *PostgresProductRepository) FindSalesByFilters(sq domain.SaleQuery) ([]d
 	JOIN product_variants pv ON (pv.variant_id = s.variant_id)
 	JOIN products p ON (p.product_id = pv.product_id)
 	WHERE s.sold_at > :start_date AND s.sold_at < :end_date
-	AND ( :product_name IS NULL OR p.name = :product_name )
-	AND ( :storage_id IS NULL OR s.storage_id = :storage_id ) 
+	AND ( cast(:product_name as varchar) IS NULL OR p.name = :product_name )
+	AND ( cast(:storage_id as integer) IS NULL OR s.storage_id = :storage_id ) 
 	LIMIT :limit`
 
 	params := map[string]interface{}{
@@ -266,6 +266,7 @@ func (r *PostgresProductRepository) FindSalesByFilters(sq domain.SaleQuery) ([]d
 		log.Print(err.Error())
 		return nil, err
 	}
+	defer stmt.Close()
 
 	err = stmt.Select(&sales, params)
 	return sales, err
