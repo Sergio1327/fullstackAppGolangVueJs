@@ -16,32 +16,32 @@ type ProductRepository interface {
 	AddProduct(tx *sqlx.Tx, p domain.Product) (int, error)
 	AddProductVariants(tx *sqlx.Tx, id int, v domain.Variant) error
 
-	CheckExists(p domain.ProductPrice) (int, error)
+	CheckExists(tx *sqlx.Tx, p domain.ProductPrice) (int, error)
 	UpdateProductPrice(tx *sqlx.Tx, p domain.ProductPrice, id int) error
 	AddProductPriceWithEndDate(tx *sqlx.Tx, p domain.ProductPrice) error
 	AddProductPrice(tx *sqlx.Tx, p domain.ProductPrice) error
 
-	CheckProductsInStock(p domain.AddProductInStock) (bool, error)
+	CheckProductsInStock(tx *sqlx.Tx, p domain.AddProductInStock) (bool, error)
 	UpdateProductsInstock(tx *sqlx.Tx, p domain.AddProductInStock) error
 	AddProductInStock(tx *sqlx.Tx, p domain.AddProductInStock) error
 
-	LoadProductInfo(id int) (domain.ProductInfo, error)
-	FindProductVariants(id int) ([]domain.Variant, error)
-	FindCurrentPrice(variantId int) (decimal.Decimal, error)
-	InStorages(id int) ([]int, error)
+	LoadProductInfo(tx *sqlx.Tx, id int) (domain.ProductInfo, error)
+	FindProductVariants(tx *sqlx.Tx, id int) ([]domain.Variant, error)
+	FindCurrentPrice(tx *sqlx.Tx, variantId int) (decimal.Decimal, error)
+	InStorages(tx *sqlx.Tx, id int) ([]int, error)
 
-	FindProductsByTag(tag string, limit int) ([]domain.ProductInfo, error)
-	LoadProducts(limit int) ([]domain.ProductInfo, error)
+	FindProductsByTag(tx *sqlx.Tx, tag string, limit int) ([]domain.ProductInfo, error)
+	LoadProducts(tx *sqlx.Tx, limit int) ([]domain.ProductInfo, error)
 
-	LoadStocks() ([]domain.Stock, error)
-	FindStocksByProductId(id int) ([]domain.Stock, error)
-	FindStocksVariants(storageId int) ([]domain.AddProductInStock, error)
+	LoadStocks(tx *sqlx.Tx) ([]domain.Stock, error)
+	FindStocksByProductId(tx *sqlx.Tx, id int) ([]domain.Stock, error)
+	FindStocksVariants(tx *sqlx.Tx, storageId int) ([]domain.AddProductInStock, error)
 
 	Buy(tx *sqlx.Tx, s domain.Sale) error
-	FindPrice(id int) (decimal.Decimal, error)
+	FindPrice(tx *sqlx.Tx, id int) (decimal.Decimal, error)
 
-	LoadSales(sq domain.SaleQuery) ([]domain.Sale, error)
-	FindSalesByFilters(sq domain.SaleQuery) ([]domain.Sale, error)
+	FindSales(tx *sqlx.Tx, sq domain.SaleQueryWithoutFilters) ([]domain.Sale, error)
+	FindSalesByFilters(tx *sqlx.Tx, sq domain.SaleQuery) ([]domain.Sale, error)
 }
 
 type PostgresProductRepository struct {
@@ -80,9 +80,9 @@ func (r *PostgresProductRepository) AddProductVariants(tx *sqlx.Tx, id int, v do
 }
 
 // CheckExists проверка наличия цен варианта продукта в указаный диапазон времени
-func (r *PostgresProductRepository) CheckExists(p domain.ProductPrice) (int, error) {
+func (r *PostgresProductRepository) CheckExists(tx *sqlx.Tx, p domain.ProductPrice) (int, error) {
 	var isExists int
-	err := r.db.Get(&isExists,
+	err := tx.Get(&isExists,
 		"select price_id from product_prices where variant_id=$1 and start_date=$2 and(end_date=$3 or end_date is null)",
 		p.VariantId, p.StartDate, p.EndDate)
 	if err != nil {
@@ -116,9 +116,9 @@ func (r *PostgresProductRepository) AddProductPrice(tx *sqlx.Tx, p domain.Produc
 }
 
 // CheckProductsInStock  проверка есть ли на скалде продукт
-func (r *PostgresProductRepository) CheckProductsInStock(p domain.AddProductInStock) (bool, error) {
+func (r *PostgresProductRepository) CheckProductsInStock(tx *sqlx.Tx, p domain.AddProductInStock) (bool, error) {
 	var isExists bool
-	err := r.db.Get(&isExists, "select exists(select 1 from products_in_storage where variant_id=$1 and storage_id=$2)",
+	err := tx.Get(&isExists, "select exists(select 1 from products_in_storage where variant_id=$1 and storage_id=$2)",
 		p.VariantId, p.StorageId)
 
 	return isExists, err
@@ -139,38 +139,38 @@ func (r *PostgresProductRepository) AddProductInStock(tx *sqlx.Tx, p domain.AddP
 }
 
 // LoadProductInfo получение информации о продукте
-func (r *PostgresProductRepository) LoadProductInfo(id int) (domain.ProductInfo, error) {
+func (r *PostgresProductRepository) LoadProductInfo(tx *sqlx.Tx, id int) (domain.ProductInfo, error) {
 	var p domain.ProductInfo
-	err := r.db.Get(&p, "select name,description from products where product_id=$1", id)
+	err := tx.Get(&p, "select name,description from products where product_id=$1", id)
 	return p, err
 }
 
 // FindProductVariants  получение вариантов продукта по его id
-func (r *PostgresProductRepository) FindProductVariants(id int) ([]domain.Variant, error) {
+func (r *PostgresProductRepository) FindProductVariants(tx *sqlx.Tx, id int) ([]domain.Variant, error) {
 	var v []domain.Variant
-	err := r.db.Select(&v, "select variant_id,weight,unit,added_at from product_variants where product_id=$1", id)
+	err := tx.Select(&v, "select variant_id,weight,unit,added_at from product_variants where product_id=$1", id)
 	return v, err
 }
 
 // FindCurrentPrice  получение актуальной цены
-func (r *PostgresProductRepository) FindCurrentPrice(variantId int) (decimal.Decimal, error) {
+func (r *PostgresProductRepository) FindCurrentPrice(tx *sqlx.Tx, variantId int) (decimal.Decimal, error) {
 	var price decimal.Decimal
-	err := r.db.Get(&price, "select price from product_prices where variant_id=$1 and start_date<$2 and (end_date is null or end_date>$2)",
+	err := tx.Get(&price, "select price from product_prices where variant_id=$1 and start_date<$2 and (end_date is null or end_date>$2)",
 		variantId, time.Now())
 	return price, err
 }
 
 // InStorages  нахождение id складов в которых находится продукт
-func (r *PostgresProductRepository) InStorages(id int) ([]int, error) {
+func (r *PostgresProductRepository) InStorages(tx *sqlx.Tx, id int) ([]int, error) {
 	var inStorages []int
-	err := r.db.Select(&inStorages, "SELECT storage_id FROM products_in_storage WHERE variant_id = $1", id)
+	err := tx.Select(&inStorages, "SELECT storage_id FROM products_in_storage WHERE variant_id = $1", id)
 	return inStorages, err
 }
 
 // FindProductsByTag  поиск информации о продукте по его тегу
-func (r *PostgresProductRepository) FindProductsByTag(tag string, limit int) ([]domain.ProductInfo, error) {
+func (r *PostgresProductRepository) FindProductsByTag(tx *sqlx.Tx, tag string, limit int) ([]domain.ProductInfo, error) {
 	var products []domain.ProductInfo
-	err := r.db.Select(&products, "select product_id,name,description from products where $1 = any (string_to_array(tags,',')) limit $2",
+	err := tx.Select(&products, "select product_id,name,description from products where $1 = any (string_to_array(tags,',')) limit $2",
 		tag, limit)
 	if err != nil {
 		return nil, err
@@ -179,24 +179,24 @@ func (r *PostgresProductRepository) FindProductsByTag(tag string, limit int) ([]
 }
 
 // LoadProducts  получение списка продуктов с лимитом
-func (r *PostgresProductRepository) LoadProducts(limit int) ([]domain.ProductInfo, error) {
+func (r *PostgresProductRepository) LoadProducts(tx *sqlx.Tx, limit int) ([]domain.ProductInfo, error) {
 	var products []domain.ProductInfo
-	err := r.db.Select(&products, "select product_id,name,description from products limit $1", limit)
+	err := tx.Select(&products, "select product_id,name,description from products limit $1", limit)
 
 	return products, err
 }
 
 // LoadStocks  Пплучение информации о складах
-func (r *PostgresProductRepository) LoadStocks() ([]domain.Stock, error) {
+func (r *PostgresProductRepository) LoadStocks(tx *sqlx.Tx) ([]domain.Stock, error) {
 	var stocks []domain.Stock
-	err := r.db.Select(&stocks, "select  storage_id,name from storages")
+	err := tx.Select(&stocks, "select  storage_id,name from storages")
 	return stocks, err
 }
 
 // FindStocksByProductId получение информации о складах где есть определенный продукт
-func (r *PostgresProductRepository) FindStocksByProductId(id int) ([]domain.Stock, error) {
+func (r *PostgresProductRepository) FindStocksByProductId(tx *sqlx.Tx, id int) ([]domain.Stock, error) {
 	var stocks []domain.Stock
-	err := r.db.Select(&stocks, `
+	err := tx.Select(&stocks, `
 	select s.storage_id ,s.name 
 	from storages s
 	join products_in_storage pis ON s.storage_id = pis.storage_id
@@ -208,16 +208,16 @@ func (r *PostgresProductRepository) FindStocksByProductId(id int) ([]domain.Stoc
 }
 
 // LoadStocksVariants  получение вариантов продукта на складе
-func (r *PostgresProductRepository) FindStocksVariants(storageId int) ([]domain.AddProductInStock, error) {
+func (r *PostgresProductRepository) FindStocksVariants(tx *sqlx.Tx, storageId int) ([]domain.AddProductInStock, error) {
 	var v []domain.AddProductInStock
-	err := r.db.Select(&v, "select variant_id,storage_id,added_at,quantity from products_in_storage where storage_id=$1 ", storageId)
+	err := tx.Select(&v, "select variant_id,storage_id,added_at,quantity from products_in_storage where storage_id=$1 ", storageId)
 	return v, err
 }
 
 // FindPrice  получение цены
-func (r *PostgresProductRepository) FindPrice(id int) (decimal.Decimal, error) {
+func (r *PostgresProductRepository) FindPrice(tx *sqlx.Tx, id int) (decimal.Decimal, error) {
 	var price decimal.Decimal
-	err := r.db.Get(&price, "select price from product_prices where variant_id = $1", id)
+	err := tx.Get(&price, "select price from product_prices where variant_id = $1", id)
 	return price, err
 }
 
@@ -229,21 +229,21 @@ func (r *PostgresProductRepository) Buy(tx *sqlx.Tx, s domain.Sale) error {
 }
 
 // LoadSales получение списка всех продаж
-func (r *PostgresProductRepository) LoadSales(sq domain.SaleQuery) ([]domain.Sale, error) {
+func (r *PostgresProductRepository) FindSales(tx *sqlx.Tx, sq domain.SaleQueryWithoutFilters) ([]domain.Sale, error) {
 	var sales []domain.Sale
 	query := `SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
-	FROM sales  s
+	FROM sales s
 	JOIN product_variants  pv ON (pv.variant_id = s.variant_id)
 	JOIN products  p ON (p.product_id = pv.product_id)
 	WHERE s.sold_at >= $1 AND s.sold_at <= $2
 	LIMIT $3`
 
-	err := r.db.Select(&sales, query, sq.StartDate, sq.EndDate, sq.Limit)
+	err := tx.Select(&sales, query, sq.StartDate, sq.EndDate, sq.Limit)
 	return sales, err
 }
 
 // FindSalesByFilters  получение списка продаж по фильтрам
-func (r *PostgresProductRepository) FindSalesByFilters(sq domain.SaleQuery) ([]domain.Sale, error) {
+func (r *PostgresProductRepository) FindSalesByFilters(tx *sqlx.Tx, sq domain.SaleQuery) ([]domain.Sale, error) {
 	var sales []domain.Sale
 
 	query := `SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
@@ -263,7 +263,7 @@ func (r *PostgresProductRepository) FindSalesByFilters(sq domain.SaleQuery) ([]d
 		"limit":        sq.Limit,
 	}
 
-	stmt, err := r.db.PrepareNamed(query)
+	stmt, err := tx.PrepareNamed(query)
 	if err != nil {
 		log.Print(err.Error())
 		return nil, err
