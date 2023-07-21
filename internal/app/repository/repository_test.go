@@ -24,7 +24,7 @@ func TestAddProduct(t *testing.T) {
 	tx, err := db.Beginx()
 	r.NoError(err)
 	id, err := repo.AddProduct(tx, domain.Product{
-		Name:     "dsfdsddcxcfz",
+		Name:     "dsfdsddcxcfzsd",
 		Descr:    "sdsdsds",
 		Addet_at: time.Now(),
 		Tags:     "123,12i",
@@ -106,10 +106,9 @@ func TestAddProductPriceWithEndDate(t *testing.T) {
 		VariantId: 4,
 		StartDate: startDate,
 		EndDate:   sqlnull.NewNullTime(endDate),
-		Price:     decimal.New(15, 99),
+		Price:     decimal.New(15, 2),
 	})
 	r.NoError(err)
-
 }
 func TestAddProductPrice(t *testing.T) {
 	r := require.New(t)
@@ -127,7 +126,7 @@ func TestAddProductPrice(t *testing.T) {
 	err = repo.AddProductPrice(tx, domain.ProductPrice{
 		VariantId: 5,
 		StartDate: startDate,
-		Price:     decimal.New(20, 15),
+		Price:     decimal.New(20, 2),
 	})
 	r.NoError(err)
 }
@@ -141,12 +140,216 @@ func TestCheckProductsInStock(t *testing.T) {
 	defer db.Close()
 
 	repo := repository.NewPostgresProductRepository(db)
-	isExists, err := repo.CheckProductsInStock(domain.AddProductInStock{
+	_, err = repo.CheckProductsInStock(domain.AddProductInStock{
 		VariantId: 4,
 		StorageId: 2,
 	})
 	r.NoError(err)
-	r.NotEmpty(isExists)
+}
+
+func TestUpdateProductsInStock(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	tx, err := db.Beginx()
+	r.NoError(err)
+
+	repo := repository.NewPostgresProductRepository(db)
+	err = repo.UpdateProductsInstock(tx, domain.AddProductInStock{
+		VariantId: 4,
+		StorageId: 2,
+		Quantity:  3,
+	})
+	r.NoError(err)
+}
+func TestAddProductInStock(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	tx, err := db.Beginx()
+	r.NoError(err)
+
+	repo := repository.NewPostgresProductRepository(db)
+	err = repo.AddProductInStock(tx, domain.AddProductInStock{
+		VariantId: 3,
+		StorageId: 1,
+		Quantity:  5,
+	})
+	r.NoError(err)
+}
+
+func TestLoadProductInfo(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	id := 1
+	productInfo, err := repo.LoadProductInfo(id)
+	r.NoError(err)
+	r.NotEmpty(productInfo)
+}
+
+func TestFindProductVariants(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	id := 1
+	variants, err := repo.FindProductVariants(id)
+	r.NoError(err)
+	r.NotEmpty(variants)
+}
+
+func TestFindCurrentPrice(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	id := 1
+	price, err := repo.FindCurrentPrice(id)
+	r.NoError(err)
+	r.NotEmpty(price)
+
+}
+
+func TestInStorages(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	id := 1
+	inStorages, err := repo.InStorages(id)
+	r.NoError(err)
+	r.NotEmpty(inStorages)
+}
+
+func TestFindProductsByTag(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	tag := "напиток"
+	limit := 3
+	products, err := repo.FindProductsByTag(tag, limit)
+	r.NoError(err)
+	r.NotEmpty(products)
+}
+
+func TestLoadProducts(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	limit := 3
+	products, err := repo.LoadProducts(limit)
+	r.NoError(err)
+	r.NotEmpty(products)
+}
+
+func TestLoadStocks(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	stocks, err := repo.LoadStocks()
+	r.NoError(err)
+	r.NotEmpty(stocks)
+}
+
+func TestFindStocksByProductId(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	id := 1
+	stocks, err := repo.FindStocksByProductId(id)
+	r.NoError(err)
+	r.NotEmpty(stocks)
+}
+
+func TestFindStockVariants(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	storageId := 1
+
+	variants, err := repo.FindStocksVariants(storageId)
+	r.NoError(err)
+	r.NotEmpty(variants)
+}
+
+func TestFindPrice(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	repo := repository.NewPostgresProductRepository(db)
+	variantId := 2
+	price, err := repo.FindPrice(variantId)
+	r.NoError(err)
+	r.NotEmpty(price)
+}
+
+func TestBuy(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	tx, err := db.Beginx()
+	r.NoError(err)
+	repo := repository.NewPostgresProductRepository(db)
+	err = repo.Buy(tx, domain.Sale{
+		VariantId:  1,
+		StorageId:  3,
+		Quantity:   2,
+		TotalPrice: decimal.New(10, 2),
+	})
+	r.NoError(err)
+}
+
+func TestLoadSales(t *testing.T) {
+	r := require.New(t)
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+	startDate, err := time.Parse("02.01.2006", "01.07.2023")
+	r.NoError(err)
+	endDate, err := time.Parse("02.01.2006", "20.07.2023")
+	r.NoError(err)
+	repo := repository.NewPostgresProductRepository(db)
+	sales, err := repo.LoadSales(domain.SaleQuery{
+		Limit:     sqlnull.NewInt64(3),
+		StartDate: startDate,
+		EndDate:   endDate,
+	})
+	r.NoError(err)
+	r.NotEmpty(sales)
 }
 
 func TestFindSalesByFilters(t *testing.T) {

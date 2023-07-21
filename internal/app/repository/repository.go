@@ -157,7 +157,6 @@ func (r *PostgresProductRepository) FindCurrentPrice(variantId int) (decimal.Dec
 	var price decimal.Decimal
 	err := r.db.Get(&price, "select price from product_prices where variant_id=$1 and start_date<$2 and (end_date is null or end_date>$2)",
 		variantId, time.Now())
-
 	return price, err
 }
 
@@ -173,6 +172,9 @@ func (r *PostgresProductRepository) FindProductsByTag(tag string, limit int) ([]
 	var products []domain.ProductInfo
 	err := r.db.Select(&products, "select product_id,name,description from products where $1 = any (string_to_array(tags,',')) limit $2",
 		tag, limit)
+	if err != nil {
+		return nil, err
+	}
 	return products, err
 }
 
