@@ -144,6 +144,9 @@ func TestCheckProductsInStock(t *testing.T) {
 	tx, err := repo.TxBegin()
 	r.NoError(err)
 
+	_, err = tx.Exec("insert into products_in_storage(variant_id,storage_id,quantity) values($1,$2,$3)", 4, 2, 10)
+	r.NoError(err)
+
 	_, err = repo.CheckProductsInStock(tx, domain.AddProductInStock{
 		VariantId: 4,
 		StorageId: 2,
@@ -158,7 +161,9 @@ func TestUpdateProductsInStock(t *testing.T) {
 	r.NoError(err)
 	defer db.Close()
 	tx, err := db.Beginx()
-	defer tx.Rollback()
+	r.NoError(err)
+
+	_, err = tx.Exec("insert into products_in_storage(variant_id,storage_id,quantity) values ($1,$2,$3)", 4, 2, 2)
 	r.NoError(err)
 
 	repo := repository.NewPostgresProductRepository(db)
@@ -199,7 +204,14 @@ func TestLoadProductInfo(t *testing.T) {
 	tx, err := repo.TxBegin()
 	r.NoError(err)
 
-	id := 1
+	id, err := repo.AddProduct(tx, domain.Product{
+		Name:     "Имя продукта",
+		Descr:    "Описание продукта",
+		Addet_at: time.Now(),
+		Tags:     "tag",
+	})
+	r.NoError(err)
+
 	productInfo, err := repo.LoadProductInfo(tx, id)
 	r.NoError(err)
 	r.NotEmpty(productInfo)
@@ -216,10 +228,16 @@ func TestFindProductVariants(t *testing.T) {
 	tx, err := repo.TxBegin()
 	r.NoError(err)
 
-	id := 1
+	id := 2
+	err = repo.AddProductVariants(tx, id, domain.Variant{
+		Weight: 500,
+		Unit:   "г",
+	})
+	r.NoError(err)
 	variants, err := repo.FindProductVariants(tx, id)
 	r.NoError(err)
 	r.NotEmpty(variants)
+	
 }
 
 func TestFindCurrentPrice(t *testing.T) {

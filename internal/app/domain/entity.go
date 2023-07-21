@@ -95,3 +95,9 @@ type SaleQuery struct {
 	StorageId   sqlnull.NullInt64  `json:"storage_id" db:"storage_id"`     //id склада
 	ProductName sqlnull.NullString `json:"product_name" db:"product_name"` //название продукта
 }
+
+type SaleQueryWithoutFilters struct {
+	StartDate time.Time        `json:"start_date" db:"sold_at"`
+	EndDate   time.Time        `json:"end_date" db:"sold_at"`
+	Limit     sqlnull.NullInt64 `json:"limit" db:"limit"`
+}

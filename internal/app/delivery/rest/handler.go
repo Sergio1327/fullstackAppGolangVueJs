@@ -145,7 +145,7 @@ func (ph *ProductHandler) FindSales(c *gin.Context) {
 		return
 	}
 
-	sales, err := ph.productService.LoadSales(salequery)
+	sales, err := ph.productService.FindSales(salequery)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
