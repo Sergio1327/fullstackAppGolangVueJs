@@ -1,6 +1,7 @@
 package repository_test
 
 import (
+	"errors"
 	"go-back/internal/app/domain"
 	"go-back/internal/app/repository"
 	"go-back/internal/pkg/database"
@@ -21,7 +22,7 @@ func TestAddProduct(t *testing.T) {
 	defer db.Close()
 	repo := repository.NewPostgresProductRepository(db)
 
-	tx, err := db.Beginx()
+	tx, err := repo.TxBegin()
 	r.NoError(err)
 	id, err := repo.AddProduct(tx, domain.Product{
 		Name:     "dsfdsddcxcfzsd",
@@ -41,10 +42,12 @@ func TestAddProductVariants(t *testing.T) {
 	r.NoError(err)
 	defer db.Close()
 
-	tx, err := db.Beginx()
+	repo := repository.NewPostgresProductRepository(db)
+
+	tx, err := repo.TxBegin()
 	defer tx.Rollback()
 	r.NoError(err)
-	repo := repository.NewPostgresProductRepository(db)
+
 	err = repo.AddProductVariants(tx, id, domain.Variant{
 		Weight: 440,
 		Unit:   "г",
@@ -60,6 +63,7 @@ func TestCheckExists(t *testing.T) {
 	r.NoError(err)
 	defer db.Close()
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
 
@@ -127,7 +131,7 @@ func TestAddProductPrice(t *testing.T) {
 	err = repo.AddProductPrice(tx, domain.ProductPrice{
 		VariantId: 5,
 		StartDate: startDate,
-		Price:     decimal.New(20, 2),
+		Price:     decimal.New(10, 2),
 	})
 	r.NoError(err)
 }
@@ -234,10 +238,11 @@ func TestFindProductVariants(t *testing.T) {
 		Unit:   "г",
 	})
 	r.NoError(err)
+
 	variants, err := repo.FindProductVariants(tx, id)
 	r.NoError(err)
 	r.NotEmpty(variants)
-	
+
 }
 
 func TestFindCurrentPrice(t *testing.T) {
@@ -292,6 +297,13 @@ func TestFindProductsByTag(t *testing.T) {
 	products, err := repo.FindProductsByTag(tx, tag, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
+
+	tag = "стирка"
+	limit = 1
+
+	products, err = repo.FindProductsByTag(tx, tag, limit)
+	r.NoError(err)
+	r.NotEmpty(products)
 }
 
 func TestLoadProducts(t *testing.T) {
@@ -309,6 +321,15 @@ func TestLoadProducts(t *testing.T) {
 	products, err := repo.LoadProducts(tx, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
+
+	limit = 1
+
+	products, err = repo.LoadProducts(tx, limit)
+	r.NoError(err)
+	r.NotEmpty(products)
+	if len(products) > 1 {
+		r.Error(errors.New("кол-во продуктов больше чем указано в лимите"))
+	}
 }
 
 func TestLoadStocks(t *testing.T) {
@@ -342,6 +363,11 @@ func TestFindStocksByProductId(t *testing.T) {
 	stocks, err := repo.FindStocksByProductId(tx, id)
 	r.NoError(err)
 	r.NotEmpty(stocks)
+
+	id = 2
+	stocks, err = repo.FindStocksByProductId(tx, id)
+	r.NoError(err)
+	r.NotEmpty(stocks)
 }
 
 func TestFindStockVariants(t *testing.T) {
@@ -356,6 +382,11 @@ func TestFindStockVariants(t *testing.T) {
 	storageId := 1
 
 	variants, err := repo.FindStocksVariants(tx, storageId)
+	r.NoError(err)
+	r.NotEmpty(variants)
+
+	storageId = 2
+	variants, err = repo.FindStocksVariants(tx, storageId)
 	r.NoError(err)
 	r.NotEmpty(variants)
 }
@@ -373,6 +404,11 @@ func TestFindPrice(t *testing.T) {
 
 	variantId := 2
 	price, err := repo.FindPrice(tx, variantId)
+	r.NoError(err)
+	r.NotEmpty(price)
+
+	variantId = 3
+	price, err = repo.FindPrice(tx, variantId)
 	r.NoError(err)
 	r.NotEmpty(price)
 }
@@ -395,7 +431,7 @@ func TestBuy(t *testing.T) {
 	r.NoError(err)
 }
 
-func TestLoadSales(t *testing.T) {
+func TestFindSales(t *testing.T) {
 	r := require.New(t)
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
