@@ -47,6 +47,7 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
 	if err != nil {
 		return err
 	}
+
 	for _, v := range p.Variants {
 		err := u.repo.AddProductVariants(tx, productId, v)
 		if err != nil {
@@ -69,6 +70,7 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 		return err
 	}
 	defer tx.Rollback()
+
 	variantID := strconv.Itoa(p.VariantId)
 	if variantID == "" {
 		return errors.New("нет варианта продукта с таким id")
@@ -124,6 +126,7 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 		return err
 	}
 	defer tx.Rollback()
+
 	err = p.IsNullFields()
 	if err != nil {
 		return err
@@ -156,6 +159,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 	if err != nil {
 		return domain.ProductInfo{}, nil
 	}
+
 	if id == 0 || id < 0 {
 		return domain.ProductInfo{}, errors.New("id не может быть меньше или равен 0")
 	}
@@ -194,9 +198,11 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) ([]domain.Pr
 	if err != nil {
 		return nil, err
 	}
+
 	if limit == 0 || limit < 0 {
 		limit = 3
 	}
+
 	if tag != "" {
 		products, err := u.repo.FindProductsByTag(tx, tag, limit)
 		if err != nil {
@@ -229,6 +235,7 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) ([]domain.Pr
 		if err != nil {
 			return nil, err
 		}
+
 		for i := range products {
 			vars, err := u.repo.FindProductVariants(tx, products[i].ProductId)
 			if err != nil {
@@ -260,9 +267,11 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock,
 	if err != nil {
 		return nil, err
 	}
+
 	if productId < 0 {
 		return nil, errors.New("id продукта не может быть меньше нуля")
 	}
+	
 	if productId == 0 {
 		stocks, err := u.repo.LoadStocks(tx)
 		if err != nil {
