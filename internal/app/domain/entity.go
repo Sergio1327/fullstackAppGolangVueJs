@@ -26,7 +26,7 @@ type Variant struct {
 	Weight       int             `json:"weight" db:"weight"`         // масса или вес продукта
 	Unit         string          `json:"unit" db:"unit"`             //единица измерения
 	Added_at     time.Time       `json:"added_at" db:"added_at"`     // дата добавления определенного варианта
-	CurrentPrice decimal.Decimal `db:"price"`                        //актуальная цена
+	CurrentPrice decimal.Decimal `json:"price" db:"price"`           //актуальная цена
 	InStorages   []int           `json:"in_storages"`                //список id складов в которых есть этот вариант
 }
 
@@ -49,7 +49,7 @@ type AddProductInStock struct {
 
 func (a *AddProductInStock) IsNullFields() error {
 	if a.StorageId == 0 || a.VariantId == 0 || a.Added_at == (time.Time{}) || a.Quantity == 0 {
-		return errors.New("поля:variant_id,storage_id,added_at,quantity не должны быть пустыми")
+		return errors.New("поля: variant_id, storage_id, added_at, quantity не должны быть пустыми")
 	}
 	return nil
 }
@@ -97,7 +97,7 @@ type SaleQuery struct {
 }
 
 type SaleQueryWithoutFilters struct {
-	StartDate time.Time        `json:"start_date" db:"sold_at"`
-	EndDate   time.Time        `json:"end_date" db:"sold_at"`
+	StartDate time.Time         `json:"start_date" db:"sold_at"`
+	EndDate   time.Time         `json:"end_date" db:"sold_at"`
 	Limit     sqlnull.NullInt64 `json:"limit" db:"limit"`
 }

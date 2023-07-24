@@ -20,66 +20,65 @@ func NewProductHandler(service service.ProductService) *ProductHandler {
 	}
 }
 
-// AddProduct обработчик который принимает json парсит данные в структуру и отправляет данные в метод AddProduct в слой сервиса
+// AddProduct добавление товара
 func (ph *ProductHandler) AddProduct(c *gin.Context) {
 	var product domain.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, "Введены некоректные данные")
 		return
 	}
 
-	err := ph.productService.AddProduct(product)
+	productId, err := ph.productService.AddProduct(product)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, "Не удалось добавить продукт")
 		log.Println(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, "the product was added")
+	c.JSON(http.StatusOK, productId)
 }
 
-// AddProductPrice обработчик который принимает json парсит данные в структуру и отправляет данные в
-// метод productService.AddProductPrice
+// AddProductPrice добавляет цену продукта
 func (ph *ProductHandler) AddProductPrice(c *gin.Context) {
 	var productPrice domain.ProductPrice
 	if err := c.ShouldBindJSON(&productPrice); err != nil {
-		c.String(http.StatusBadRequest, err.Error())
+		c.String(http.StatusBadRequest, "Введенны некоректные данные")
 		return
 	}
 	err := ph.productService.AddProductPrice(productPrice)
 	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
+		c.String(http.StatusBadRequest, "Не удалось добавить цену продукта")
 		return
 	}
 	c.JSON(http.StatusOK, "the price was added")
 }
 
-// AddProductInStock парсит данные в структуру и добавляет продукт в склад через product.service
+// AddProductInStock добавляет продукт в склад
 func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 	var addProduct domain.AddProductInStock
 	if err := c.ShouldBindJSON(&addProduct); err != nil {
-		c.String(http.StatusBadRequest, err.Error(), "1")
+		c.String(http.StatusBadRequest, "Введены некорректные данные")
 		return
 	}
 	err := ph.productService.AddProductInStock(addProduct)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error(), "2")
+		c.String(http.StatusInternalServerError, "Не удалось добавить продукт на склад")
 		return
 	}
 	c.JSON(http.StatusOK, "The product was succesfuly added in storage")
 }
 
-// FindProductInfoById  парсит данные в структуру и выводит ионформацию о продукте по его id
+// FindProductInfoById  выводит данные о продукте по его id
 func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 	id := c.Param("id")
 	productId, err := strconv.Atoi(id)
 	if err != nil {
-		c.String(http.StatusBadRequest, err.Error(), 1)
+		c.String(http.StatusBadRequest, "Неверный или некоректный id")
 		return
 	}
 	productInfo, err := ph.productService.FindProductInfoById(productId)
 	if err != nil {
-		c.String(http.StatusBadRequest, err.Error(), 2)
+		c.String(http.StatusBadRequest, "Не удалось найти информацию о продукте")
 		return
 	}
 
@@ -97,7 +96,7 @@ func (ph *ProductHandler) LoadProductList(c *gin.Context) {
 
 	products, err := ph.productService.FindProductList(tag, limit)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Не удалось найти список продуктов")
 		return
 	}
 
@@ -112,12 +111,12 @@ func (ph *ProductHandler) LoadProductsInStock(c *gin.Context) {
 	}
 	productId, err := strconv.Atoi(id)
 	if err != nil {
-		c.String(http.StatusBadRequest, err.Error())
+		c.String(http.StatusBadRequest, "Неверный или некоректный id")
 		return
 	}
 	stocks, err := ph.productService.FindProductsInStock(productId)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Не удалось найти продукты на складе")
 	}
 	c.JSON(http.StatusOK, stocks)
 }
@@ -126,12 +125,12 @@ func (ph *ProductHandler) LoadProductsInStock(c *gin.Context) {
 func (ph *ProductHandler) Buy(c *gin.Context) {
 	var sale domain.Sale
 	if err := c.ShouldBindJSON(&sale); err != nil {
-		c.String(http.StatusBadRequest, err.Error())
+		c.String(http.StatusBadRequest, "Введены неверные или некоректные данные")
 		return
 	}
 	err := ph.productService.Buy(sale)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Не удалось добавить продажи в базу данных")
 		return
 	}
 	c.String(http.StatusOK, "the sale was added")
@@ -141,13 +140,13 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 func (ph *ProductHandler) FindSales(c *gin.Context) {
 	var salequery domain.SaleQuery
 	if err := c.ShouldBindJSON(&salequery); err != nil {
-		c.String(http.StatusBadRequest, err.Error())
+		c.String(http.StatusBadRequest, "Неверные или некоректные фильтры")
 		return
 	}
 
 	sales, err := ph.productService.FindSales(salequery)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Не удалось найти продажи по данным фильтрам")
 		return
 	}
 

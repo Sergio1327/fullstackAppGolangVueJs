@@ -11,7 +11,7 @@ import (
 )
 
 type ProductService interface {
-	AddProduct(p domain.Product) error
+	AddProduct(p domain.Product) (int, error)
 	AddProductPrice(pr domain.ProductPrice) error
 	AddProductInStock(p domain.AddProductInStock) error
 	FindProductInfoById(id int) (domain.ProductInfo, error)
@@ -32,34 +32,35 @@ func NewProductUseCase(repo repository.ProductRepository) *ProductServiceImpl {
 }
 
 // AddProduct логика добавление продукта в базу
-func (u *ProductServiceImpl) AddProduct(p domain.Product) error {
+func (u *ProductServiceImpl) AddProduct(p domain.Product) (productId int, err error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer tx.Rollback()
 
 	if p.Name == "" {
-		return errors.New("имя продукта не может быть пустым")
+		return 0, errors.New("имя продукта не может быть пустым")
 	}
 
-	productId, err := u.repo.AddProduct(tx, p)
+	productId, err = u.repo.AddProduct(tx, p)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	for _, v := range p.Variants {
 		err := u.repo.AddProductVariants(tx, productId, v)
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	
+	return productId, nil
 }
 
 // AddProductPrice  логика проверки цены и вставки в базу
@@ -271,7 +272,7 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock,
 	if productId < 0 {
 		return nil, errors.New("id продукта не может быть меньше нуля")
 	}
-	
+
 	if productId == 0 {
 		stocks, err := u.repo.LoadStocks(tx)
 		if err != nil {
@@ -317,7 +318,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 		return err
 	}
 	p.SoldAt = time.Now()
-	
+
 	price, err := u.repo.FindPrice(tx, p.VariantId)
 	if err != nil {
 		return err
@@ -333,9 +334,9 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 
 // LoadSales  получение списка всех продаж или списка продаж по фильтрам
 func (u *ProductServiceImpl) FindSales(sq domain.SaleQuery) ([]domain.Sale, error) {
-	tx,err:=u.repo.TxBegin()
-	if err!=nil{
-		return nil,err
+	tx, err := u.repo.TxBegin()
+	if err != nil {
+		return nil, err
 	}
 	if !sq.Limit.Valid {
 		sq.Limit.Int64 = 3
@@ -347,13 +348,13 @@ func (u *ProductServiceImpl) FindSales(sq domain.SaleQuery) ([]domain.Sale, erro
 			EndDate:   sq.EndDate,
 			Limit:     sq.Limit,
 		}
-		sales, err := u.repo.FindSales(tx,s)
+		sales, err := u.repo.FindSales(tx, s)
 		if err != nil {
 			return nil, err
 		}
 		return sales, nil
 	} else {
-		sales, err := u.repo.FindSalesByFilters(tx,sq)
+		sales, err := u.repo.FindSalesByFilters(tx, sq)
 		if err != nil {
 			return nil, err
 		}
