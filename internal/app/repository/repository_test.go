@@ -30,12 +30,14 @@ func TestAddProduct(t *testing.T) {
 		Addet_at: time.Now(),
 		Tags:     "123,12i",
 	}
+	defer tx.Rollback()
 	id, err := repo.AddProduct(tx, p)
 	r.NoError(err)
 	r.NotEmpty(id)
 
 	product, err := repo.LoadProductInfo(tx, id)
 	r.NoError(err)
+	r.Equal(id, product.ProductId)
 	r.NotEmpty(product)
 }
 

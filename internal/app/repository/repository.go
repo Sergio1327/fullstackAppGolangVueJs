@@ -26,6 +26,7 @@ type ProductRepository interface {
 	AddProductInStock(tx *sqlx.Tx, p domain.AddProductInStock) error
 
 	LoadProductInfo(tx *sqlx.Tx, id int) (domain.ProductInfo, error)
+	AreExistsVariants(tx *sqlx.Tx, productId int) (bool, error)
 	FindProductVariants(tx *sqlx.Tx, id int) ([]domain.Variant, error)
 	FindCurrentPrice(tx *sqlx.Tx, variantId int) (decimal.Decimal, error)
 	InStorages(tx *sqlx.Tx, id int) ([]int, error)
@@ -81,7 +82,7 @@ func (r *PostgresProductRepository) AddProductVariants(tx *sqlx.Tx, productId in
 	_, err := tx.Exec(`
 	insert into product_variants 
 	(product_id, weight, unit) 
-	values ($1, $2, $3)", productId, v.Weight, v.Unit`)
+	values ($1, $2, $3)`, productId, v.Weight, v.Unit)
 	return err
 }
 
@@ -173,16 +174,25 @@ func (r *PostgresProductRepository) AddProductInStock(tx *sqlx.Tx, p domain.AddP
 // LoadProductInfo получение информации о продукте
 func (r *PostgresProductRepository) LoadProductInfo(tx *sqlx.Tx, productId int) (productInfo domain.ProductInfo, err error) {
 	err = tx.Get(&productInfo,
-		`select name, description  
+		`select product_id, name, description  
 	 	 from products 
 	     where product_id = $1`, productId)
 	return productInfo, err
 }
 
+func (r *PostgresProductRepository) AreExistsVariants(tx *sqlx.Tx, productId int) (isExists bool, err error) {
+	err = tx.Get(&isExists,
+		`select exists
+		(select 1 from product_variants)
+		 where product_id = $1`, productId)
+
+	return isExists, err
+}
+
 // FindProductVariants  получение вариантов продукта по его id
 func (r *PostgresProductRepository) FindProductVariants(tx *sqlx.Tx, productId int) (variants []domain.Variant, err error) {
 	err = tx.Select(&variants,
-		`select variant_id, weight, unit, added_at
+		`select product_id, variant_id, weight, unit, added_at
 		 from product_variants	
 		 where product_id = $1`, productId)
 	return variants, err
@@ -252,9 +262,9 @@ func (r *PostgresProductRepository) FindStocksByProductId(tx *sqlx.Tx, productId
 	err = tx.Select(&stocks, `
 	select s.storage_id ,s.name 
 	from storages s
-	join products_in_storage pis ON s.storage_id = pis.storage_id
-	join product_variants pv ON pis.variant_id = pv.variant_id
-	join products p ON pv.product_id = p.product_id
+	join products_in_storage pis ON (s.storage_id = pis.storage_id)
+	join product_variants pv ON (pis.variant_id = pv.variant_id)
+	join products p ON (pv.product_id = p.product_id)
 	where p.product_id=$1`, productId)
 
 	return stocks, err

@@ -59,7 +59,7 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) (productId int, err er
 	if err != nil {
 		return 0, err
 	}
-	
+
 	return productId, nil
 }
 
@@ -160,6 +160,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 	if err != nil {
 		return domain.ProductInfo{}, nil
 	}
+	defer tx.Rollback()
 
 	if id == 0 || id < 0 {
 		return domain.ProductInfo{}, errors.New("id не может быть меньше или равен 0")
@@ -169,7 +170,17 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 	if err != nil {
 		return domain.ProductInfo{}, err
 	}
-	product.ProductId = id
+
+	isExists, err := u.repo.AreExistsVariants(tx, id)
+	if err != nil {
+		return domain.ProductInfo{}, err
+	}
+
+	if !isExists {
+		emptyVariants := []domain.Variant{}
+		product.Variants = emptyVariants
+		return product, nil
+	}
 
 	product.Variants, err = u.repo.FindProductVariants(tx, product.ProductId)
 	if err != nil {
@@ -181,7 +192,6 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (domain.ProductInfo, er
 		if err != nil {
 			return domain.ProductInfo{}, err
 		}
-		product.Variants[i].ProductId = id
 		product.Variants[i].CurrentPrice = price
 
 		inStorages, err := u.repo.InStorages(tx, v.VariantId)
