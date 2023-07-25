@@ -5,7 +5,6 @@ import (
 	"go-back/internal/tools/sqlnull"
 	"time"
 
-	"github.com/shopspring/decimal"
 )
 
 // Product cтруктура продукта для записи в базу
@@ -26,7 +25,7 @@ type Variant struct {
 	Weight       int             `json:"weight" db:"weight"`         // масса или вес продукта
 	Unit         string          `json:"unit" db:"unit"`             //единица измерения
 	Added_at     time.Time       `json:"added_at" db:"added_at"`     // дата добавления определенного варианта
-	CurrentPrice decimal.Decimal `json:"price" db:"price"`           //актуальная цена
+	CurrentPrice float64 `json:"price" db:"price"`           //актуальная цена
 	InStorages   []int           `json:"in_storages"`                //список id складов в которых есть этот вариант
 }
 
@@ -36,7 +35,7 @@ type ProductPrice struct {
 	VariantId int              `json:"variant_id"` //id варианта продука
 	StartDate time.Time        `json:"start_date"` // дата начала цены
 	EndDate   sqlnull.NullTime `json:"end_date"`   //дата конца цены
-	Price     decimal.Decimal  `json:"price"`      //цена продукта
+	Price     float64  `json:"price"`      //цена продукта
 }
 
 // AddProductInStock  структура для вставки продукта на склад
@@ -77,7 +76,7 @@ type Sale struct {
 	StorageId   int                `json:"storage_id" db:"storage_id"` //id склада из которого произошла продажа продукта
 	SoldAt      time.Time          `db:"sold_at"`                      //дата продажи
 	Quantity    int                `json:"quantity" db:"quantity"`     //кол-во проданного продукта
-	TotalPrice  decimal.Decimal    `db:"total_price"`                  //общая стоимость с учетом кол-ва продукта
+	TotalPrice  float64    `db:"total_price"`                  //общая стоимость с учетом кол-ва продукта
 }
 
 func (s *Sale) IsNullFields() error {

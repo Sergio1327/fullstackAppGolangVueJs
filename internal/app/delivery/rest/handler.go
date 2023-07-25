@@ -118,6 +118,7 @@ func (ph *ProductHandler) LoadProductsInStock(c *gin.Context) {
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Не удалось найти продукты на складе")
 	}
+	
 	c.JSON(http.StatusOK, stocks)
 }
 
@@ -133,6 +134,7 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Не удалось добавить продажи в базу данных")
 		return
 	}
+
 	c.String(http.StatusOK, "the sale was added")
 }
 
