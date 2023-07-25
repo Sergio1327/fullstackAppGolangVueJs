@@ -110,7 +110,6 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 			if err != nil {
 				return err
 			}
-
 		} else {
 			// если же нет то просто добавляется запись в базу
 			err := u.repo.AddProductPriceWithEndDate(tx, p)
