@@ -19,17 +19,20 @@ func TestAddProduct(t *testing.T) {
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
+
 	repo := repository.NewPostgresProductRepository(db)
 
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
+
 	p := domain.Product{
 		Name:     "dsfdsddcxcfzsd",
 		Descr:    "sdsdsds",
 		Addet_at: time.Now(),
 		Tags:     "123,12i",
 	}
-	defer tx.Rollback()
+
 	id, err := repo.AddProduct(tx, p)
 	r.NoError(err)
 	r.NotEmpty(id)
@@ -42,7 +45,9 @@ func TestAddProduct(t *testing.T) {
 
 func TestAddProductVariants(t *testing.T) {
 	r := require.New(t)
+
 	id := 1
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
@@ -51,8 +56,8 @@ func TestAddProductVariants(t *testing.T) {
 	repo := repository.NewPostgresProductRepository(db)
 
 	tx, err := repo.TxBegin()
-	defer tx.Rollback()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	varQuery := domain.Variant{
 		Weight: 440,
@@ -63,7 +68,12 @@ func TestAddProductVariants(t *testing.T) {
 	r.NoError(err)
 
 	var variant domain.Variant
-	err = tx.Get(&variant, "select variant_id from product_variants where product_id=$1 and weight=$2 and unit=$3",
+	err = tx.Get(&variant,
+		`select variant_id 
+		 from product_variants 
+		 where product_id=$1 
+		 and weight=$2 
+		 and unit=$3`,
 		id, varQuery.Weight, varQuery.Unit)
 
 	r.NoError(err)
@@ -72,10 +82,12 @@ func TestAddProductVariants(t *testing.T) {
 
 func TestCheckExists(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
+
 	repo := repository.NewPostgresProductRepository(db)
 
 	tx, err := repo.TxBegin()
@@ -86,11 +98,13 @@ func TestCheckExists(t *testing.T) {
 		StartDate: time.Now(),
 		Price:     15.2,
 	})
+
 	r.NoError(err)
 }
 
 func TestUpdateProductPrice(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
@@ -99,6 +113,7 @@ func TestUpdateProductPrice(t *testing.T) {
 	tx, err := db.Beginx()
 	defer tx.Rollback()
 	r.NoError(err)
+
 	repo := repository.NewPostgresProductRepository(db)
 	err = repo.UpdateProductPrice(tx, domain.ProductPrice{
 		EndDate: sqlnull.NewNullTime(time.Now()),
@@ -108,6 +123,7 @@ func TestUpdateProductPrice(t *testing.T) {
 
 func TestAddProductPriceWithEndDate(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
@@ -135,6 +151,7 @@ func TestAddProductPriceWithEndDate(t *testing.T) {
 }
 func TestAddProductPrice(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
@@ -142,7 +159,10 @@ func TestAddProductPrice(t *testing.T) {
 
 	tx, err := db.Beginx()
 	r.NoError(err)
+	defer tx.Rollback()
+
 	repo := repository.NewPostgresProductRepository(db)
+
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
@@ -151,6 +171,7 @@ func TestAddProductPrice(t *testing.T) {
 		StartDate: startDate,
 		Price:     18.99,
 	})
+
 	r.NoError(err)
 }
 
@@ -166,7 +187,10 @@ func TestCheckProductsInStock(t *testing.T) {
 	tx, err := repo.TxBegin()
 	r.NoError(err)
 
-	_, err = tx.Exec("insert into products_in_storage(variant_id,storage_id,quantity) values($1,$2,$3)", 4, 2, 10)
+	_, err = tx.Exec(
+		`insert into products_in_storage
+		 (variant_id,storage_id,quantity) 
+		 values($1,$2,$3)`, 4, 2, 10)
 	r.NoError(err)
 
 	_, err = repo.CheckProductsInStock(tx, domain.AddProductInStock{
@@ -178,14 +202,20 @@ func TestCheckProductsInStock(t *testing.T) {
 
 func TestUpdateProductsInStock(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
+
 	tx, err := db.Beginx()
 	r.NoError(err)
+	defer tx.Rollback()
 
-	_, err = tx.Exec("insert into products_in_storage(variant_id,storage_id,quantity) values ($1,$2,$3)", 4, 2, 2)
+	_, err = tx.Exec(
+		`insert into products_in_storage
+		 (variant_id,storage_id,quantity)
+		 values ($1,$2,$3)`, 4, 2, 2)
 	r.NoError(err)
 
 	repo := repository.NewPostgresProductRepository(db)
@@ -194,17 +224,20 @@ func TestUpdateProductsInStock(t *testing.T) {
 		StorageId: 2,
 		Quantity:  3,
 	})
+
 	r.NoError(err)
 }
 func TestAddProductInStock(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
+
 	tx, err := db.Beginx()
-	defer tx.Rollback()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	repo := repository.NewPostgresProductRepository(db)
 	err = repo.AddProductInStock(tx, domain.AddProductInStock{
@@ -212,19 +245,23 @@ func TestAddProductInStock(t *testing.T) {
 		StorageId: 1,
 		Quantity:  5,
 	})
+
 	r.NoError(err)
 }
 
 func TestLoadProductInfo(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
+
 	repo := repository.NewPostgresProductRepository(db)
 
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	id, err := repo.AddProduct(tx, domain.Product{
 		Name:     "Имя продукта",
@@ -239,21 +276,52 @@ func TestLoadProductInfo(t *testing.T) {
 	r.NotEmpty(productInfo)
 }
 
-func TestFindProductVariants(t *testing.T) {
+func TestAreExistsVariants(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
 
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
+
+	productId, err := repo.AddProduct(tx, domain.Product{
+		Name:     "dlsldsd",
+		Descr:    "fdfd'fd",
+		Addet_at: time.Now(),
+		Tags:     "dqwqwqw",
+	})
+	r.NoError(err)
+	r.NotEmpty(productId)
+
+	_, err = repo.AreExistsVariants(tx, productId)
+	r.NoError(err)
+}
+
+func TestFindProductVariants(t *testing.T) {
+	r := require.New(t)
+
+	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
+	db, err := database.NewPostgreSQLdb(conStr)
+	r.NoError(err)
+	defer db.Close()
+
+	repo := repository.NewPostgresProductRepository(db)
+
+	tx, err := repo.TxBegin()
+	r.NoError(err)
+	defer tx.Rollback()
 
 	varquery := domain.Variant{
 		Weight: 500,
 		Unit:   "г",
 	}
+
 	id := 2
 	err = repo.AddProductVariants(tx, id, varquery)
 	r.NoError(err)
@@ -261,8 +329,15 @@ func TestFindProductVariants(t *testing.T) {
 	variants, err := repo.FindProductVariants(tx, id)
 	r.NoError(err)
 	r.NotEmpty(variants)
+
 	var variant domain.Variant
-	err = tx.Get(&variant, "select variant_id from product_variants where product_id=$1 and weight=$2 and unit = $3",
+
+	err = tx.Get(&variant,
+		`select variant_id 
+		 from product_variants
+		 where product_id=$1
+		 and weight=$2 
+		 and unit = $3`,
 		id, varquery.Weight, varquery.Unit)
 	r.NoError(err)
 	r.NotEmpty(variant)
@@ -270,6 +345,7 @@ func TestFindProductVariants(t *testing.T) {
 
 func TestFindCurrentPrice(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
@@ -278,6 +354,7 @@ func TestFindCurrentPrice(t *testing.T) {
 	repo := repository.NewPostgresProductRepository(db)
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	var id int
 	pp := domain.ProductPrice{
@@ -285,7 +362,12 @@ func TestFindCurrentPrice(t *testing.T) {
 		Price:     14.99,
 		StartDate: time.Now(),
 	}
-	err = tx.QueryRow("insert into product_prices(variant_id,price,start_date) values($1,$2,$3) returning variant_id",
+
+	err = tx.QueryRow(
+		`insert into product_prices
+		 (variant_id,price,start_date)
+	 	 values($1,$2,$3)
+		 returning variant_id`,
 		pp.VariantId, pp.Price, pp.StartDate).Scan(&id)
 	r.NoError(err)
 
@@ -296,6 +378,7 @@ func TestFindCurrentPrice(t *testing.T) {
 
 func TestInStorages(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
@@ -304,6 +387,7 @@ func TestInStorages(t *testing.T) {
 	repo := repository.NewPostgresProductRepository(db)
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	var id int
 	product := domain.AddProductInStock{
@@ -312,7 +396,12 @@ func TestInStorages(t *testing.T) {
 		Added_at:  time.Now(),
 		Quantity:  3,
 	}
-	err = tx.QueryRow("insert into products_in_storage(variant_id,storage_id,added_at,quantity) values($1,$2,$3,$4) returning variant_id",
+
+	err = tx.QueryRow(
+		`insert into products_in_storage
+		 (variant_id,storage_id,added_at,quantity)
+		 values($1,$2,$3,$4)
+		 returning variant_id`,
 		product.VariantId, product.StorageId, product.Added_at, product.Quantity).Scan(&id)
 	r.NoError(err)
 
@@ -323,14 +412,17 @@ func TestInStorages(t *testing.T) {
 
 func TestFindProductsByTag(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
 
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	product := domain.Product{
 		Name:     "sldlsd",
@@ -345,11 +437,18 @@ func TestFindProductsByTag(t *testing.T) {
 		Addet_at: time.Now(),
 		Tags:     "стирка",
 	}
-	_, err = tx.Exec("insert into products(name,description,added_at,tags) values($1,$2,$3,$4)",
+
+	_, err = tx.Exec(`
+	insert into products
+	(name,description,added_at,tags)
+	values($1,$2,$3,$4)`,
 		product.Name, product.Descr, product.Addet_at, product.Tags)
 	r.NoError(err)
 
-	_, err = tx.Exec("insert into products(name,description,added_at,tags) values($1,$2,$3,$4)",
+	_, err = tx.Exec(`
+	insert into products
+	(name,description,added_at,tags)
+	values($1,$2,$3,$4)`,
 		product2.Name, product2.Descr, product2.Addet_at, product2.Tags)
 	r.NoError(err)
 
@@ -370,14 +469,18 @@ func TestFindProductsByTag(t *testing.T) {
 
 func TestLoadProducts(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
 
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
+
 	limit := 3
 
 	products, err := repo.LoadProducts(tx, limit)
@@ -389,6 +492,7 @@ func TestLoadProducts(t *testing.T) {
 	products, err = repo.LoadProducts(tx, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
+
 	if len(products) > 1 {
 		r.Error(errors.New("кол-во продуктов больше чем указано в лимите"))
 	}
@@ -396,14 +500,17 @@ func TestLoadProducts(t *testing.T) {
 
 func TestLoadStocks(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
 
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	stocks, err := repo.LoadStocks(tx)
 	r.NoError(err)
@@ -412,14 +519,17 @@ func TestLoadStocks(t *testing.T) {
 
 func TestFindStocksByProductId(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
 
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	id := 1
 	stocks, err := repo.FindStocksByProductId(tx, id)
@@ -434,15 +544,19 @@ func TestFindStocksByProductId(t *testing.T) {
 
 func TestFindStockVariants(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
+
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
-	storageId := 1
+	defer tx.Rollback()
 
+	storageId := 1
 	variants, err := repo.FindStocksVariants(tx, storageId)
 	r.NoError(err)
 	r.NotEmpty(variants)
@@ -455,14 +569,17 @@ func TestFindStockVariants(t *testing.T) {
 
 func TestFindPrice(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
+
 	repo := repository.NewPostgresProductRepository(db)
 
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	var variantId int
 	priceQuery := domain.ProductPrice{
@@ -470,7 +587,12 @@ func TestFindPrice(t *testing.T) {
 		Price:     9.99,
 		StartDate: time.Now(),
 	}
-	err = tx.QueryRow("insert into product_prices(variant_id,price,start_date) values ($1,$2,$3) returning variant_id",
+
+	err = tx.QueryRow(`
+	insert into product_prices
+	(variant_id,price,start_date)
+	values ($1,$2,$3) 
+	returning variant_id`,
 		priceQuery.VariantId, priceQuery.Price, priceQuery.StartDate).Scan(&variantId)
 	r.NoError(err)
 
@@ -481,13 +603,17 @@ func TestFindPrice(t *testing.T) {
 
 func TestBuy(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
 	defer db.Close()
-	tx, err := db.Beginx()
-	r.NoError(err)
+
 	repo := repository.NewPostgresProductRepository(db)
+
+	tx, err := repo.TxBegin()
+	r.NoError(err)
+	defer tx.Rollback()
 
 	saleQuery := domain.Sale{
 		VariantId:  1,
@@ -500,15 +626,20 @@ func TestBuy(t *testing.T) {
 	r.NoError(err)
 
 	var sale domain.Sale
-	err = tx.Get(&sale, "select variant_id from sales where variant_id=$1 and storage_id=$2 and quantity=$3",
+	err = tx.Get(&sale, `
+	select variant_id 
+	from sales 
+	where variant_id=$1 
+	and storage_id=$2 
+	and quantity=$3`,
 		saleQuery.VariantId, saleQuery.StorageId, saleQuery.Quantity)
 	r.NoError(err)
 	r.NotEmpty(sale)
-
 }
 
 func TestFindSales(t *testing.T) {
 	r := require.New(t)
+
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
 	db, err := database.NewPostgreSQLdb(conStr)
 	r.NoError(err)
@@ -520,8 +651,11 @@ func TestFindSales(t *testing.T) {
 	r.NoError(err)
 
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
+
 	sales, err := repo.FindSales(tx, domain.SaleQueryWithoutFilters{
 		Limit:     sqlnull.NewInt64(3),
 		StartDate: startDate,
@@ -541,8 +675,10 @@ func TestFindSalesByFilters(t *testing.T) {
 
 	//инициализация слоев
 	repo := repository.NewPostgresProductRepository(db)
+
 	tx, err := repo.TxBegin()
 	r.NoError(err)
+	defer tx.Rollback()
 
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
