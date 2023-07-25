@@ -152,7 +152,7 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 // FindSales выводит информацию о продажах по фильтрам или без них
 func (ph *ProductHandler) FindSales(c *gin.Context) {
 	var salequery domain.SaleQuery
-	
+
 	if err := c.ShouldBindJSON(&salequery); err != nil {
 		c.String(http.StatusBadRequest, "Неверные или некоректные фильтры")
 		return

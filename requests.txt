@@ -17,6 +17,15 @@ localhost:8080/product/add
     }
   ]
 }
+
+или
+
+{
+  "name": "Название 3",
+  "description": "2",
+ "added_at": "2021-07-23T14:50:20+05:00",
+  "tags": "тег1,dsdsdsd"
+}
   
 
 localhost:8080/product/price

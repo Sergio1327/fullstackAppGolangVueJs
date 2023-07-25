@@ -188,7 +188,7 @@ func (r *PostgresProductRepository) AreExistsVariants(tx *sqlx.Tx, productId int
 		(select 1 
 		from product_variants
 		where product_id = $1)`, productId)
-		
+
 	return isExists, err
 }
 
