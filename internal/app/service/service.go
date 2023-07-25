@@ -45,14 +45,14 @@ func (u *ProductServiceImpl) AddProduct(product domain.Product) (productId int, 
 	// добавляется продукт в базу
 	productId, err = u.repo.AddProduct(tx, product)
 	if err != nil {
-		return 0, err
+		return 0, errors.New("не удалось добавить продукт в базу данных")
 	}
 
 	// если пользователь не ввел варианты продукта то данные о продукте просто запишутся в базу
 	if product.Variants == nil {
 		err = tx.Commit()
 		if err != nil {
-			return 0, err
+			return 0, errors.New("ошибка в добавлении вариантов продукта")
 		}
 		return productId, nil
 	}
@@ -61,13 +61,13 @@ func (u *ProductServiceImpl) AddProduct(product domain.Product) (productId int, 
 	for _, v := range product.Variants {
 		err := u.repo.AddProductVariants(tx, productId, v)
 		if err != nil {
-			return 0, err
+			return 0, errors.New("не удалось добавить варианты продукта")
 		}
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return 0, err
+		return 0, errors.New("не удалось добавить продукт и его варианты в базу")
 	}
 
 	return productId, nil
@@ -108,13 +108,13 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 			p.EndDate.Time = time.Now()
 			err := u.repo.UpdateProductPrice(tx, p, isExistsId)
 			if err != nil {
-				return err
+				return errors.New("не удалось обновить цену")
 			}
 		} else {
 			// если же нет то просто добавляется запись в базу
 			err := u.repo.AddProductPriceWithEndDate(tx, p)
 			if err != nil {
-				return err
+				return errors.New("не удалось добавить цену")
 			}
 
 		}
@@ -122,7 +122,7 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 	} else {
 		err := u.repo.AddProductPrice(tx, p)
 		if err != nil {
-			return err
+			return errors.New("не удалось добавить цену")
 		}
 
 	}
@@ -147,20 +147,20 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error
 	// проверка есть ли уже продукт на складе
 	isExist, err := u.repo.CheckProductsInStock(tx, p)
 	if err != nil {
-		return err
+		return errors.New("ошибка при проверке наличия продукта на складе")
 	}
 
 	// если продукт уже имеется в базе обновляется его кол-во
 	if isExist {
 		err := u.repo.UpdateProductsInstock(tx, p)
 		if err != nil {
-			return err
+			return errors.New("не удалось обновить кол-во продуктов на складе")
 		}
 	} else {
 		// если продукта нет на складе то он просто добавляется на склад
 		err := u.repo.AddProductInStock(tx, p)
 		if err != nil {
-			return err
+			return errors.New("не удалось добавить продукт на склад")
 		}
 	}
 
@@ -184,13 +184,13 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 	// поиск продукта по его id
 	product, err = u.repo.LoadProductInfo(tx, id)
 	if err != nil {
-		return domain.ProductInfo{}, err
+		return domain.ProductInfo{}, errors.New("не удалось получить информацию о продукте")
 	}
 
 	// проверка имеется ли на данный моммент у продукта его варианты
 	isExists, err := u.repo.AreExistsVariants(tx, id)
 	if err != nil {
-		return domain.ProductInfo{}, err
+		return domain.ProductInfo{}, errors.New("ошибка при проверке наличия вариантов продукта")
 	}
 
 	// если вариантов нет  то выведется информация о продукте без вариантов
@@ -203,13 +203,13 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 	// если варианты есть то происходит поиск всех вариантов
 	product.Variants, err = u.repo.FindProductVariants(tx, product.ProductId)
 	if err != nil {
-		return domain.ProductInfo{}, err
+		return domain.ProductInfo{}, errors.New("не удалось найти варианты продукта")
 	}
 
 	for i, v := range product.Variants {
 		price, err := u.repo.FindCurrentPrice(tx, v.VariantId)
 		if err != nil {
-			return domain.ProductInfo{}, err
+			return domain.ProductInfo{}, errors.New("не удалось найти актуальную цену варианта продукта")
 		}
 
 		// получение актуальной цены для каждого варианта продукта
@@ -218,7 +218,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 		// получение id складов в которых есть этот продукт
 		inStorages, err := u.repo.InStorages(tx, v.VariantId)
 		if err != nil {
-			return domain.ProductInfo{}, err
+			return domain.ProductInfo{}, errors.New("не удалось найти склады в которых есть продукт")
 		}
 		product.Variants[i].InStorages = inStorages
 	}
@@ -243,26 +243,26 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 	if tag != "" {
 		products, err = u.repo.FindProductsByTag(tx, tag, limit)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("не удалось найти продукты по данному тегу")
 		}
 
 		for i := range products {
 			vars, err := u.repo.FindProductVariants(tx, products[i].ProductId)
 			if err != nil {
-				return nil, err
+				return nil, errors.New("не удалось найти варианты продукта")
 			}
 			products[i].Variants = vars
 			variants := products[i].Variants
 			for j := range variants {
 				price, err := u.repo.FindCurrentPrice(tx, variants[j].VariantId)
 				if err != nil {
-					return nil, err
+					return nil, errors.New("не удалось найти актуальную цену продукта")
 				}
 
 				variants[j].CurrentPrice = price
 				inStorages, err := u.repo.InStorages(tx, variants[j].VariantId)
 				if err != nil {
-					return nil, err
+					return nil, errors.New("не удалось найти склады в которых есть продукт")
 				}
 
 				variants[j].InStorages = inStorages
@@ -321,12 +321,12 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) (stocks []domain
 	if productId == 0 {
 		stocks, err = u.repo.LoadStocks(tx)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("не удалось найти склады")
 		}
 		for i, v := range stocks {
 			variants, err := u.repo.FindStocksVariants(tx, v.StorageID)
 			if err != nil {
-				return nil, err
+				return nil, errors.New("не удалось найти варианты продукта на складе")
 			}
 			stocks[i].ProductVariants = variants
 		}
@@ -337,12 +337,12 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) (stocks []domain
 		//Если же пользователь ввел id продукта то произойдет фильтрация складов по id продукта
 		stocks, err = u.repo.FindStocksByProductId(tx, productId)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("не удалось найти склады с продуктами по данному id ")
 		}
 		for i, v := range stocks {
 			variants, err := u.repo.FindStocksVariants(tx, v.StorageID)
 			if err != nil {
-				return nil, err
+				return nil, errors.New("не удалось найти варианты продукта на складе")
 			}
 			stocks[i].ProductVariants = variants
 		}
@@ -372,7 +372,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	// получение цены варианта
 	price, err := u.repo.FindPrice(tx, p.VariantId)
 	if err != nil {
-		return err
+		return errors.New("не удалось найти цену продукта")
 	}
 
 	// подсчет общей цены продажи
@@ -381,7 +381,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	// запись продажи в базу
 	err = u.repo.Buy(tx, p)
 	if err != nil {
-		return err
+		return errors.New("не удалось записать продажу в базу")
 	}
 	err = tx.Commit()
 	return err
@@ -410,7 +410,7 @@ func (u *ProductServiceImpl) FindSales(sq domain.SaleQuery) (sales []domain.Sale
 
 		sales, err = u.repo.FindSales(tx, s)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("не удалось найти продажи")
 		}
 
 		return sales, nil
@@ -418,7 +418,7 @@ func (u *ProductServiceImpl) FindSales(sq domain.SaleQuery) (sales []domain.Sale
 		//  если имя продукта или id склада указан то произойдет фильтрация по этим параметрам
 		sales, err = u.repo.FindSalesByFilters(tx, sq)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("не удалось найти продажи по данным фильтрам")
 		}
 
 		return sales, nil
