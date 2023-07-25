@@ -77,7 +77,6 @@ func (u *ProductServiceImpl) AddProduct(p domain.Product) (productId int, err er
 
 // AddProductPrice  логика проверки цены и вставки в базу
 func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
-
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return err
@@ -235,6 +234,7 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) ([]domain.Pr
 	if err != nil {
 		return nil, err
 	}
+	defer tx.Rollback()
 
 	// если лимит не указан или некорректен то по умолчанию устанавливается 3
 	if limit == 0 || limit < 0 {
@@ -306,6 +306,7 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) ([]domain.Stock,
 	if err != nil {
 		return nil, err
 	}
+	defer tx.Rollback()
 
 	if productId < 0 {
 		return nil, errors.New("id продукта не может быть меньше нуля")
@@ -387,6 +388,7 @@ func (u *ProductServiceImpl) FindSales(sq domain.SaleQuery) ([]domain.Sale, erro
 	if err != nil {
 		return nil, err
 	}
+	defer tx.Rollback()
 
 	// если лимит не указан то по умолчанию устанавливается 3
 	if !sq.Limit.Valid {
