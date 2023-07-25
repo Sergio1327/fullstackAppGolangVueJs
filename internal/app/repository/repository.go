@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/shopspring/decimal"
 )
 
 type ProductRepository interface {
@@ -28,7 +27,7 @@ type ProductRepository interface {
 	LoadProductInfo(tx *sqlx.Tx, id int) (domain.ProductInfo, error)
 	AreExistsVariants(tx *sqlx.Tx, productId int) (bool, error)
 	FindProductVariants(tx *sqlx.Tx, id int) ([]domain.Variant, error)
-	FindCurrentPrice(tx *sqlx.Tx, variantId int) (decimal.Decimal, error)
+	FindCurrentPrice(tx *sqlx.Tx, variantId int) (float64, error)
 	InStorages(tx *sqlx.Tx, id int) ([]int, error)
 
 	FindProductsByTag(tx *sqlx.Tx, tag string, limit int) ([]domain.ProductInfo, error)
@@ -39,7 +38,7 @@ type ProductRepository interface {
 	FindStocksVariants(tx *sqlx.Tx, storageId int) ([]domain.AddProductInStock, error)
 
 	Buy(tx *sqlx.Tx, s domain.Sale) error
-	FindPrice(tx *sqlx.Tx, id int) (decimal.Decimal, error)
+	FindPrice(tx *sqlx.Tx, id int) (float64, error)
 
 	FindSales(tx *sqlx.Tx, sq domain.SaleQueryWithoutFilters) ([]domain.Sale, error)
 	FindSalesByFilters(tx *sqlx.Tx, sq domain.SaleQuery) ([]domain.Sale, error)
@@ -170,7 +169,7 @@ func (r *PostgresProductRepository) AddProductInStock(tx *sqlx.Tx, productInStoc
 	 (variant_id, storage_id, added_at, quantity)
 	 values ($1, $2, $3, $4)`,
 		productInStock.VariantId, productInStock.StorageId, productInStock.Added_at, productInStock.Quantity)
-		
+
 	return err
 }
 
@@ -202,7 +201,7 @@ func (r *PostgresProductRepository) FindProductVariants(tx *sqlx.Tx, productId i
 }
 
 // FindCurrentPrice  получение актуальной цены
-func (r *PostgresProductRepository) FindCurrentPrice(tx *sqlx.Tx, variantId int) (price decimal.Decimal, err error) {
+func (r *PostgresProductRepository) FindCurrentPrice(tx *sqlx.Tx, variantId int) (price float64, err error) {
 	err = tx.Get(&price,
 		`select price 
 		 from product_prices 
@@ -284,7 +283,7 @@ func (r *PostgresProductRepository) FindStocksVariants(tx *sqlx.Tx, storageId in
 }
 
 // FindPrice  получение цены
-func (r *PostgresProductRepository) FindPrice(tx *sqlx.Tx, variantId int) (price decimal.Decimal, err error) {
+func (r *PostgresProductRepository) FindPrice(tx *sqlx.Tx, variantId int) (price float64, err error) {
 	err = tx.Get(&price,
 		`select price
 	 	 from product_prices

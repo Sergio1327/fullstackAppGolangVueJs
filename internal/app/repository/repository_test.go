@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -85,7 +84,7 @@ func TestCheckExists(t *testing.T) {
 	_, err = repo.CheckExists(tx, domain.ProductPrice{
 		VariantId: 4,
 		StartDate: time.Now(),
-		Price:     decimal.New(15, 2),
+		Price:     15.2,
 	})
 	r.NoError(err)
 }
@@ -129,7 +128,7 @@ func TestAddProductPriceWithEndDate(t *testing.T) {
 		VariantId: 4,
 		StartDate: startDate,
 		EndDate:   sqlnull.NewNullTime(endDate),
-		Price:     decimal.New(15, 2),
+		Price:     10.99,
 	})
 
 	r.NoError(err)
@@ -150,7 +149,7 @@ func TestAddProductPrice(t *testing.T) {
 	err = repo.AddProductPrice(tx, domain.ProductPrice{
 		VariantId: 5,
 		StartDate: startDate,
-		Price:     decimal.New(10, 2),
+		Price:     18.99,
 	})
 	r.NoError(err)
 }
@@ -283,7 +282,7 @@ func TestFindCurrentPrice(t *testing.T) {
 	var id int
 	pp := domain.ProductPrice{
 		VariantId: 1,
-		Price:     decimal.New(10, 2),
+		Price:     14.99,
 		StartDate: time.Now(),
 	}
 	err = tx.QueryRow("insert into product_prices(variant_id,price,start_date) values($1,$2,$3) returning variant_id",
@@ -468,7 +467,7 @@ func TestFindPrice(t *testing.T) {
 	var variantId int
 	priceQuery := domain.ProductPrice{
 		VariantId: 1,
-		Price:     decimal.New(15, 2),
+		Price:     9.99,
 		StartDate: time.Now(),
 	}
 	err = tx.QueryRow("insert into product_prices(variant_id,price,start_date) values ($1,$2,$3) returning variant_id",
@@ -494,7 +493,7 @@ func TestBuy(t *testing.T) {
 		VariantId:  1,
 		StorageId:  3,
 		Quantity:   2,
-		TotalPrice: decimal.New(10, 2),
+		TotalPrice: 19.99,
 	}
 
 	err = repo.Buy(tx, saleQuery)
