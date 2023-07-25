@@ -82,7 +82,7 @@ type Sale struct {
 
 func (s *Sale) IsNullFields() error {
 	if s.VariantId == 0 || s.StorageId == 0 || s.Quantity == 0 {
-		return errors.New("variant_id,storage_id или quantity являются пустыми")
+		return errors.New("variant_id, storage_id или quantity являются пустыми полями")
 	}
 	return nil
 }

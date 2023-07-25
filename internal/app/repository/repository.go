@@ -64,13 +64,13 @@ func NewPostgresProductRepository(db *sqlx.DB) *PostgresProductRepository {
 }
 
 // AddProduct вставка названия,описания,времени добавления и тегов в базу
-func (r *PostgresProductRepository) AddProduct(tx *sqlx.Tx, p domain.Product) (productId int, err error) {
+func (r *PostgresProductRepository) AddProduct(tx *sqlx.Tx, product domain.Product) (productId int, err error) {
 	err = tx.QueryRow(`
 	insert into products
 	(name, description, added_at, tags)
 	values ($1, $2, $3, $4) 
 	returning product_id`,
-		p.Name, p.Descr, p.Addet_at, p.Tags).Scan(&productId)
+		product.Name, product.Descr, product.Addet_at, product.Tags).Scan(&productId)
 	if err != nil {
 		return 0, err
 	}
@@ -78,11 +78,11 @@ func (r *PostgresProductRepository) AddProduct(tx *sqlx.Tx, p domain.Product) (p
 }
 
 // AddProductVariants  добавление вариантов продукта в продукт по его id
-func (r *PostgresProductRepository) AddProductVariants(tx *sqlx.Tx, productId int, v domain.Variant) error {
+func (r *PostgresProductRepository) AddProductVariants(tx *sqlx.Tx, productId int, variant domain.Variant) error {
 	_, err := tx.Exec(`
 	insert into product_variants 
 	(product_id, weight, unit) 
-	values ($1, $2, $3)`, productId, v.Weight, v.Unit)
+	values ($1, $2, $3)`, productId, variant.Weight, variant.Unit)
 	return err
 }
 
@@ -105,38 +105,40 @@ func (r *PostgresProductRepository) CheckExists(tx *sqlx.Tx, p domain.ProductPri
 }
 
 // UpdateProductPrice  обновление цены варианта продукта
-func (r *PostgresProductRepository) UpdateProductPrice(tx *sqlx.Tx, p domain.ProductPrice, priceId int) error {
+func (r *PostgresProductRepository) UpdateProductPrice(tx *sqlx.Tx, price domain.ProductPrice, priceId int) error {
 	_, err := tx.Exec(`
 	update product_prices
 	set end_date = $1 
 	where price_id = $2`,
-		p.EndDate, priceId)
+		price.EndDate, priceId)
+
 	return err
 }
 
 // AddProductPriceWithEndDate  добавление цены варианта продукта в опеределенный диапазон времени
-func (r *PostgresProductRepository) AddProductPriceWithEndDate(tx *sqlx.Tx, p domain.ProductPrice) error {
+func (r *PostgresProductRepository) AddProductPriceWithEndDate(tx *sqlx.Tx, price domain.ProductPrice) error {
 	_, err := tx.Exec(`
 	insert into product_prices 
 	(variant_id, price, start_date, end_date)
 	values($1, $2, $3, $4)`,
-		p.VariantId, p.Price, p.StartDate, p.EndDate)
+		price.VariantId, price.Price, price.StartDate, price.EndDate)
+
 	return err
 }
 
 // AddProductPrice вставка цены варианта продукта в базу
-func (r *PostgresProductRepository) AddProductPrice(tx *sqlx.Tx, p domain.ProductPrice) error {
+func (r *PostgresProductRepository) AddProductPrice(tx *sqlx.Tx, price domain.ProductPrice) error {
 	_, err := tx.Exec(`
 	insert into product_prices
 	(variant_id, price, start_date)
 	values($1, $2, $3)`,
 
-		p.VariantId, p.Price, p.StartDate)
+		price.VariantId, price.Price, price.StartDate)
 	return err
 }
 
 // CheckProductsInStock  проверка есть ли на скалде продукт
-func (r *PostgresProductRepository) CheckProductsInStock(tx *sqlx.Tx, p domain.AddProductInStock) (isExists bool, err error) {
+func (r *PostgresProductRepository) CheckProductsInStock(tx *sqlx.Tx, productInStock domain.AddProductInStock) (isExists bool, err error) {
 	err = tx.Get(&isExists,
 		`select exists
 		 (select 1 
@@ -144,30 +146,31 @@ func (r *PostgresProductRepository) CheckProductsInStock(tx *sqlx.Tx, p domain.A
 		 where variant_id = $1 
 		 and storage_id= $2)`,
 
-		p.VariantId, p.StorageId)
+		productInStock.VariantId, productInStock.StorageId)
 
 	return isExists, err
 }
 
 // UpdateProductsInstock обновление колличества продукта
-func (r *PostgresProductRepository) UpdateProductsInstock(tx *sqlx.Tx, p domain.AddProductInStock) error {
+func (r *PostgresProductRepository) UpdateProductsInstock(tx *sqlx.Tx, productInStock domain.AddProductInStock) error {
 	_, err := tx.Exec(`
 	update products_in_storage 
 	set quantity = $1
 	where variant_id = $2 
 	and storage_id= $3`,
 
-		p.Quantity, p.VariantId, p.StorageId)
+		productInStock.Quantity, productInStock.VariantId, productInStock.StorageId)
 	return err
 }
 
 // AddProductInStock добавление продукта на склад
-func (r *PostgresProductRepository) AddProductInStock(tx *sqlx.Tx, p domain.AddProductInStock) error {
+func (r *PostgresProductRepository) AddProductInStock(tx *sqlx.Tx, productInStock domain.AddProductInStock) error {
 	_, err := tx.Exec(`
 	 insert into products_in_storage
 	 (variant_id, storage_id, added_at, quantity)
 	 values ($1, $2, $3, $4)`,
-		p.VariantId, p.StorageId, p.Added_at, p.Quantity)
+		productInStock.VariantId, productInStock.StorageId, productInStock.Added_at, productInStock.Quantity)
+		
 	return err
 }
 
