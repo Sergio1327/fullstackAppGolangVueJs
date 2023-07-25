@@ -78,7 +78,6 @@ func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 	}
 	productInfo, err := ph.productService.FindProductInfoById(productId)
 	if err != nil {
-		log.Println(err)
 		c.String(http.StatusBadRequest, "Не удалось найти информацию о продукте")
 		return
 	}
