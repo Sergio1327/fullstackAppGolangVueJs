@@ -185,9 +185,10 @@ func (r *PostgresProductRepository) LoadProductInfo(tx *sqlx.Tx, productId int) 
 func (r *PostgresProductRepository) AreExistsVariants(tx *sqlx.Tx, productId int) (isExists bool, err error) {
 	err = tx.Get(&isExists,
 		`select exists
-		(select 1 from product_variants)
-		 where product_id = $1`, productId)
-
+		(select 1 
+		from product_variants
+		where product_id = $1)`, productId)
+		log.Println(err)
 	return isExists, err
 }
 

@@ -78,6 +78,7 @@ func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 	}
 	productInfo, err := ph.productService.FindProductInfoById(productId)
 	if err != nil {
+		log.Println(err)
 		c.String(http.StatusBadRequest, "Не удалось найти информацию о продукте")
 		return
 	}
@@ -86,7 +87,7 @@ func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 }
 
 // LoadProductList выводит список продуктов по тегам и лимитам
-func (ph *ProductHandler) LoadProductList(c *gin.Context) {
+func (ph *ProductHandler) FindProductList(c *gin.Context) {
 	tag := c.Query("tag")
 	limitstr := c.Query("limit")
 	limit, err := strconv.Atoi(limitstr)
@@ -104,7 +105,7 @@ func (ph *ProductHandler) LoadProductList(c *gin.Context) {
 }
 
 // LoadProductsInStock выводит информацию о складах и продуктах в них
-func (ph *ProductHandler) LoadProductsInStock(c *gin.Context) {
+func (ph *ProductHandler) FindProductsInStock(c *gin.Context) {
 	id := c.Query("product_id")
 	if id == "" {
 		id = "0"
@@ -118,7 +119,7 @@ func (ph *ProductHandler) LoadProductsInStock(c *gin.Context) {
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Не удалось найти продукты на складе")
 	}
-	
+
 	c.JSON(http.StatusOK, stocks)
 }
 
