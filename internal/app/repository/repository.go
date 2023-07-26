@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"go-back/internal/app/domain"
 	"log"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -38,7 +37,7 @@ type ProductRepository interface {
 	Buy(tx *sqlx.Tx, s domain.Sale) (int, error)
 	FindPrice(tx *sqlx.Tx, variantID int) (float64, error)
 
-	FindSaleList(tx *sqlx.Tx, sq domain.SaleQueryWithoutFilters) ([]domain.Sale, error)
+	FindSaleListOnlyBySoldDate(tx *sqlx.Tx, sq domain.SaleQueryOnlyBySoldDate) ([]domain.Sale, error)
 	FindSaleListByFilters(tx *sqlx.Tx, sq domain.SaleQuery) ([]domain.Sale, error)
 }
 
@@ -98,7 +97,7 @@ func (r *PostgresProductRepository) CheckExists(tx *sqlx.Tx, p domain.ProductPri
 		return 0, err
 	}
 
-	return isExists, nil
+	return isExists,err
 }
 
 // UpdateProductPrice бновление цены варианта продукта
@@ -188,9 +187,9 @@ func (r *PostgresProductRepository) FindCurrentPrice(tx *sqlx.Tx, variantID int)
 		`select price 
 		 from product_prices 
 		 where variant_id = $1 
-		 and start_date < $2 
-		 and ( end_date is null or end_date > $2 )`,
-		variantID, time.Now())
+		 and start_date < now() 
+		 and ( end_date is null or end_date > now() )`,
+		variantID)
 
 	return price, err
 }
@@ -213,10 +212,6 @@ func (r *PostgresProductRepository) FindProductListByTag(tx *sqlx.Tx, tag string
 	 	 where $1 = any ( string_to_array( tags,',' )) 
 	 	 limit $2`,
 		tag, limit)
-
-	if err != nil {
-		return nil, err
-	}
 
 	return productList, err
 }
@@ -286,7 +281,7 @@ func (r *PostgresProductRepository) Buy(tx *sqlx.Tx, sale domain.Sale) (saleID i
 }
 
 // FindSaleList получение списка всех продаж
-func (r *PostgresProductRepository) FindSaleList(tx *sqlx.Tx, saleFilters domain.SaleQueryWithoutFilters) (saleList []domain.Sale, err error) {
+func (r *PostgresProductRepository) FindSaleListOnlyBySoldDate(tx *sqlx.Tx, saleFilters domain.SaleQueryOnlyBySoldDate) (saleList []domain.Sale, err error) {
 	query := `
 	SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
 	FROM sales s

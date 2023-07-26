@@ -424,13 +424,13 @@ func (u *ProductServiceImpl) FindSales(sq domain.SaleQuery) (sales []domain.Sale
 
 	// если не указано имя продукта или id склада то произойдет фильтрация только по датам
 	if !sq.ProductName.Valid && !sq.StorageId.Valid {
-		s := domain.SaleQueryWithoutFilters{
+		s := domain.SaleQueryOnlyBySoldDate{
 			StartDate: sq.StartDate,
 			EndDate:   sq.EndDate,
 			Limit:     sq.Limit,
 		}
 
-		sales, err = u.repo.FindSaleList(tx, s)
+		sales, err = u.repo.FindSaleListOnlyBySoldDate(tx, s)
 		if err != nil {
 			return nil, errors.New("не удалось найти продажи")
 		}

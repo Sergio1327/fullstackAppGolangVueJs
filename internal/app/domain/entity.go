@@ -94,7 +94,7 @@ type SaleQuery struct {
 	ProductName sqlnull.NullString `json:"product_name" db:"product_name"` // название продукта
 }
 
-type SaleQueryWithoutFilters struct {
+type SaleQueryOnlyBySoldDate struct {
 	StartDate time.Time         `json:"start_date" db:"sold_at"`	// дата начала продаж
 	EndDate   time.Time         `json:"end_date" db:"sold_at"`	    // дата конца продаж
 	Limit     sqlnull.NullInt64 `json:"limit" db:"limit"`			// лимит вывода

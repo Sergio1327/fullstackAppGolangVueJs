@@ -605,7 +605,7 @@ func TestFindSaleList(t *testing.T) {
 	r.NoError(err)
 	defer tx.Rollback()
 
-	sales, err := repo.FindSaleList(tx, domain.SaleQueryWithoutFilters{
+	sales, err := repo.FindSaleListOnlyBySoldDate(tx, domain.SaleQueryOnlyBySoldDate{
 		Limit:     sqlnull.NewInt64(3),
 		StartDate: startDate,
 		EndDate:   endDate,
