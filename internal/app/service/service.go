@@ -13,9 +13,9 @@ type ProductService interface {
 	AddProduct(p domain.Product) (int, error)
 	AddProductPrice(pr domain.ProductPrice) (int, error)
 	AddProductInStock(p domain.AddProductInStock) (int, error)
-	FindProductInfoById(id int) (domain.ProductInfo, error)
+	FindProductInfoById(productID int) (domain.ProductInfo, error)
 	FindProductList(tag string, limit int) ([]domain.ProductInfo, error)
-	FindProductsInStock(productId int) ([]domain.Stock, error)
+	FindProductsInStock(productID int) ([]domain.Stock, error)
 	Buy(p domain.Sale) (int, error)
 	FindSales(sq domain.SaleQuery) ([]domain.Sale, error)
 }
@@ -31,7 +31,7 @@ func NewProductUseCase(repo repository.ProductRepository) *ProductServiceImpl {
 }
 
 // AddProduct логика добавление продукта в базу
-func (u *ProductServiceImpl) AddProduct(product domain.Product) (productId int, err error) {
+func (u *ProductServiceImpl) AddProduct(product domain.Product) (productID int, err error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return 0, err
@@ -44,7 +44,7 @@ func (u *ProductServiceImpl) AddProduct(product domain.Product) (productId int, 
 	}
 
 	// добавляется продукт в базу
-	productId, err = u.repo.AddProduct(tx, product)
+	productID, err = u.repo.AddProduct(tx, product)
 	if err != nil {
 		return 0, errors.New("не удалось добавить продукт в базу данных")
 	}
@@ -55,12 +55,12 @@ func (u *ProductServiceImpl) AddProduct(product domain.Product) (productId int, 
 		if err != nil {
 			return 0, errors.New("ошибка в добавлении вариантов продукта")
 		}
-		return productId, nil
+		return productID, nil
 	}
 
 	// добавляются варианты продукта
 	for _, v := range product.VariantList {
-		err := u.repo.AddProductVariantList(tx, productId, v)
+		err := u.repo.AddProductVariantList(tx, productID, v)
 		if err != nil {
 			return 0, errors.New("не удалось добавить варианты продукта")
 		}
@@ -71,7 +71,7 @@ func (u *ProductServiceImpl) AddProduct(product domain.Product) (productId int, 
 		return 0, errors.New("не удалось добавить продукт и его варианты в базу")
 	}
 
-	return productId, nil
+	return productID, nil
 }
 
 // AddProductPrice  логика проверки цены и вставки в базу
@@ -82,7 +82,7 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) (priceID int
 	}
 	defer tx.Rollback()
 
-	variantID := strconv.Itoa(p.VariantId)
+	variantID := strconv.Itoa(p.VariantID)
 
 	//проверка  id варианта, цены, даты начала цены на нулевые значения
 	if variantID == "" {
@@ -164,7 +164,7 @@ func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) (prod
 }
 
 // FindProductInfoById  логика получения всей информации о продукте и его вариантах по id
-func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.ProductInfo, err error) {
+func (u *ProductServiceImpl) FindProductInfoById(productID int) (product domain.ProductInfo, err error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return domain.ProductInfo{}, nil
@@ -172,17 +172,17 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 	defer tx.Rollback()
 
 	// если пользователь не ввел id выводится ошибка
-	if id == 0 || id < 0 {
+	if productID == 0 || productID < 0 {
 		return domain.ProductInfo{}, errors.New("id не может быть меньше или равен 0")
 	}
 
 	// поиск продукта по его id
-	product, err = u.repo.LoadProductInfo(tx, id)
+	product, err = u.repo.LoadProductInfo(tx, productID)
 	if err != nil {
 		return domain.ProductInfo{}, errors.New("не удалось получить информацию о продукте")
 	}
 
-	product.VariantList, err = u.repo.FindProductVariantList(tx, product.ProductId)
+	product.VariantList, err = u.repo.FindProductVariantList(tx, product.ProductID)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
@@ -194,7 +194,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 	}
 
 	for i, v := range product.VariantList {
-		price, err := u.repo.FindCurrentPrice(tx, v.VariantId)
+		price, err := u.repo.FindCurrentPrice(tx, v.VariantID)
 		if err != nil {
 			switch err {
 			case sql.ErrNoRows:
@@ -208,7 +208,7 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 		product.VariantList[i].CurrentPrice = price
 
 		// получение id складов в которых есть этот продукт
-		inStorages, err := u.repo.InStorages(tx, v.VariantId)
+		inStorages, err := u.repo.InStorages(tx, v.VariantID)
 		if err != nil {
 			switch err {
 			case sql.ErrNoRows:
@@ -244,7 +244,7 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 		}
 
 		for i := range products {
-			vars, err := u.repo.FindProductVariantList(tx, products[i].ProductId)
+			vars, err := u.repo.FindProductVariantList(tx, products[i].ProductID)
 			if err != nil {
 				switch err {
 				case sql.ErrNoRows:
@@ -256,7 +256,7 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 			products[i].VariantList = vars
 			variantList := products[i].VariantList
 			for j := range variantList {
-				price, err := u.repo.FindCurrentPrice(tx, variantList[j].VariantId)
+				price, err := u.repo.FindCurrentPrice(tx, variantList[j].VariantID)
 				if err != nil {
 					switch err {
 					case sql.ErrNoRows:
@@ -267,7 +267,7 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 				}
 
 				variantList[j].CurrentPrice = price
-				inStorages, err := u.repo.InStorages(tx, variantList[j].VariantId)
+				inStorages, err := u.repo.InStorages(tx, variantList[j].VariantID)
 				if err != nil {
 					switch err {
 					case sql.ErrNoRows:
@@ -290,7 +290,7 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 		}
 
 		for i := range products {
-			vars, err := u.repo.FindProductVariantList(tx, products[i].ProductId)
+			vars, err := u.repo.FindProductVariantList(tx, products[i].ProductID)
 			if err != nil {
 				return nil, err
 			}
@@ -298,13 +298,13 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 			products[i].VariantList = vars
 			variants := products[i].VariantList
 			for j := range variants {
-				price, err := u.repo.FindCurrentPrice(tx, variants[j].VariantId)
+				price, err := u.repo.FindCurrentPrice(tx, variants[j].VariantID)
 				if err != nil {
 					return nil, err
 				}
 
 				variants[j].CurrentPrice = price
-				inStorages, err := u.repo.InStorages(tx, variants[j].VariantId)
+				inStorages, err := u.repo.InStorages(tx, variants[j].VariantID)
 				if err != nil {
 					return nil, err
 				}
@@ -318,19 +318,19 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 }
 
 // FindProductsInStock  логика получения всех складов и продуктов в ней или фильтрация по продукту
-func (u *ProductServiceImpl) FindProductsInStock(productId int) (stocks []domain.Stock, err error) {
+func (u *ProductServiceImpl) FindProductsInStock(productID int) (stocks []domain.Stock, err error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback()
 
-	if productId < 0 {
+	if productID < 0 {
 		return nil, errors.New("id продукта не может быть меньше нуля")
 	}
 
 	// если пользователь не ввел id продукта то будет выполнен поиск всех складов
-	if productId == 0 {
+	if productID == 0 {
 		stocks, err = u.repo.LoadStockList(tx)
 		if err != nil {
 			return nil, errors.New("не удалось найти склады")
@@ -347,7 +347,7 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) (stocks []domain
 	} else {
 
 		//Если же пользователь ввел id продукта то произойдет фильтрация складов по id продукта
-		stocks, err = u.repo.FindStockListByProductId(tx, productId)
+		stocks, err = u.repo.FindStockListByProductId(tx, productID)
 		if err != nil {
 			return nil, errors.New("не удалось найти склады с продуктами по данному id ")
 		}
@@ -365,7 +365,7 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) (stocks []domain
 }
 
 // Buy  логuка записи о покупке в базу
-func (u *ProductServiceImpl) Buy(p domain.Sale) (int, error) {
+func (u *ProductServiceImpl) Buy(p domain.Sale) (saleID int,err error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
 		return 0, err
@@ -382,7 +382,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) (int, error) {
 	p.SoldAt = time.Now()
 
 	// получение цены варианта
-	price, err := u.repo.FindPrice(tx, p.VariantId)
+	price, err := u.repo.FindPrice(tx, p.VariantID)
 	if err != nil {
 		return 0, errors.New("не удалось найти цену продукта")
 	}
@@ -391,7 +391,7 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) (int, error) {
 	p.TotalPrice = price * float64(p.Quantity)
 
 	// запись продажи в базу
-	saleID, err := u.repo.Buy(tx, p)
+	saleID, err = u.repo.Buy(tx, p)
 	if err != nil {
 		return 0, errors.New("не удалось записать продажу в базу")
 	}

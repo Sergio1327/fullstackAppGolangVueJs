@@ -30,7 +30,7 @@ func (ph *ProductHandler) AddProduct(c *gin.Context) {
 		return
 	}
 
-	productId, err := ph.productService.AddProduct(product)
+	productID, err := ph.productService.AddProduct(product)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "не удалось добавить продукт",
@@ -40,7 +40,7 @@ func (ph *ProductHandler) AddProduct(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"product_id": productId,
+		"product_id": productID,
 	})
 }
 
@@ -55,7 +55,7 @@ func (ph *ProductHandler) AddProductPrice(c *gin.Context) {
 		return
 	}
 
-	priceId, err := ph.productService.AddProductPrice(productPrice)
+	priceID, err := ph.productService.AddProductPrice(productPrice)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -65,7 +65,7 @@ func (ph *ProductHandler) AddProductPrice(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"price_id": priceId,
+		"price_id": priceID,
 	})
 }
 

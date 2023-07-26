@@ -39,7 +39,7 @@ func TestAddProduct(t *testing.T) {
 
 	product, err := repo.LoadProductInfo(tx, id)
 	r.NoError(err)
-	r.Equal(id, product.ProductId)
+	r.Equal(id, product.ProductID)
 	r.NotEmpty(product)
 }
 
@@ -94,7 +94,7 @@ func TestCheckExists(t *testing.T) {
 	r.NoError(err)
 
 	_, err = repo.CheckExists(tx, domain.ProductPrice{
-		VariantId: 4,
+		VariantID: 4,
 		StartDate: time.Now(),
 		Price:     15.2,
 	})
@@ -139,7 +139,7 @@ func TestAddProductPrice(t *testing.T) {
 	r.NoError(err)
 
 	priceID, err := repo.AddProductPrice(tx, domain.ProductPrice{
-		VariantId: 5,
+		VariantID: 5,
 		StartDate: startDate,
 		Price:     18.99,
 	})
@@ -167,8 +167,8 @@ func TestCheckProductInStock(t *testing.T) {
 	r.NoError(err)
 
 	_, err = repo.CheckProductInStock(tx, domain.AddProductInStock{
-		VariantId: 4,
-		StorageId: 2,
+		VariantID: 4,
+		StorageID: 2,
 	})
 	r.NoError(err)
 }
@@ -193,8 +193,8 @@ func TestUpdateProductInStock(t *testing.T) {
 
 	repo := repository.NewPostgresProductRepository(db)
 	productStockID, err := repo.UpdateProductInstock(tx, domain.AddProductInStock{
-		VariantId: 4,
-		StorageId: 2,
+		VariantID: 4,
+		StorageID: 2,
 		Quantity:  3,
 	})
 	r.NotZero(productStockID)
@@ -214,8 +214,8 @@ func TestAddProductInStock(t *testing.T) {
 
 	repo := repository.NewPostgresProductRepository(db)
 	productStockID, err := repo.AddProductInStock(tx, domain.AddProductInStock{
-		VariantId: 3,
-		StorageId: 1,
+		VariantID: 3,
+		StorageID: 1,
 		AddedAt:   time.Now(),
 		Quantity:  5,
 	})
@@ -306,7 +306,7 @@ func TestFindCurrentPrice(t *testing.T) {
 
 	var id int
 	pp := domain.ProductPrice{
-		VariantId: 1,
+		VariantID: 1,
 		Price:     14.99,
 		StartDate: time.Now(),
 	}
@@ -316,7 +316,7 @@ func TestFindCurrentPrice(t *testing.T) {
 		 (variant_id,price,start_date)
 	 	 values($1,$2,$3)
 		 returning variant_id`,
-		pp.VariantId, pp.Price, pp.StartDate).Scan(&id)
+		pp.VariantID, pp.Price, pp.StartDate).Scan(&id)
 	r.NoError(err)
 
 	price, err := repo.FindCurrentPrice(tx, id)
@@ -339,8 +339,8 @@ func TestInStorages(t *testing.T) {
 
 	var id int
 	product := domain.AddProductInStock{
-		VariantId: 5,
-		StorageId: 1,
+		VariantID: 5,
+		StorageID: 1,
 		AddedAt:   time.Now(),
 		Quantity:  3,
 	}
@@ -350,7 +350,7 @@ func TestInStorages(t *testing.T) {
 		 (variant_id,storage_id,added_at,quantity)
 		 values($1,$2,$3,$4)
 		 returning variant_id`,
-		product.VariantId, product.StorageId, product.AddedAt, product.Quantity).Scan(&id)
+		product.VariantID, product.StorageID, product.AddedAt, product.Quantity).Scan(&id)
 	r.NoError(err)
 
 	inStorages, err := repo.InStorages(tx, id)
@@ -529,9 +529,9 @@ func TestFindPrice(t *testing.T) {
 	r.NoError(err)
 	defer tx.Rollback()
 
-	var variantId int
+	var variantID int
 	priceQuery := domain.ProductPrice{
-		VariantId: 1,
+		VariantID: 1,
 		Price:     9.99,
 		StartDate: time.Now(),
 	}
@@ -541,10 +541,10 @@ func TestFindPrice(t *testing.T) {
 	(variant_id,price,start_date)
 	values ($1,$2,$3) 
 	returning variant_id`,
-		priceQuery.VariantId, priceQuery.Price, priceQuery.StartDate).Scan(&variantId)
+		priceQuery.VariantID, priceQuery.Price, priceQuery.StartDate).Scan(&variantID)
 	r.NoError(err)
 
-	price, err := repo.FindPrice(tx, variantId)
+	price, err := repo.FindPrice(tx, variantID)
 	r.NoError(err)
 	r.NotEmpty(price)
 }
@@ -564,8 +564,8 @@ func TestBuy(t *testing.T) {
 	defer tx.Rollback()
 
 	saleQuery := domain.Sale{
-		VariantId:  1,
-		StorageId:  3,
+		VariantID:  1,
+		StorageID:  3,
 		Quantity:   2,
 		TotalPrice: 19.99,
 	}
@@ -580,7 +580,7 @@ func TestBuy(t *testing.T) {
 	where variant_id=$1 
 	and storage_id=$2 
 	and quantity=$3`,
-		saleQuery.VariantId, saleQuery.StorageId, saleQuery.Quantity)
+		saleQuery.VariantID, saleQuery.StorageID, saleQuery.Quantity)
 	r.NoError(err)
 	r.NotZero(saleID)
 	r.NotEmpty(sale)

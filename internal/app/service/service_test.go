@@ -1,11 +1,9 @@
 package service_test
 
 import (
-	"encoding/json"
 	"go-back/internal/app/repository"
 	"go-back/internal/app/service"
 	"go-back/internal/pkg/database"
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -30,10 +28,7 @@ func TestFindProductListByTag(t *testing.T) {
 
 	products, err := serv.FindProductList(tag, limit)
 	r.NoError(err)
-
-	jsonProducts, err := json.Marshal(products)
 	r.NoError(err)
-	log.Println(string(jsonProducts))
 	r.NoError(err)
 	r.NotEmpty(products)
 }
