@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
 	"go-back/internal/app/domain"
 	"go-back/internal/app/repository"
@@ -181,29 +182,26 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 		return domain.ProductInfo{}, errors.New("не удалось получить информацию о продукте")
 	}
 
-	// проверка имеется ли на данный моммент у продукта его варианты
-	isExists, err := u.repo.AreExistsVariantList(tx, id)
-	if err != nil {
-		return domain.ProductInfo{}, errors.New("ошибка при проверке наличия вариантов продукта")
-	}
-
-	// если вариантов нет  то выведется информация о продукте без вариантов
-	if !isExists {
-		emptyVariants := []domain.Variant{}
-		product.VariantList = emptyVariants
-		return product, nil
-	}
-
-	// если варианты есть то происходит поиск всех вариантов
 	product.VariantList, err = u.repo.FindProductVariantList(tx, product.ProductId)
 	if err != nil {
-		return domain.ProductInfo{}, errors.New("не удалось найти варианты продукта")
+		switch err {
+		case sql.ErrNoRows:
+			return product, nil
+		default:
+			return domain.ProductInfo{}, errors.New("не удалось найти варианты продукта")
+		}
+
 	}
 
 	for i, v := range product.VariantList {
 		price, err := u.repo.FindCurrentPrice(tx, v.VariantId)
 		if err != nil {
-			return domain.ProductInfo{}, errors.New("не удалось найти актуальную цену варианта продукта")
+			switch err {
+			case sql.ErrNoRows:
+				continue
+			default:
+				return domain.ProductInfo{}, errors.New("не удалось найти актуальную цену варианта продукта")
+			}
 		}
 
 		// получение актуальной цены для каждого варианта продукта
@@ -212,7 +210,12 @@ func (u *ProductServiceImpl) FindProductInfoById(id int) (product domain.Product
 		// получение id складов в которых есть этот продукт
 		inStorages, err := u.repo.InStorages(tx, v.VariantId)
 		if err != nil {
-			return domain.ProductInfo{}, errors.New("не удалось найти склады в которых есть продукт")
+			switch err {
+			case sql.ErrNoRows:
+				continue
+			default:
+				return domain.ProductInfo{}, errors.New("не удалось найти склады в которых есть продукт")
+			}
 		}
 		product.VariantList[i].InStorages = inStorages
 	}

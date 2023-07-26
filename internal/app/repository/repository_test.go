@@ -251,33 +251,6 @@ func TestLoadProductInfo(t *testing.T) {
 	r.NotEmpty(productInfo)
 }
 
-func TestAreExistsVariantList(t *testing.T) {
-	r := require.New(t)
-
-	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
-	db, err := database.NewPostgreSQLdb(conStr)
-	r.NoError(err)
-	defer db.Close()
-
-	repo := repository.NewPostgresProductRepository(db)
-
-	tx, err := repo.TxBegin()
-	r.NoError(err)
-	defer tx.Rollback()
-
-	productId, err := repo.AddProduct(tx, domain.Product{
-		Name:    "dlsldsd",
-		Descr:   "fdfd'fd",
-		AddetAt: time.Now(),
-		Tags:    "dqwqwqw",
-	})
-	r.NoError(err)
-	r.NotEmpty(productId)
-
-	_, err = repo.AreExistsVariantList(tx, productId)
-	r.NoError(err)
-}
-
 func TestFindProductVariantList(t *testing.T) {
 	r := require.New(t)
 

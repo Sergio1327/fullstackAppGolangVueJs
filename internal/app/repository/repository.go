@@ -24,7 +24,6 @@ type ProductRepository interface {
 	AddProductInStock(tx *sqlx.Tx, p domain.AddProductInStock) (int, error)
 
 	LoadProductInfo(tx *sqlx.Tx, id int) (domain.ProductInfo, error)
-	AreExistsVariantList(tx *sqlx.Tx, productId int) (bool, error)
 	FindProductVariantList(tx *sqlx.Tx, id int) ([]domain.Variant, error)
 	FindCurrentPrice(tx *sqlx.Tx, variantId int) (float64, error)
 	InStorages(tx *sqlx.Tx, id int) ([]int, error)
@@ -176,16 +175,6 @@ func (r *PostgresProductRepository) LoadProductInfo(tx *sqlx.Tx, productId int) 
 	return productInfo, err
 }
 
-func (r *PostgresProductRepository) AreExistsVariantList(tx *sqlx.Tx, productId int) (isExists bool, err error) {
-	err = tx.Get(&isExists,
-		`select exists
-		(select 1 
-		from product_variants
-		where product_id = $1)`, productId)
-
-	return isExists, err
-}
-
 // FindProductVariants  получение вариантов продукта по его id
 func (r *PostgresProductRepository) FindProductVariantList(tx *sqlx.Tx, productId int) (variantList []domain.Variant, err error) {
 	err = tx.Select(&variantList,
@@ -224,7 +213,7 @@ func (r *PostgresProductRepository) FindProductListByTag(tx *sqlx.Tx, tag string
 	err = tx.Select(&productList,
 		`select product_id, name, description
 	 	 from products 
-	 	 where $1 = any (string_to_array(tags,',')) 
+	 	 where $1 = any ( string_to_array( tags,',' )) 
 	 	 limit $2`,
 		tag, limit)
 
@@ -310,7 +299,7 @@ func (r *PostgresProductRepository) FindSaleList(tx *sqlx.Tx, saleFilters domain
 	LIMIT $3`
 
 	err = tx.Select(&saleList, query, saleFilters.StartDate, saleFilters.EndDate, saleFilters.Limit)
-	
+
 	return saleList, err
 }
 
