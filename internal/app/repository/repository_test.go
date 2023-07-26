@@ -43,7 +43,7 @@ func TestAddProduct(t *testing.T) {
 	r.NotEmpty(product)
 }
 
-func TestAddProductVariants(t *testing.T) {
+func TestAddProductVariantList(t *testing.T) {
 	r := require.New(t)
 
 	id := 1
@@ -64,7 +64,7 @@ func TestAddProductVariants(t *testing.T) {
 		Unit:   "г",
 	}
 
-	err = repo.AddProductVariants(tx, id, varQuery)
+	err = repo.AddProductVariantList(tx, id, varQuery)
 	r.NoError(err)
 
 	var variant domain.Variant
@@ -148,7 +148,7 @@ func TestAddProductPrice(t *testing.T) {
 	r.NoError(err)
 }
 
-func TestCheckProductsInStock(t *testing.T) {
+func TestCheckProductInStock(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -166,14 +166,14 @@ func TestCheckProductsInStock(t *testing.T) {
 		 values($1,$2,$3)`, 4, 2, 10)
 	r.NoError(err)
 
-	_, err = repo.CheckProductsInStock(tx, domain.AddProductInStock{
+	_, err = repo.CheckProductInStock(tx, domain.AddProductInStock{
 		VariantId: 4,
 		StorageId: 2,
 	})
 	r.NoError(err)
 }
 
-func TestUpdateProductsInStock(t *testing.T) {
+func TestUpdateProductInStock(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -192,7 +192,7 @@ func TestUpdateProductsInStock(t *testing.T) {
 	r.NoError(err)
 
 	repo := repository.NewPostgresProductRepository(db)
-	productStockID, err := repo.UpdateProductsInstock(tx, domain.AddProductInStock{
+	productStockID, err := repo.UpdateProductInstock(tx, domain.AddProductInStock{
 		VariantId: 4,
 		StorageId: 2,
 		Quantity:  3,
@@ -251,7 +251,7 @@ func TestLoadProductInfo(t *testing.T) {
 	r.NotEmpty(productInfo)
 }
 
-func TestAreExistsVariants(t *testing.T) {
+func TestAreExistsVariantList(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -274,11 +274,11 @@ func TestAreExistsVariants(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(productId)
 
-	_, err = repo.AreExistsVariants(tx, productId)
+	_, err = repo.AreExistsVariantList(tx, productId)
 	r.NoError(err)
 }
 
-func TestFindProductVariants(t *testing.T) {
+func TestFindProductVariantList(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -298,10 +298,10 @@ func TestFindProductVariants(t *testing.T) {
 	}
 
 	id := 2
-	err = repo.AddProductVariants(tx, id, varquery)
+	err = repo.AddProductVariantList(tx, id, varquery)
 	r.NoError(err)
 
-	variants, err := repo.FindProductVariants(tx, id)
+	variants, err := repo.FindProductVariantList(tx, id)
 	r.NoError(err)
 	r.NotEmpty(variants)
 
@@ -385,7 +385,7 @@ func TestInStorages(t *testing.T) {
 	r.NotEmpty(inStorages)
 }
 
-func TestFindProductsByTag(t *testing.T) {
+func TestFindProductListByTag(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -430,19 +430,19 @@ func TestFindProductsByTag(t *testing.T) {
 	tag := "напиток"
 	limit := 3
 
-	products, err := repo.FindProductsByTag(tx, tag, limit)
+	products, err := repo.FindProductListByTag(tx, tag, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
 
 	tag = "стирка"
 	limit = 1
 
-	products, err = repo.FindProductsByTag(tx, tag, limit)
+	products, err = repo.FindProductListByTag(tx, tag, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
 }
 
-func TestLoadProducts(t *testing.T) {
+func TestLoadProductList(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -458,13 +458,13 @@ func TestLoadProducts(t *testing.T) {
 
 	limit := 3
 
-	products, err := repo.LoadProducts(tx, limit)
+	products, err := repo.LoadProductList(tx, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
 
 	limit = 1
 
-	products, err = repo.LoadProducts(tx, limit)
+	products, err = repo.LoadProductList(tx, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
 
@@ -473,7 +473,7 @@ func TestLoadProducts(t *testing.T) {
 	}
 }
 
-func TestLoadStocks(t *testing.T) {
+func TestLoadStockList(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -487,12 +487,12 @@ func TestLoadStocks(t *testing.T) {
 	r.NoError(err)
 	defer tx.Rollback()
 
-	stocks, err := repo.LoadStocks(tx)
+	stocks, err := repo.LoadStockList(tx)
 	r.NoError(err)
 	r.NotEmpty(stocks)
 }
 
-func TestFindStocksByProductId(t *testing.T) {
+func TestFindStockListByProductId(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -507,17 +507,17 @@ func TestFindStocksByProductId(t *testing.T) {
 	defer tx.Rollback()
 
 	id := 1
-	stocks, err := repo.FindStocksByProductId(tx, id)
+	stocks, err := repo.FindStockListByProductId(tx, id)
 	r.NoError(err)
 	r.NotEmpty(stocks)
 
 	id = 2
-	stocks, err = repo.FindStocksByProductId(tx, id)
+	stocks, err = repo.FindStockListByProductId(tx, id)
 	r.NoError(err)
 	r.NotEmpty(stocks)
 }
 
-func TestFindStockVariants(t *testing.T) {
+func TestFindStockVariantList(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -532,12 +532,12 @@ func TestFindStockVariants(t *testing.T) {
 	defer tx.Rollback()
 
 	storageId := 1
-	variants, err := repo.FindStocksVariants(tx, storageId)
+	variants, err := repo.FindStocksVariantList(tx, storageId)
 	r.NoError(err)
 	r.NotEmpty(variants)
 
 	storageId = 2
-	variants, err = repo.FindStocksVariants(tx, storageId)
+	variants, err = repo.FindStocksVariantList(tx, storageId)
 	r.NoError(err)
 	r.NotEmpty(variants)
 }
@@ -613,7 +613,7 @@ func TestBuy(t *testing.T) {
 	r.NotEmpty(sale)
 }
 
-func TestFindSales(t *testing.T) {
+func TestFindSaleList(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -632,7 +632,7 @@ func TestFindSales(t *testing.T) {
 	r.NoError(err)
 	defer tx.Rollback()
 
-	sales, err := repo.FindSales(tx, domain.SaleQueryWithoutFilters{
+	sales, err := repo.FindSaleList(tx, domain.SaleQueryWithoutFilters{
 		Limit:     sqlnull.NewInt64(3),
 		StartDate: startDate,
 		EndDate:   endDate,
@@ -641,7 +641,7 @@ func TestFindSales(t *testing.T) {
 	r.NotEmpty(sales)
 }
 
-func TestFindSalesByFilters(t *testing.T) {
+func TestFindSaleListByFilters(t *testing.T) {
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -659,14 +659,14 @@ func TestFindSalesByFilters(t *testing.T) {
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
-	data, err := repo.FindSalesByFilters(tx, domain.SaleQuery{
+	data, err := repo.FindSaleListByFilters(tx, domain.SaleQuery{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 	})
 	r.NoError(err)
 	r.NotEmpty(data)
 
-	data2, err := repo.FindSalesByFilters(tx, domain.SaleQuery{
+	data2, err := repo.FindSaleListByFilters(tx, domain.SaleQuery{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 		StorageId: sqlnull.NewNullInt64(1),
@@ -675,7 +675,7 @@ func TestFindSalesByFilters(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(data2)
 
-	data3, err := repo.FindSalesByFilters(tx, domain.SaleQuery{
+	data3, err := repo.FindSaleListByFilters(tx, domain.SaleQuery{
 		StartDate:   startDate,
 		EndDate:     startDate.AddDate(0, 1, 0),
 		StorageId:   sqlnull.NewNullInt64(1),

@@ -14,7 +14,7 @@ type Product struct {
 	AddetAt   time.Time        `json:"added_at"`    //Дата добавления продукта
 	RemovedAt sqlnull.NullTime `json:"removed_at"`  // дата удаления продукта
 	Tags       string           `json:"tags"`        //теги продукта
-	Variants   []Variant        `json:"variants"`    //	Список вариантов продукта
+	VariantList   []Variant        `json:"variants"`    //	Список вариантов продукта
 }
 
 // Variant структура варианта, продукта представляем с собой информацию о продукте который нужно внести в базу
@@ -57,14 +57,14 @@ type ProductInfo struct {
 	ProductId int       `db:"product_id"`  //id продукта
 	Name      string    `db:"name"`        //название продукта
 	Descr     string    `db:"description"` //описание продукта
-	Variants  []Variant //список вариантов продукта
+	VariantList  []Variant //список вариантов продукта
 }
 
 // Stock структура склада
 type Stock struct {
 	StorageID       int                 `db:"storage_id"` //id склада
 	StorageName     string              `db:"name"`       //название склада
-	ProductVariants []AddProductInStock //список продуктов на данном складе
+	ProductVariantList []AddProductInStock //список продуктов на данном складе
 }
 
 // Sale структура продажи

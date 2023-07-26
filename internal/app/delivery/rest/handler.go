@@ -125,7 +125,7 @@ func (ph *ProductHandler) FindProductList(c *gin.Context) {
 		limit = 3
 	}
 
-	products, err := ph.productService.FindProductList(tag, limit)
+	productList, err := ph.productService.FindProductList(tag, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Не удалось найти список продуктов",
@@ -133,11 +133,11 @@ func (ph *ProductHandler) FindProductList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, products)
+	c.JSON(http.StatusOK, productList)
 }
 
 // LoadProductsInStock выводит информацию о складах и продуктах в них
-func (ph *ProductHandler) FindProductsInStock(c *gin.Context) {
+func (ph *ProductHandler) FindProductListInStock(c *gin.Context) {
 	id := c.Query("product_id")
 	if id == "" {
 		id = "0"
@@ -150,14 +150,14 @@ func (ph *ProductHandler) FindProductsInStock(c *gin.Context) {
 		return
 	}
 
-	stocks, err := ph.productService.FindProductsInStock(productId)
+	stockList, err := ph.productService.FindProductsInStock(productId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "не удалось найти продукты на складе",
 		})
 	}
 
-	c.JSON(http.StatusOK, stocks)
+	c.JSON(http.StatusOK, stockList)
 }
 
 // Buy  запись сделанной продажи в базу
@@ -185,7 +185,7 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 }
 
 // FindSales выводит информацию о продажах по фильтрам или без них
-func (ph *ProductHandler) FindSales(c *gin.Context) {
+func (ph *ProductHandler) FindSaleList(c *gin.Context) {
 	var salequery domain.SaleQuery
 
 	if err := c.ShouldBindJSON(&salequery); err != nil {
@@ -195,7 +195,7 @@ func (ph *ProductHandler) FindSales(c *gin.Context) {
 		return
 	}
 
-	sales, err := ph.productService.FindSales(salequery)
+	saleList, err := ph.productService.FindSales(salequery)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "не удалось найти продажи по данным фильтрам",
@@ -203,5 +203,5 @@ func (ph *ProductHandler) FindSales(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, sales)
+	c.JSON(http.StatusOK, saleList)
 }

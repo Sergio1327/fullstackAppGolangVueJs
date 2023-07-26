@@ -32,9 +32,9 @@ func main() {
 	r.POST("/product/add/stock", handler.AddProductInStock)
 	r.GET("/product/:id", handler.FindProductInfoById)
 	r.GET("/product_list", handler.FindProductList)
-	r.GET("/stock", handler.FindProductsInStock)
+	r.GET("/stock", handler.FindProductListInStock)
 	r.POST("/buy", handler.Buy)
-	r.POST("/sales", handler.FindSales)
+	r.POST("/sales", handler.FindSaleList)
 
 	// запуск сервера
 	err = r.Run(":8080")
