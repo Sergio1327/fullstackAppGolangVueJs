@@ -97,7 +97,7 @@ func (r *PostgresProductRepository) CheckExists(tx *sqlx.Tx, p domain.ProductPri
 		return 0, err
 	}
 
-	return isExists,err
+	return isExists, err
 }
 
 // UpdateProductPrice бновление цены варианта продукта
@@ -280,7 +280,7 @@ func (r *PostgresProductRepository) Buy(tx *sqlx.Tx, sale domain.Sale) (saleID i
 	return saleID, err
 }
 
-// FindSaleList получение списка всех продаж
+// FindSaleListOnlyBySoldDate получение списка всех продаж
 func (r *PostgresProductRepository) FindSaleListOnlyBySoldDate(tx *sqlx.Tx, saleFilters domain.SaleQueryOnlyBySoldDate) (saleList []domain.Sale, err error) {
 	query := `
 	SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
@@ -307,14 +307,6 @@ func (r *PostgresProductRepository) FindSaleListByFilters(tx *sqlx.Tx, saleFilte
 	AND ( cast(:storage_id as integer) IS NULL OR s.storage_id = :storage_id ) 
 	LIMIT :limit`
 
-	params := map[string]interface{}{
-		"start_date":   saleFilters.StartDate,
-		"end_date":     saleFilters.EndDate,
-		"product_name": saleFilters.ProductName,
-		"storage_id":   saleFilters.StorageId,
-		"limit":        saleFilters.Limit,
-	}
-
 	stmt, err := tx.PrepareNamed(query)
 	if err != nil {
 		log.Print(err.Error())
@@ -322,7 +314,7 @@ func (r *PostgresProductRepository) FindSaleListByFilters(tx *sqlx.Tx, saleFilte
 	}
 	defer stmt.Close()
 
-	err = stmt.Select(&saleList, params)
+	err = stmt.Select(&saleList, saleFilters)
 
 	return saleList, err
 }

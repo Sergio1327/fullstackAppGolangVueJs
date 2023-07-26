@@ -197,6 +197,7 @@ func (ph *ProductHandler) FindSaleList(c *gin.Context) {
 
 	saleList, err := ph.productService.FindSales(salequery)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "не удалось найти продажи по данным фильтрам",
 		})

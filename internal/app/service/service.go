@@ -5,6 +5,7 @@ import (
 	"errors"
 	"go-back/internal/app/domain"
 	"go-back/internal/app/repository"
+	"log"
 	"strconv"
 	"time"
 )
@@ -440,6 +441,7 @@ func (u *ProductServiceImpl) FindSales(sq domain.SaleQuery) (sales []domain.Sale
 		//  если имя продукта или id склада указан то произойдет фильтрация по этим параметрам
 		sales, err = u.repo.FindSaleListByFilters(tx, sq)
 		if err != nil {
+			log.Println(err)
 			return nil, errors.New("не удалось найти продажи по данным фильтрам")
 		}
 
