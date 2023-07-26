@@ -55,15 +55,18 @@ func (ph *ProductHandler) AddProductPrice(c *gin.Context) {
 		return
 	}
 
-	err := ph.productService.AddProductPrice(productPrice)
+	priceId, err := ph.productService.AddProductPrice(productPrice)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "не удалось добавить цену продукта",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, "the price was added")
+	c.JSON(http.StatusOK, gin.H{
+		"price_id": priceId,
+	})
 }
 
 // AddProductInStock добавляет продукт в склад
@@ -77,7 +80,7 @@ func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 		return
 	}
 
-	err := ph.productService.AddProductInStock(addProduct)
+	productStockID, err := ph.productService.AddProductInStock(addProduct)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "не удалось добавить продукт на склад",
@@ -85,7 +88,9 @@ func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "The product was succesfuly added in storage")
+	c.JSON(http.StatusOK, gin.H{
+		"product_in_stock_id": productStockID,
+	})
 }
 
 // FindProductInfoById  выводит данные о продукте по его id
@@ -166,7 +171,7 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 		return
 	}
 
-	err := ph.productService.Buy(sale)
+	saleID, err := ph.productService.Buy(sale)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "не удалось добавить продажи в базу данных",
@@ -174,7 +179,9 @@ func (ph *ProductHandler) Buy(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, "the sale was added")
+	c.JSON(http.StatusOK, gin.H{
+		"sale_id": saleID,
+	})
 }
 
 // FindSales выводит информацию о продажах по фильтрам или без них

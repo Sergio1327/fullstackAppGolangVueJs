@@ -10,12 +10,12 @@ import (
 
 type ProductService interface {
 	AddProduct(p domain.Product) (int, error)
-	AddProductPrice(pr domain.ProductPrice) error
-	AddProductInStock(p domain.AddProductInStock) error
+	AddProductPrice(pr domain.ProductPrice) (int, error)
+	AddProductInStock(p domain.AddProductInStock) (int, error)
 	FindProductInfoById(id int) (domain.ProductInfo, error)
 	FindProductList(tag string, limit int) ([]domain.ProductInfo, error)
 	FindProductsInStock(productId int) ([]domain.Stock, error)
-	Buy(p domain.Sale) error
+	Buy(p domain.Sale) (int, error)
 	FindSales(sq domain.SaleQuery) ([]domain.Sale, error)
 }
 
@@ -74,10 +74,10 @@ func (u *ProductServiceImpl) AddProduct(product domain.Product) (productId int, 
 }
 
 // AddProductPrice  логика проверки цены и вставки в базу
-func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
+func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) (priceID int, err error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer tx.Rollback()
 
@@ -85,87 +85,81 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) error {
 
 	//проверка  id варианта, цены, даты начала цены на нулевые значения
 	if variantID == "" {
-		return errors.New("нет варианта продукта с таким id")
+		return 0, errors.New("нет варианта продукта с таким id")
 	}
 
 	if p.Price == 0 {
-		return errors.New("цена не может быть пустой или равна 0")
+		return 0, errors.New("цена не может быть пустой или равна 0")
 	}
 
 	if p.StartDate == (time.Time{}) {
-		return errors.New("дата не может быть пустой")
+		return 0, errors.New("дата не может быть пустой")
 	}
+
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
 	isExistsId, err := u.repo.CheckExists(tx, p)
 	if err != nil {
-		return errors.New("ошибка при проверке цен в базе данных")
+		return 0, errors.New("ошибка при проверке цен в базе данных")
 	}
-	// если пользователь ввел дату окончания цены то
-	// прооисходит проверка есть ли записи уже в базе
-	if p.EndDate.Valid {
-		// если записи есть то вставляется дата окончания цены
-		if isExistsId > 0 {
-			p.EndDate.Time = time.Now()
-			err := u.repo.UpdateProductPrice(tx, p, isExistsId)
-			if err != nil {
-				return errors.New("не удалось обновить цену")
-			}
-		} else {
-			// если же нет то просто добавляется запись в базу
-			err := u.repo.AddProductPriceWithEndDate(tx, p)
-			if err != nil {
-				return errors.New("не удалось добавить цену")
-			}
 
-		}
-		// если пользователь не ввел дату окончания то просто вставляется новая запись в базу
-	} else {
-		err := u.repo.AddProductPrice(tx, p)
+	// если запись уже имеется устанавливается дата окончания цены
+	if isExistsId > 0 {
+		p.EndDate.Time = time.Now()
+		err := u.repo.UpdateProductPrice(tx, p, isExistsId)
 		if err != nil {
-			return errors.New("не удалось добавить цену")
+			return 0, errors.New("не удалось обновить цену")
 		}
 
+		priceID = isExistsId
+	} else {
+		// если записи нет то цена вставляется в базу
+		priceId, err := u.repo.AddProductPrice(tx, p)
+		if err != nil {
+			return 0, errors.New("не удалось добавить цену")
+		}
+		priceID = priceId
 	}
+
 	err = tx.Commit()
-	return err
+	return priceID, err
 }
 
 // AddProductInStock логика проверка продукта на складе и обновления или добавления на базу
-func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) error {
+func (u *ProductServiceImpl) AddProductInStock(p domain.AddProductInStock) (productStockID int, err error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer tx.Rollback()
 
 	// проверка запроса на нулевые значения
 	err = p.IsNullFields()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// проверка есть ли уже продукт на складе
 	isExist, err := u.repo.CheckProductsInStock(tx, p)
 	if err != nil {
-		return errors.New("ошибка при проверке наличия продукта на складе")
+		return 0, errors.New("ошибка при проверке наличия продукта на складе")
 	}
 
 	// если продукт уже имеется в базе обновляется его кол-во
 	if isExist {
-		err := u.repo.UpdateProductsInstock(tx, p)
+		productStockID, err = u.repo.UpdateProductsInstock(tx, p)
 		if err != nil {
-			return errors.New("не удалось обновить кол-во продуктов на складе")
+			return 0, errors.New("не удалось обновить кол-во продуктов на складе")
 		}
 	} else {
 		// если продукта нет на складе то он просто добавляется на склад
-		err := u.repo.AddProductInStock(tx, p)
+		productStockID, err = u.repo.AddProductInStock(tx, p)
 		if err != nil {
-			return errors.New("не удалось добавить продукт на склад")
+			return 0, errors.New("не удалось добавить продукт на склад")
 		}
 	}
 
 	err = tx.Commit()
-	return err
+	return productStockID, err
 }
 
 // FindProductInfoById  логика получения всей информации о продукте и его вариантах по id
@@ -353,17 +347,17 @@ func (u *ProductServiceImpl) FindProductsInStock(productId int) (stocks []domain
 }
 
 // Buy  логuка записи о покупке в базу
-func (u *ProductServiceImpl) Buy(p domain.Sale) error {
+func (u *ProductServiceImpl) Buy(p domain.Sale) (int, error) {
 	tx, err := u.repo.TxBegin()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer tx.Rollback()
 
 	// проверка фильтров на нулевые значения ,которые ввел пользователь
 	err = p.IsNullFields()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// устанавливаем текущую дату как дату продажи
@@ -372,19 +366,19 @@ func (u *ProductServiceImpl) Buy(p domain.Sale) error {
 	// получение цены варианта
 	price, err := u.repo.FindPrice(tx, p.VariantId)
 	if err != nil {
-		return errors.New("не удалось найти цену продукта")
+		return 0, errors.New("не удалось найти цену продукта")
 	}
 
 	// подсчет общей цены продажи
 	p.TotalPrice = price * float64(p.Quantity)
 
 	// запись продажи в базу
-	err = u.repo.Buy(tx, p)
+	saleID, err := u.repo.Buy(tx, p)
 	if err != nil {
-		return errors.New("не удалось записать продажу в базу")
+		return 0, errors.New("не удалось записать продажу в базу")
 	}
 	err = tx.Commit()
-	return err
+	return saleID, err
 }
 
 // LoadSales  получение списка всех продаж или списка продаж по фильтрам

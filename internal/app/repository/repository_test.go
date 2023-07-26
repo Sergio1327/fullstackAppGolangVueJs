@@ -121,34 +121,6 @@ func TestUpdateProductPrice(t *testing.T) {
 	r.NoError(err)
 }
 
-func TestAddProductPriceWithEndDate(t *testing.T) {
-	r := require.New(t)
-
-	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
-	db, err := database.NewPostgreSQLdb(conStr)
-	r.NoError(err)
-	defer db.Close()
-
-	tx, err := db.Beginx()
-	defer tx.Rollback()
-	r.NoError(err)
-
-	repo := repository.NewPostgresProductRepository(db)
-	startDate, err := time.Parse("02.01.2006", "01.07.2023")
-	r.NoError(err)
-
-	endDate, err := time.Parse("02.01.2006", "20.07.2023")
-	r.NoError(err)
-
-	err = repo.AddProductPriceWithEndDate(tx, domain.ProductPrice{
-		VariantId: 4,
-		StartDate: startDate,
-		EndDate:   sqlnull.NewNullTime(endDate),
-		Price:     10.99,
-	})
-
-	r.NoError(err)
-}
 func TestAddProductPrice(t *testing.T) {
 	r := require.New(t)
 
@@ -166,12 +138,13 @@ func TestAddProductPrice(t *testing.T) {
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
-	err = repo.AddProductPrice(tx, domain.ProductPrice{
+	priceID, err := repo.AddProductPrice(tx, domain.ProductPrice{
 		VariantId: 5,
 		StartDate: startDate,
 		Price:     18.99,
 	})
 
+	r.NotZero(priceID)
 	r.NoError(err)
 }
 
@@ -219,12 +192,12 @@ func TestUpdateProductsInStock(t *testing.T) {
 	r.NoError(err)
 
 	repo := repository.NewPostgresProductRepository(db)
-	err = repo.UpdateProductsInstock(tx, domain.AddProductInStock{
+	productStockID, err := repo.UpdateProductsInstock(tx, domain.AddProductInStock{
 		VariantId: 4,
 		StorageId: 2,
 		Quantity:  3,
 	})
-
+	r.NotZero(productStockID)
 	r.NoError(err)
 }
 func TestAddProductInStock(t *testing.T) {
@@ -240,12 +213,14 @@ func TestAddProductInStock(t *testing.T) {
 	defer tx.Rollback()
 
 	repo := repository.NewPostgresProductRepository(db)
-	err = repo.AddProductInStock(tx, domain.AddProductInStock{
+	productStockID, err := repo.AddProductInStock(tx, domain.AddProductInStock{
 		VariantId: 3,
 		StorageId: 1,
+		AddedAt:   time.Now(),
 		Quantity:  5,
 	})
 
+	r.NotZero(productStockID)
 	r.NoError(err)
 }
 
@@ -622,7 +597,7 @@ func TestBuy(t *testing.T) {
 		TotalPrice: 19.99,
 	}
 
-	err = repo.Buy(tx, saleQuery)
+	saleID, err := repo.Buy(tx, saleQuery)
 	r.NoError(err)
 
 	var sale domain.Sale
@@ -634,6 +609,7 @@ func TestBuy(t *testing.T) {
 	and quantity=$3`,
 		saleQuery.VariantId, saleQuery.StorageId, saleQuery.Quantity)
 	r.NoError(err)
+	r.NotZero(saleID)
 	r.NotEmpty(sale)
 }
 
