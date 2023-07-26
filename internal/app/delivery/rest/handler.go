@@ -93,7 +93,7 @@ func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 	})
 }
 
-// FindProductInfoById  выводит данные о продукте по его id
+// FindProductInfoById выводит данные о продукте по его id
 func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 	id := c.Param("id")
 	productId, err := strconv.Atoi(id)
@@ -160,7 +160,7 @@ func (ph *ProductHandler) FindProductListInStock(c *gin.Context) {
 	c.JSON(http.StatusOK, stockList)
 }
 
-// Buy  запись сделанной продажи в базу
+// Buy запись сделанной продажи в базу
 func (ph *ProductHandler) Buy(c *gin.Context) {
 	var sale domain.Sale
 
