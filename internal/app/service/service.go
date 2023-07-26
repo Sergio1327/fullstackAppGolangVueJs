@@ -246,20 +246,35 @@ func (u *ProductServiceImpl) FindProductList(tag string, limit int) (products []
 		for i := range products {
 			vars, err := u.repo.FindProductVariantList(tx, products[i].ProductId)
 			if err != nil {
-				return nil, errors.New("не удалось найти варианты продукта")
+				switch err {
+				case sql.ErrNoRows:
+					return products, nil
+				default:
+					return nil, errors.New("не удалось найти варианты продукта")
+				}
 			}
 			products[i].VariantList = vars
 			variantList := products[i].VariantList
 			for j := range variantList {
 				price, err := u.repo.FindCurrentPrice(tx, variantList[j].VariantId)
 				if err != nil {
-					return nil, errors.New("не удалось найти актуальную цену продукта")
+					switch err {
+					case sql.ErrNoRows:
+						continue
+					default:
+						return nil, errors.New("не удалось найти актуальную цену продукта")
+					}
 				}
 
 				variantList[j].CurrentPrice = price
 				inStorages, err := u.repo.InStorages(tx, variantList[j].VariantId)
 				if err != nil {
-					return nil, errors.New("не удалось найти склады в которых есть продукт")
+					switch err {
+					case sql.ErrNoRows:
+						continue
+					default:
+						return nil, errors.New("не удалось найти склады в которых есть продукт")
+					}
 				}
 
 				variantList[j].InStorages = inStorages
