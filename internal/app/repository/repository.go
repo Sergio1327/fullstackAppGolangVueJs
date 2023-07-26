@@ -69,7 +69,7 @@ func (r *PostgresProductRepository) AddProduct(tx *sqlx.Tx, product domain.Produ
 	(name, description, added_at, tags)
 	values ($1, $2, $3, $4) 
 	returning product_id`,
-		product.Name, product.Descr, product.Addet_at, product.Tags).Scan(&productId)
+		product.Name, product.Descr, product.AddetAt, product.Tags).Scan(&productId)
 	if err != nil {
 		return 0, err
 	}
@@ -100,6 +100,7 @@ func (r *PostgresProductRepository) CheckExists(tx *sqlx.Tx, p domain.ProductPri
 		}
 		return 0, err
 	}
+
 	return isExists, nil
 }
 
@@ -168,7 +169,7 @@ func (r *PostgresProductRepository) AddProductInStock(tx *sqlx.Tx, productInStoc
 	 insert into products_in_storage
 	 (variant_id, storage_id, added_at, quantity)
 	 values ($1, $2, $3, $4)`,
-		productInStock.VariantId, productInStock.StorageId, productInStock.Added_at, productInStock.Quantity)
+		productInStock.VariantId, productInStock.StorageId, productInStock.AddedAt, productInStock.Quantity)
 
 	return err
 }

@@ -11,8 +11,8 @@ type Product struct {
 	ProductID  int              `json:"product_id"`  // Id продукта
 	Name       string           `json:"name"`        // Название продукта
 	Descr      string           `json:"description"` // Описание продукта
-	Addet_at   time.Time        `json:"added_at"`    //Дата добавления продукта
-	Removed_at sqlnull.NullTime `json:"removed_at"`  // дата удаления продукта
+	AddetAt   time.Time        `json:"added_at"`    //Дата добавления продукта
+	RemovedAt sqlnull.NullTime `json:"removed_at"`  // дата удаления продукта
 	Tags       string           `json:"tags"`        //теги продукта
 	Variants   []Variant        `json:"variants"`    //	Список вариантов продукта
 }
@@ -23,7 +23,7 @@ type Variant struct {
 	VariantId    int       `json:"variant_id" db:"variant_id"` //id конкретного варианта продукта
 	Weight       int       `json:"weight" db:"weight"`         // масса или вес продукта
 	Unit         string    `json:"unit" db:"unit"`             //единица измерения
-	Added_at     time.Time `json:"added_at" db:"added_at"`     // дата добавления определенного варианта
+	AddedAt     time.Time `json:"added_at" db:"added_at"`     // дата добавления определенного варианта
 	CurrentPrice float64   `json:"price" db:"price"`           //актуальная цена
 	InStorages   []int     `json:"in_storages"`                //список id складов в которых есть этот вариант
 }
@@ -41,12 +41,12 @@ type ProductPrice struct {
 type AddProductInStock struct {
 	VariantId int       `json:"variant_id" db:"variant_id"` //id варианта продукта
 	StorageId int       `json:"storage_id" db:"storage_id"` //id склада куда будет помещен этот продукт
-	Added_at  time.Time `json:"added_at" db:"added_at" `    //дата добавления продукта на склад
+	AddedAt  time.Time `json:"added_at" db:"added_at" `    //дата добавления продукта на склад
 	Quantity  int       `json:"quantity" db:"quantity"`     //кол-во продукта добавленного на склад
 }
 
 func (a *AddProductInStock) IsNullFields() error {
-	if a.StorageId == 0 || a.VariantId == 0 || a.Added_at == (time.Time{}) || a.Quantity == 0 {
+	if a.StorageId == 0 || a.VariantId == 0 || a.AddedAt == (time.Time{}) || a.Quantity == 0 {
 		return errors.New("поля: variant_id, storage_id, added_at, quantity не должны быть пустыми")
 	}
 	return nil

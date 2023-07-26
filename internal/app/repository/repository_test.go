@@ -27,10 +27,10 @@ func TestAddProduct(t *testing.T) {
 	defer tx.Rollback()
 
 	p := domain.Product{
-		Name:     "dsfdsddcxcfzsd",
-		Descr:    "sdsdsds",
-		Addet_at: time.Now(),
-		Tags:     "123,12i",
+		Name:    "dsfdsddcxcfzsd",
+		Descr:   "sdsdsds",
+		AddetAt: time.Now(),
+		Tags:    "123,12i",
 	}
 
 	id, err := repo.AddProduct(tx, p)
@@ -264,10 +264,10 @@ func TestLoadProductInfo(t *testing.T) {
 	defer tx.Rollback()
 
 	id, err := repo.AddProduct(tx, domain.Product{
-		Name:     "Имя продукта",
-		Descr:    "Описание продукта",
-		Addet_at: time.Now(),
-		Tags:     "tag",
+		Name:    "Имя продукта",
+		Descr:   "Описание продукта",
+		AddetAt: time.Now(),
+		Tags:    "tag",
 	})
 	r.NoError(err)
 
@@ -291,10 +291,10 @@ func TestAreExistsVariants(t *testing.T) {
 	defer tx.Rollback()
 
 	productId, err := repo.AddProduct(tx, domain.Product{
-		Name:     "dlsldsd",
-		Descr:    "fdfd'fd",
-		Addet_at: time.Now(),
-		Tags:     "dqwqwqw",
+		Name:    "dlsldsd",
+		Descr:   "fdfd'fd",
+		AddetAt: time.Now(),
+		Tags:    "dqwqwqw",
 	})
 	r.NoError(err)
 	r.NotEmpty(productId)
@@ -393,7 +393,7 @@ func TestInStorages(t *testing.T) {
 	product := domain.AddProductInStock{
 		VariantId: 5,
 		StorageId: 1,
-		Added_at:  time.Now(),
+		AddedAt:   time.Now(),
 		Quantity:  3,
 	}
 
@@ -402,7 +402,7 @@ func TestInStorages(t *testing.T) {
 		 (variant_id,storage_id,added_at,quantity)
 		 values($1,$2,$3,$4)
 		 returning variant_id`,
-		product.VariantId, product.StorageId, product.Added_at, product.Quantity).Scan(&id)
+		product.VariantId, product.StorageId, product.AddedAt, product.Quantity).Scan(&id)
 	r.NoError(err)
 
 	inStorages, err := repo.InStorages(tx, id)
@@ -425,31 +425,31 @@ func TestFindProductsByTag(t *testing.T) {
 	defer tx.Rollback()
 
 	product := domain.Product{
-		Name:     "sldlsd",
-		Descr:    "sdsdsdsds",
-		Addet_at: time.Now(),
-		Tags:     "напиток",
+		Name:    "sldlsd",
+		Descr:   "sdsdsdsds",
+		AddetAt: time.Now(),
+		Tags:    "напиток",
 	}
 
 	product2 := domain.Product{
-		Name:     "авывывы",
-		Descr:    "sdsdsdsds",
-		Addet_at: time.Now(),
-		Tags:     "стирка",
+		Name:    "авывывы",
+		Descr:   "sdsdsdsds",
+		AddetAt: time.Now(),
+		Tags:    "стирка",
 	}
 
 	_, err = tx.Exec(`
 	insert into products
 	(name,description,added_at,tags)
 	values($1,$2,$3,$4)`,
-		product.Name, product.Descr, product.Addet_at, product.Tags)
+		product.Name, product.Descr, product.AddetAt, product.Tags)
 	r.NoError(err)
 
 	_, err = tx.Exec(`
 	insert into products
 	(name,description,added_at,tags)
 	values($1,$2,$3,$4)`,
-		product2.Name, product2.Descr, product2.Addet_at, product2.Tags)
+		product2.Name, product2.Descr, product2.AddetAt, product2.Tags)
 	r.NoError(err)
 
 	tag := "напиток"
