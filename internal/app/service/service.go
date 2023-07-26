@@ -102,7 +102,7 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) (priceID int
 
 	// если запись уже имеется устанавливается дата окончания цены
 	if isExistsId > 0 {
-		p.EndDate.Time = time.Now()
+		p.EndDate.Scan(time.Now())
 		err := u.repo.UpdateProductPrice(tx, p, isExistsId)
 		if err != nil {
 			return 0, errors.New("не удалось обновить цену")

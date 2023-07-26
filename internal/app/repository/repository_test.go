@@ -71,9 +71,9 @@ func TestAddProductVariantList(t *testing.T) {
 	err = tx.Get(&variant,
 		`select variant_id 
 		 from product_variants 
-		 where product_id=$1 
-		 and weight=$2 
-		 and unit=$3`,
+		 where product_id = $1 
+		 and weight = $2 
+		 and unit = $3`,
 		id, varQuery.Weight, varQuery.Unit)
 
 	r.NoError(err)
@@ -162,8 +162,8 @@ func TestCheckProductInStock(t *testing.T) {
 
 	_, err = tx.Exec(
 		`insert into products_in_storage
-		 (variant_id,storage_id,quantity) 
-		 values($1,$2,$3)`, 4, 2, 10)
+		 ( variant_id, storage_id, quantity ) 
+		 values( $1, $2, $3 )`, 4, 2, 10)
 	r.NoError(err)
 
 	_, err = repo.CheckProductInStock(tx, domain.AddProductInStock{
@@ -187,8 +187,8 @@ func TestUpdateProductInStock(t *testing.T) {
 
 	_, err = tx.Exec(
 		`insert into products_in_storage
-		 (variant_id,storage_id,quantity)
-		 values ($1,$2,$3)`, 4, 2, 2)
+		 ( variant_id, storage_id, quantity )
+		 values ( $1, $2, $3 )`, 4, 2, 2)
 	r.NoError(err)
 
 	repo := repository.NewPostgresProductRepository(db)
@@ -283,8 +283,8 @@ func TestFindProductVariantList(t *testing.T) {
 	err = tx.Get(&variant,
 		`select variant_id 
 		 from product_variants
-		 where product_id=$1
-		 and weight=$2 
+		 where product_id = $1
+		 and weight = $2 
 		 and unit = $3`,
 		id, varquery.Weight, varquery.Unit)
 	r.NoError(err)
@@ -313,8 +313,8 @@ func TestFindCurrentPrice(t *testing.T) {
 
 	err = tx.QueryRow(
 		`insert into product_prices
-		 (variant_id,price,start_date)
-	 	 values($1,$2,$3)
+		 ( variant_id, price, start_date )
+	 	 values($1, $2, $3 ) 
 		 returning variant_id`,
 		pp.VariantID, pp.Price, pp.StartDate).Scan(&id)
 	r.NoError(err)
@@ -347,8 +347,8 @@ func TestInStorages(t *testing.T) {
 
 	err = tx.QueryRow(
 		`insert into products_in_storage
-		 (variant_id,storage_id,added_at,quantity)
-		 values($1,$2,$3,$4)
+		 ( variant_id, storage_id, added_at, quantity )
+		 values( $1, $2, $3, $4 )
 		 returning variant_id`,
 		product.VariantID, product.StorageID, product.AddedAt, product.Quantity).Scan(&id)
 	r.NoError(err)
@@ -388,15 +388,15 @@ func TestFindProductListByTag(t *testing.T) {
 
 	_, err = tx.Exec(`
 	insert into products
-	(name,description,added_at,tags)
-	values($1,$2,$3,$4)`,
+	( name, description, added_at, tags )
+	values($1, $2, $3, $4 )`,
 		product.Name, product.Descr, product.AddetAt, product.Tags)
 	r.NoError(err)
 
 	_, err = tx.Exec(`
 	insert into products
-	(name,description,added_at,tags)
-	values($1,$2,$3,$4)`,
+	(name, description, added_at, tags )
+	values($1, $2, $3, $4 )`,
 		product2.Name, product2.Descr, product2.AddetAt, product2.Tags)
 	r.NoError(err)
 
@@ -538,8 +538,8 @@ func TestFindPrice(t *testing.T) {
 
 	err = tx.QueryRow(`
 	insert into product_prices
-	(variant_id,price,start_date)
-	values ($1,$2,$3) 
+	( variant_id, price, start_date )
+	values ($1, $2, $3 ) 
 	returning variant_id`,
 		priceQuery.VariantID, priceQuery.Price, priceQuery.StartDate).Scan(&variantID)
 	r.NoError(err)
@@ -577,9 +577,9 @@ func TestBuy(t *testing.T) {
 	err = tx.Get(&sale, `
 	select variant_id 
 	from sales 
-	where variant_id=$1 
-	and storage_id=$2 
-	and quantity=$3`,
+	where variant_id = $1 
+	and storage_id = $2 
+	and quantity = $3`,
 		saleQuery.VariantID, saleQuery.StorageID, saleQuery.Quantity)
 	r.NoError(err)
 	r.NotZero(saleID)
