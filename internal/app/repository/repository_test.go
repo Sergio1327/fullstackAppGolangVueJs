@@ -1,11 +1,11 @@
 package repository_test
 
 import (
-	"errors"
 	"go-back/internal/app/domain"
 	"go-back/internal/app/repository"
 	"go-back/internal/pkg/database"
 	"go-back/internal/tools/sqlnull"
+	"log"
 	"testing"
 	"time"
 
@@ -40,6 +40,8 @@ func TestAddProduct(t *testing.T) {
 	product, err := repo.LoadProductInfo(tx, id)
 	r.NoError(err)
 	r.Equal(id, product.ProductID)
+	r.Equal(p.Name, product.Name)
+	r.Equal(p.Descr, product.Descr)
 	r.NotEmpty(product)
 }
 
@@ -69,12 +71,16 @@ func TestAddProductVariantList(t *testing.T) {
 
 	var variant domain.Variant
 	err = tx.Get(&variant,
-		`select variant_id 
+		`select product_id, variant_id, weight, unit 
 		 from product_variants 
 		 where product_id = $1 
 		 and weight = $2 
 		 and unit = $3`,
 		id, varQuery.Weight, varQuery.Unit)
+
+	r.Equal(id, variant.ProductID)
+	r.Equal(varQuery.Weight, variant.Weight)
+	r.Equal(varQuery.Unit, variant.Unit)
 
 	r.NoError(err)
 	r.NotEmpty(variant)
@@ -114,11 +120,25 @@ func TestUpdateProductPrice(t *testing.T) {
 	defer tx.Rollback()
 	r.NoError(err)
 
-	repo := repository.NewPostgresProductRepository(db)
-	err = repo.UpdateProductPrice(tx, domain.ProductPrice{
+	expectedProductPrice := domain.ProductPrice{
+		PriceID: 2,
 		EndDate: sqlnull.NewNullTime(time.Now()),
-	}, 2)
+	}
+	log.Println(expectedProductPrice.EndDate)
+
+	repo := repository.NewPostgresProductRepository(db)
+	err = repo.UpdateProductPrice(tx, expectedProductPrice, expectedProductPrice.PriceID)
 	r.NoError(err)
+
+	var productPrice domain.ProductPrice
+	err = tx.Get(&productPrice,
+		`select price_id 
+	     from product_prices
+		 where price_id = $1 
+		 and end_date = $2`, expectedProductPrice.PriceID, expectedProductPrice.EndDate)
+	r.NoError(err)
+	r.Equal(expectedProductPrice.PriceID, productPrice.PriceID)
+
 }
 
 func TestAddProductPrice(t *testing.T) {
@@ -138,14 +158,26 @@ func TestAddProductPrice(t *testing.T) {
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
-	priceID, err := repo.AddProductPrice(tx, domain.ProductPrice{
+	expectedProductPrice := domain.ProductPrice{
 		VariantID: 5,
 		StartDate: startDate,
 		Price:     18.99,
-	})
+	}
 
+	priceID, err := repo.AddProductPrice(tx, expectedProductPrice)
 	r.NotZero(priceID)
 	r.NoError(err)
+	var productPrice domain.ProductPrice
+	err = tx.Get(&productPrice,
+		`select variant_id, price
+		 from product_prices
+		 where variant_id = $1
+		 and start_date = $2 
+		 and price = $3`, expectedProductPrice.VariantID, expectedProductPrice.StartDate, expectedProductPrice.Price)
+	r.NoError(err)
+
+	r.Equal(expectedProductPrice.VariantID, productPrice.VariantID)
+	r.Equal(expectedProductPrice.Price, productPrice.Price)
 }
 
 func TestCheckProductInStock(t *testing.T) {
@@ -170,6 +202,7 @@ func TestCheckProductInStock(t *testing.T) {
 		VariantID: 4,
 		StorageID: 2,
 	})
+
 	r.NoError(err)
 }
 
@@ -212,16 +245,30 @@ func TestAddProductInStock(t *testing.T) {
 	r.NoError(err)
 	defer tx.Rollback()
 
-	repo := repository.NewPostgresProductRepository(db)
-	productStockID, err := repo.AddProductInStock(tx, domain.AddProductInStock{
+	expectedProduct := domain.AddProductInStock{
 		VariantID: 3,
 		StorageID: 1,
 		AddedAt:   time.Now(),
 		Quantity:  5,
-	})
+	}
 
+	repo := repository.NewPostgresProductRepository(db)
+
+	productStockID, err := repo.AddProductInStock(tx, expectedProduct)
 	r.NotZero(productStockID)
 	r.NoError(err)
+
+	var productInStock domain.AddProductInStock
+	err = tx.Get(&productInStock, `
+	select variant_id, storage_id, quantity
+	from products_in_storage
+	where variant_id = $1 and storage_id = $2 and quantity = $3`,
+		expectedProduct.VariantID, expectedProduct.StorageID, expectedProduct.Quantity)
+	r.NoError(err)
+
+	r.Equal(expectedProduct.VariantID, productInStock.VariantID)
+	r.Equal(expectedProduct.StorageID, productInStock.StorageID)
+	r.Equal(expectedProduct.Quantity, productInStock.Quantity)
 }
 
 func TestLoadProductInfo(t *testing.T) {
@@ -238,17 +285,22 @@ func TestLoadProductInfo(t *testing.T) {
 	r.NoError(err)
 	defer tx.Rollback()
 
-	id, err := repo.AddProduct(tx, domain.Product{
+	product := domain.Product{
 		Name:    "Имя продукта",
 		Descr:   "Описание продукта",
 		AddetAt: time.Now(),
 		Tags:    "tag",
-	})
+	}
+
+	id, err := repo.AddProduct(tx, product)
 	r.NoError(err)
 
 	productInfo, err := repo.LoadProductInfo(tx, id)
 	r.NoError(err)
 	r.NotEmpty(productInfo)
+	r.Equal(product.Name, productInfo.Name)
+	r.Equal(product.Descr, productInfo.Descr)
+
 }
 
 func TestFindProductVariantList(t *testing.T) {
@@ -281,14 +333,17 @@ func TestFindProductVariantList(t *testing.T) {
 	var variant domain.Variant
 
 	err = tx.Get(&variant,
-		`select variant_id 
+		`select  weight, unit 
 		 from product_variants
 		 where product_id = $1
 		 and weight = $2 
 		 and unit = $3`,
 		id, varquery.Weight, varquery.Unit)
+
 	r.NoError(err)
 	r.NotEmpty(variant)
+	r.Equal(varquery.Weight, variant.Weight)
+	r.Equal(varquery.Unit, variant.Unit)
 }
 
 func TestFindCurrentPrice(t *testing.T) {
@@ -314,7 +369,7 @@ func TestFindCurrentPrice(t *testing.T) {
 	err = tx.QueryRow(
 		`insert into product_prices
 		 ( variant_id, price, start_date )
-	 	 values($1, $2, $3 ) 
+	 	 values( $1, $2, $3 ) 
 		 returning variant_id`,
 		pp.VariantID, pp.Price, pp.StartDate).Scan(&id)
 	r.NoError(err)
@@ -440,10 +495,7 @@ func TestLoadProductList(t *testing.T) {
 	products, err = repo.LoadProductList(tx, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
-
-	if len(products) > 1 {
-		r.Error(errors.New("кол-во продуктов больше чем указано в лимите"))
-	}
+	r.Len(products, 1)
 }
 
 func TestLoadStockList(t *testing.T) {
@@ -539,7 +591,7 @@ func TestFindPrice(t *testing.T) {
 	err = tx.QueryRow(`
 	insert into product_prices
 	( variant_id, price, start_date )
-	values ($1, $2, $3 ) 
+	values ( $1, $2, $3 ) 
 	returning variant_id`,
 		priceQuery.VariantID, priceQuery.Price, priceQuery.StartDate).Scan(&variantID)
 	r.NoError(err)

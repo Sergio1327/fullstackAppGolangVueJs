@@ -30,11 +30,11 @@ type Variant struct {
 
 // ProductPrice структура для вставки цены продукта
 type ProductPrice struct {
-	PriceID   int              					   //id цены продукта
-	VariantID int              `json:"variant_id"` // id варианта продука
-	StartDate time.Time        `json:"start_date"` // дата начала цены
-	EndDate   sqlnull.NullTime `json:"end_date"`   // дата конца цены
-	Price     float64          `json:"price"`      // цена продукта
+	PriceID   int              `json:"price_id" db:"price_id"` 				// id цены продукта
+	VariantID int              `json:"variant_id" db:"variant_id"`          // id варианта продука
+	StartDate time.Time        `json:"start_date" db:"start_date"`          // дата начала цены
+	EndDate   sqlnull.NullTime `json:"end_date" db:"end_date"`              // дата конца цены
+	Price     float64          `json:"price" db:"price"`                  	// цена продукта
 }
 
 // AddProductInStock структура для вставки продукта на склад
@@ -62,9 +62,9 @@ type ProductInfo struct {
 
 // Stock структура склада
 type Stock struct {
-	StorageID          int                 `db:"storage_id"` //id склада
-	StorageName        string              `db:"name"`       //название склада
-	ProductVariantList []AddProductInStock 					 //список продуктов на данном складе
+	StorageID          int                 `db:"storage_id"` // id склада
+	StorageName        string              `db:"name"`       // название склада
+	ProductVariantList []AddProductInStock 					 // список продуктов на данном складе
 }
 
 // Sale структура продажи
@@ -87,15 +87,15 @@ func (s Sale) IsNullFields() error {
 
 // SaleQuery фильтры продаж по которым нужно вывести информацию
 type SaleQuery struct {
-	StartDate   time.Time          `json:"start_date" db:"start_date"`        // дата начала продаж(обязательные поля)
-	EndDate     time.Time          `json:"end_date"  db:"end_date"`         // дата конца прдаж (обязательные поля)
+	StartDate   time.Time          `json:"start_date" db:"start_date"`     // дата начала продаж(обязательные поля)
+	EndDate     time.Time          `json:"end_date"  db:"end_date"`        // дата конца прдаж (обязательные поля)
 	Limit       sqlnull.NullInt64  `json:"limit" db:"limit"`               // лимит вывода продаж
 	StorageId   sqlnull.NullInt64  `json:"storage_id" db:"storage_id"`     // id склада
 	ProductName sqlnull.NullString `json:"product_name" db:"product_name"` // название продукта
 }
 
 type SaleQueryOnlyBySoldDate struct {
-	StartDate time.Time         `json:"start_date" db:"sold_at"`	// дата начала продаж
-	EndDate   time.Time         `json:"end_date" db:"sold_at"`	    // дата конца продаж
-	Limit     sqlnull.NullInt64 `json:"limit" db:"limit"`			// лимит вывода
+	StartDate time.Time         `json:"start_date" db:"sold_at"` // дата начала продаж
+	EndDate   time.Time         `json:"end_date" db:"sold_at"`   // дата конца продаж
+	Limit     sqlnull.NullInt64 `json:"limit" db:"limit"`        // лимит вывода
 }
