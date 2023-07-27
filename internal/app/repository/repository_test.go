@@ -444,7 +444,7 @@ func TestFindProductListByTag(t *testing.T) {
 	_, err = tx.Exec(`
 	insert into products
 	( name, description, added_at, tags )
-	values($1, $2, $3, $4 )`,
+	values( $1, $2, $3, $4 )`,
 		product.Name, product.Descr, product.AddetAt, product.Tags)
 	r.NoError(err)
 

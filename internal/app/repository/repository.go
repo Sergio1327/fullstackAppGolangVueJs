@@ -285,8 +285,8 @@ func (r *PostgresProductRepository) FindSaleListOnlyBySoldDate(tx *sqlx.Tx, sale
 	query := `
 	SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
 	FROM sales s
-	JOIN product_variants  pv ON (pv.variant_id = s.variant_id)
-	JOIN products  p ON (p.product_id = pv.product_id)
+	JOIN product_variants  pv ON ( pv.variant_id = s.variant_id )
+	JOIN products  p ON ( p.product_id = pv.product_id )
 	WHERE s.sold_at >= $1 AND s.sold_at <= $2
 	LIMIT $3`
 
