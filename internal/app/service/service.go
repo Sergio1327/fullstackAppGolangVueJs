@@ -95,27 +95,26 @@ func (u *ProductServiceImpl) AddProductPrice(p domain.ProductPrice) (priceID int
 	}
 
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
-	isExistsId, err := u.repo.CheckExists(tx, p)
+	isExistsID, err := u.repo.CheckExists(tx, p)
 	if err != nil {
 		return 0, errors.New("ошибка при проверке цен в базе данных")
 	}
 
 	// если запись уже имеется устанавливается дата окончания цены
-	if isExistsId > 0 {
+	if isExistsID > 0 {
 		p.EndDate.Scan(time.Now())
-		err := u.repo.UpdateProductPrice(tx, p, isExistsId)
+		err := u.repo.UpdateProductPrice(tx, p, isExistsID)
 		if err != nil {
 			return 0, errors.New("не удалось обновить цену")
 		}
 
-		priceID = isExistsId
+		priceID = isExistsID
 	} else {
 		// если записи нет то цена вставляется в базу
-		priceId, err := u.repo.AddProductPrice(tx, p)
+		priceID, err = u.repo.AddProductPrice(tx, p)
 		if err != nil {
 			return 0, errors.New("не удалось добавить цену")
 		}
-		priceID = priceId
 	}
 
 	err = tx.Commit()
@@ -169,7 +168,7 @@ func (u *ProductServiceImpl) FindProductInfoById(productID int) (product domain.
 	defer tx.Rollback()
 
 	// если пользователь не ввел id выводится ошибка
-	if productID == 0 || productID < 0 {
+	if productID <= 0 {
 		return domain.ProductInfo{}, errors.New("id не может быть меньше или равен 0")
 	}
 

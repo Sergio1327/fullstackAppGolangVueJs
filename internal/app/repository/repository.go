@@ -100,7 +100,7 @@ func (r *PostgresProductRepository) CheckExists(tx *sqlx.Tx, p domain.ProductPri
 	return isExists, err
 }
 
-// UpdateProductPrice бновление цены варианта продукта
+// UpdateProductPrice обновление цены варианта продукта
 func (r *PostgresProductRepository) UpdateProductPrice(tx *sqlx.Tx, price domain.ProductPrice, priceID int) error {
 	_, err := tx.Exec(`
 	update product_prices

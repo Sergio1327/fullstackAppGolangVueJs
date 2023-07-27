@@ -96,7 +96,7 @@ func (ph *ProductHandler) AddProductInStock(c *gin.Context) {
 // FindProductInfoById выводит данные о продукте по его id
 func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 	id := c.Param("id")
-	productId, err := strconv.Atoi(id)
+	productID, err := strconv.Atoi(id)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -105,7 +105,7 @@ func (ph *ProductHandler) FindProductInfoById(c *gin.Context) {
 		return
 	}
 
-	productInfo, err := ph.productService.FindProductInfoById(productId)
+	productInfo, err := ph.productService.FindProductInfoById(productID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "не удалось найти информацию о продукте",

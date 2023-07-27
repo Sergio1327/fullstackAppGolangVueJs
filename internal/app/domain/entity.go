@@ -8,10 +8,10 @@ import (
 
 // Product cтруктура продукта для записи в базу
 type Product struct {
-	ProductID   int              `json:"product_id"`  // Id продукта
-	Name        string           `json:"name"`        // Название продукта
-	Descr       string           `json:"description"` // Описание продукта
-	AddetAt     time.Time        `json:"added_at"`    // Дата добавления продукта
+	ProductID   int              `json:"product_id"`  // id продукта
+	Name        string           `json:"name"`        // название продукта
+	Descr       string           `json:"description"` // описание продукта
+	AddetAt     time.Time        `json:"added_at"`    // дата добавления продукта
 	RemovedAt   sqlnull.NullTime `json:"removed_at"`  // дата удаления продукта
 	Tags        string           `json:"tags"`        // теги продукта
 	VariantList []Variant        `json:"variants"`    // cписок вариантов продукта
