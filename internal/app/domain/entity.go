@@ -30,11 +30,11 @@ type Variant struct {
 
 // ProductPrice структура для вставки цены продукта
 type ProductPrice struct {
-	PriceID   int              `json:"price_id" db:"price_id"` 		  // id цены продукта
-	VariantID int              `json:"variant_id" db:"variant_id"`    // id варианта продука
-	StartDate time.Time        `json:"start_date" db:"start_date"`    // дата начала цены
-	EndDate   sqlnull.NullTime `json:"end_date" db:"end_date"`        // дата конца цены
-	Price     float64          `json:"price" db:"price"`              // цена продукта
+	PriceID   int              `json:"price_id" db:"price_id"`     // id цены продукта
+	VariantID int              `json:"variant_id" db:"variant_id"` // id варианта продука
+	StartDate time.Time        `json:"start_date" db:"start_date"` // дата начала цены
+	EndDate   sqlnull.NullTime `json:"end_date" db:"end_date"`     // дата конца цены
+	Price     float64          `json:"price" db:"price"`           // цена продукта
 }
 
 // AddProductInStock структура для вставки продукта на склад
@@ -54,17 +54,17 @@ func (a AddProductInStock) IsNullFields() error {
 
 // ProductInfo структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {
-	ProductID   int       `db:"product_id"`  // id продукта
-	Name        string    `db:"name"`        // название продукта
-	Descr       string    `db:"description"` // описание продукта
-	VariantList []Variant 					 // список вариантов продукта
+	ProductID   int       `db:"product_id"`       // id продукта
+	Name        string    `db:"name"`             // название продукта
+	Descr       string    `db:"description"`      // описание продукта
+	VariantList []Variant `db:"product_variants"` // список вариантов продукта
 }
 
 // Stock структура склада
 type Stock struct {
-	StorageID          int                 `db:"storage_id"` // id склада
-	StorageName        string              `db:"name"`       // название склада
-	ProductVariantList []AddProductInStock 					 // список продуктов на данном складе
+	StorageID          int                 `db:"storage_id"`          // id склада
+	StorageName        string              `db:"name"`                // название склада
+	ProductVariantList []AddProductInStock `db:"products_in_storage"` // список продуктов на данном складе
 }
 
 // Sale структура продажи
