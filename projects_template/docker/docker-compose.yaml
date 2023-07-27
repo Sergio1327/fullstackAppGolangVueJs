@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:14.5-alpine
+    environment:
+      POSTGRES_USER: project_template
+      POSTGRES_PASSWORD: project_template
+      POSTGRES_DB: project_template
+      PGDATA: /data
+      TZ: 'GMT+5'
+    volumes:
+       - ./volumes/pg/data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U project_template"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "5432:5432"
+  migrate:
+    depends_on:
+      db:
+        condition: service_healthy
+    image: migrate/migrate
+    volumes:
+        - ./volumes/migrate:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://project_template:project_template@db:5432/project_template?sslmode=disable", "up", "1"]
+  cache:
+    image: redis:latest
+    command: redis-server --save 20 1 --loglevel warning 
+    ports:
+      - "6379:6379"
+    volumes: 
+      - ./volumes/redis:/data
+  cron:
+    image: project_template:${VERSION}
+    build: 
+      context: ..
+      dockerfile: ./docker/Dockerfile
+      args:
+        VERSION: ${VERSION}
+        NAME: project_template
+    command: /app/project_template
+    environment:
+      TZ: 'Asia/Tashkent'
+      DEBUG: 'true'
+      VERSION: ${VERSION}
+    volumes: 
+      - ./volumes/log:/app/log
+      - ../src/config/conf.yaml:/app/conf.yaml
+      - ../src/config/oracle_connect:/app/oracle_connect
+    stop_grace_period: 2s
