@@ -58,7 +58,6 @@ func (t *TestRepositoryImports) RepositoryImports() RepositoryImports {
 		SessionManager: t.SessionManager,
 		Config:         t.Config,
 		Repository: Repository{
-			Logger:   t.MockRepository.Logger,
 			Template: t.MockRepository.Template,
 		},
 	}

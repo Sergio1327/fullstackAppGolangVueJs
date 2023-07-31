@@ -2,6 +2,7 @@ package repository
 
 import (
 	"projects_template/internal/entity/log"
+	"projects_template/internal/entity/product"
 	"projects_template/internal/entity/template"
 	"projects_template/internal/transaction"
 	"projects_template/tools/sqlnull"
@@ -16,4 +17,9 @@ type Logger interface {
 type Template interface {
 	FindTemplateObj(ts transaction.Session, id int) (template.TemplateObject, error)
 	LoadAllTemplateObj(ts transaction.Session) ([]template.TemplateObject, error)
+}
+
+type ProductRepository interface {
+	AddProduct(ts transaction.Session, product product.Product) (productID int, err error)
+	AddProductVariantList(ts transaction.Session, productID int, variant product.Variant) error
 }
