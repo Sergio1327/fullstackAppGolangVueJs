@@ -11,3 +11,4 @@ type MockRepository struct {
 	Logger   *repository.MockLogger
 	Template *repository.MockTemplate
 }
+
