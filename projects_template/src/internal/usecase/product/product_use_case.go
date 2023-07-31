@@ -36,7 +36,7 @@ func (u *ProductUseCaseImpl) AddProduct(ts transaction.Session, product product.
 	if err != nil {
 		return 0, errors.New("не удалось добавить продукт в базу данных")
 	}
-	
+
 	// если пользователь не ввел варианты продукта то данные о продукте просто запишутся в базу
 	if product.VariantList == nil {
 		err = ts.Commit()

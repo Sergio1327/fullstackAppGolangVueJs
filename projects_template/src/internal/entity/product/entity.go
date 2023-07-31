@@ -37,35 +37,12 @@ type ProductPrice struct {
 	Price     float64          `json:"price" db:"price"`           // цена продукта
 }
 
-// AddProductInStock структура для вставки продукта на склад
-type AddProductInStock struct {
-	VariantID int       `json:"variant_id" db:"variant_id"` // id варианта продукта
-	StorageID int       `json:"storage_id" db:"storage_id"` // id склада куда будет помещен этот продукт
-	AddedAt   time.Time `json:"added_at" db:"added_at" `    // дата добавления продукта на склад
-	Quantity  int       `json:"quantity" db:"quantity"`     // кол-во продукта добавленного на склад
-}
-
-// IsNullFields проверка полей на нулевые значения
-func (a AddProductInStock) IsNullFields() error {
-	if a.StorageID == 0 || a.VariantID == 0 || a.AddedAt == (time.Time{}) || a.Quantity == 0 {
-		return errors.New("поля: variant_id, storage_id, added_at, quantity не должны быть пустыми")
-	}
-	return nil
-}
-
 // ProductInfo структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {
 	ProductID   int       `db:"product_id"`       // id продукта
 	Name        string    `db:"name"`             // название продукта
 	Descr       string    `db:"description"`      // описание продукта
 	VariantList []Variant `db:"product_variants"` // список вариантов продукта
-}
-
-// Stock структура склада
-type Stock struct {
-	StorageID          int                 `db:"storage_id"`          // id склада
-	StorageName        string              `db:"name"`                // название склада
-	ProductVariantList []AddProductInStock `db:"products_in_storage"` // список продуктов на данном складе
 }
 
 // Sale структура продажи
