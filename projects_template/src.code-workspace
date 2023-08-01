@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "docker"
+		},
+		{
+			"path": "../old"
 		}
 	]
 }
