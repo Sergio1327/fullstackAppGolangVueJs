@@ -3,16 +3,17 @@ package product
 import (
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
-	"product_storage/internal/transaction"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type ProductUseCase interface {
-	AddProduct(ts transaction.Session, product product.Product) (productID int, err error)
-	AddProductPrice(ts transaction.Session, pr product.ProductPrice) (int, error)
-	AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (int, error)
-	FindProductInfoById(ts transaction.Session, productID int) (product.ProductInfo, error)
-	FindProductList(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error)
-	FindProductsInStock(ts transaction.Session, productID int) ([]stock.Stock, error)
-	Buy(ts transaction.Session, p product.Sale) (int, error)
-	FindSales(ts transaction.Session, sq product.SaleQuery) ([]product.Sale, error)
+	AddProduct(tx *sqlx.Tx, product product.Product) (productID int, err error)
+	AddProductPrice(tx *sqlx.Tx, pr product.ProductPrice) (int, error)
+	AddProductInStock(tx *sqlx.Tx, p stock.AddProductInStock) (int, error)
+	FindProductInfoById(tx *sqlx.Tx, productID int) (product.ProductInfo, error)
+	FindProductList(tx *sqlx.Tx, tag string, limit int) ([]product.ProductInfo, error)
+	FindProductsInStock(tx *sqlx.Tx, productID int) ([]stock.Stock, error)
+	Buy(tx *sqlx.Tx, p product.Sale) (int, error)
+	FindSales(tx *sqlx.Tx, sq product.SaleQuery) ([]product.Sale, error)
 }

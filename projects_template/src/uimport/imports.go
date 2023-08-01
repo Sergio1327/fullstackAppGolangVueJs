@@ -23,7 +23,6 @@ func NewUsecaseImports(
 	log *logrus.Logger,
 	dblog *logrus.Logger,
 	ri rimport.RepositoryImports,
-	bi *bimport.BridgeImports,
 	sessionManager transaction.SessionManager,
 ) UsecaseImports {
 	config, err := config.NewConfig(os.Getenv("CONF_PATH"))
@@ -39,7 +38,6 @@ func NewUsecaseImports(
 			Logger:         usecase.NewLogger(log, ri),
 			ProdcutUsecase: product.NewProductUseCaseImpl(log, dblog, ri),
 		},
-		BridgeImports: bi,
 	}
 
 	return ui
