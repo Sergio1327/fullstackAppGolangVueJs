@@ -1,10 +1,10 @@
 package oracle
 
 import (
-	"projects_template/internal/entity/template"
-	"projects_template/internal/repository"
-	"projects_template/internal/transaction"
-	"projects_template/tools/gensql"
+	"product_storage/internal/entity/template"
+	"product_storage/internal/repository"
+	"product_storage/internal/transaction"
+	"product_storage/tools/gensql"
 )
 
 type templateRepository struct {

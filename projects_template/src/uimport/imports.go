@@ -2,12 +2,12 @@ package uimport
 
 import (
 	"os"
-	"projects_template/bimport"
-	"projects_template/config"
-	"projects_template/internal/transaction"
-	"projects_template/internal/usecase"
-	"projects_template/internal/usecase/product"
-	"projects_template/rimport"
+	"product_storage/bimport"
+	"product_storage/config"
+	"product_storage/internal/transaction"
+	"product_storage/internal/usecase"
+	"product_storage/internal/usecase/product"
+	"product_storage/rimport"
 
 	"github.com/sirupsen/logrus"
 )
@@ -36,8 +36,8 @@ func NewUsecaseImports(
 		SessionManager: sessionManager,
 
 		Usecase: Usecase{
-			Logger:   usecase.NewLogger(log, ri),
-			ProdcutUsecase: product.NewProductUseCaseImpl(log,dblog,ri),
+			Logger:         usecase.NewLogger(log, ri),
+			ProdcutUsecase: product.NewProductUseCaseImpl(log, dblog, ri),
 		},
 		BridgeImports: bi,
 	}

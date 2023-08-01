@@ -3,7 +3,7 @@ package logger
 import (
 	"fmt"
 	"path"
-	"projects_template/internal/entity/log"
+	"product_storage/internal/entity/log"
 	"reflect"
 	"runtime"
 	"strings"

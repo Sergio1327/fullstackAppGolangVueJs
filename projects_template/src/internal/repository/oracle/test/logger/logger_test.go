@@ -2,12 +2,12 @@ package logger_test
 
 import (
 	"os"
-	"projects_template/config"
-	"projects_template/internal/entity/log"
-	"projects_template/internal/repository/oracle"
-	"projects_template/internal/transaction"
-	"projects_template/tools/oradb"
-	"projects_template/tools/sqlnull"
+	"product_storage/config"
+	"product_storage/internal/entity/log"
+	"product_storage/internal/repository/oracle"
+	"product_storage/internal/transaction"
+	"product_storage/tools/oradb"
+	"product_storage/tools/sqlnull"
 
 	"testing"
 

@@ -3,12 +3,12 @@ package measure_test
 import (
 	"fmt"
 	"os"
-	"projects_template/config"
-	"projects_template/internal/transaction"
-	"projects_template/rimport"
-	"projects_template/tools/logger"
-	"projects_template/tools/measure"
-	"projects_template/tools/oradb"
+	"product_storage/config"
+	"product_storage/internal/transaction"
+	"product_storage/rimport"
+	"product_storage/tools/logger"
+	"product_storage/tools/measure"
+	"product_storage/tools/oradb"
 
 	"testing"
 	"time"

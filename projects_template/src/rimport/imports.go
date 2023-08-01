@@ -3,9 +3,9 @@ package rimport
 import (
 	"log"
 	"os"
-	"projects_template/config"
-	"projects_template/internal/repository/postgresql"
-	"projects_template/internal/transaction"
+	"product_storage/config"
+	"product_storage/internal/repository/postgresql"
+	"product_storage/internal/transaction"
 )
 
 type RepositoryImports struct {

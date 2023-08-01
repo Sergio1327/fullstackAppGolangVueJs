@@ -1,9 +1,9 @@
 package usecase
 
 import (
-	"projects_template/internal/entity/log"
-	"projects_template/rimport"
-	"projects_template/tools/sqlnull"
+	"product_storage/internal/entity/log"
+	"product_storage/rimport"
+	"product_storage/tools/sqlnull"
 
 	"github.com/sirupsen/logrus"
 )

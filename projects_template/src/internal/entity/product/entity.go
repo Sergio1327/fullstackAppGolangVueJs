@@ -2,7 +2,7 @@ package product
 
 import (
 	"errors"
-	"projects_template/tools/sqlnull"
+	"product_storage/tools/sqlnull"
 	"time"
 )
 

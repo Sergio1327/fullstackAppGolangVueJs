@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"fmt"
-	"projects_template/bimport"
-	"projects_template/internal/entity/global"
-	"projects_template/internal/entity/template"
-	"projects_template/internal/transaction"
-	"projects_template/rimport"
+	"product_storage/bimport"
+	"product_storage/internal/entity/global"
+	"product_storage/internal/entity/template"
+	"product_storage/internal/transaction"
+	"product_storage/rimport"
 
 	"github.com/sirupsen/logrus"
 )

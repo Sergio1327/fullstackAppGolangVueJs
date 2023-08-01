@@ -2,7 +2,7 @@ package gensql
 
 import (
 	"database/sql"
-	"projects_template/internal/entity/global"
+	"product_storage/internal/entity/global"
 
 	"github.com/jmoiron/sqlx"
 )

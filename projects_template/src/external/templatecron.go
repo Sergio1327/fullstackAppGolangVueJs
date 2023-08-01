@@ -1,7 +1,7 @@
 package external
 
 import (
-	"projects_template/uimport"
+	"product_storage/uimport"
 
 	"github.com/sirupsen/logrus"
 )

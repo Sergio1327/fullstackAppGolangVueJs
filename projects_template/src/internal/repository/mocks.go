@@ -5,10 +5,10 @@
 package repository
 
 import (
-	log "projects_template/internal/entity/log"
-	template "projects_template/internal/entity/template"
-	transaction "projects_template/internal/transaction"
-	sqlnull "projects_template/tools/sqlnull"
+	log "product_storage/internal/entity/log"
+	template "product_storage/internal/entity/template"
+	transaction "product_storage/internal/transaction"
+	sqlnull "product_storage/tools/sqlnull"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

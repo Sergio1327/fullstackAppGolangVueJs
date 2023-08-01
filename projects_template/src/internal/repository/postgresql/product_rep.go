@@ -2,9 +2,9 @@ package postgresql
 
 import (
 	"database/sql"
-	"projects_template/internal/entity/product"
-	"projects_template/internal/entity/stock"
-	"projects_template/internal/transaction"
+	"product_storage/internal/entity/product"
+	"product_storage/internal/entity/stock"
+	"product_storage/internal/transaction"
 )
 
 type PostgresProductRepository struct {

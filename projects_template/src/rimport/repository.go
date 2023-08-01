@@ -1,6 +1,6 @@
 package rimport
 
-import "projects_template/internal/repository"
+import "product_storage/internal/repository"
 
 type Repository struct {
 	Logger   repository.Logger

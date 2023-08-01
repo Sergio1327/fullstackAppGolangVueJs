@@ -3,9 +3,9 @@ package rimport
 import (
 	"log"
 	"os"
-	"projects_template/config"
-	"projects_template/internal/repository"
-	"projects_template/internal/transaction"
+	"product_storage/config"
+	"product_storage/internal/repository"
+	"product_storage/internal/transaction"
 
 	"github.com/golang/mock/gomock"
 )

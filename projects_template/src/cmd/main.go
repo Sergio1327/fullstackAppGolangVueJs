@@ -1,14 +1,16 @@
 package main
 
 import (
-	"projects_template/tools/logger"
+	"os"
+	"product_storage/tools/logger"
 )
 
 var (
-	version string
+	version string = os.Getenv("VERSION")
 )
 
 func main() {
-	log := logger.NewNoFileLogger("projects_template")
+	log := logger.NewNoFileLogger("product_storage")
 	log.Infoln("version", version)
+	log.Debugln("pg", os.Getenv("PG_URL"))
 }

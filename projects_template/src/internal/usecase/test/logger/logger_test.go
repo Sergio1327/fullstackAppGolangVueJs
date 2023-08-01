@@ -1,11 +1,11 @@
 package test
 
 import (
-	"projects_template/internal/entity/log"
-	"projects_template/internal/usecase"
-	"projects_template/rimport"
-	"projects_template/tools/logger"
-	"projects_template/tools/sqlnull"
+	"product_storage/internal/entity/log"
+	"product_storage/internal/usecase"
+	"product_storage/rimport"
+	"product_storage/tools/logger"
+	"product_storage/tools/sqlnull"
 	"testing"
 
 	"github.com/golang/mock/gomock"

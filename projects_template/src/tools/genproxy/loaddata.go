@@ -1,7 +1,7 @@
 package genproxy
 
 import (
-	"projects_template/internal/entity/global"
+	"product_storage/internal/entity/global"
 
 	"github.com/sirupsen/logrus"
 )

@@ -1,12 +1,12 @@
 package repository
 
 import (
-	"projects_template/internal/entity/log"
-	"projects_template/internal/entity/product"
-	"projects_template/internal/entity/stock"
-	"projects_template/internal/entity/template"
-	"projects_template/internal/transaction"
-	"projects_template/tools/sqlnull"
+	"product_storage/internal/entity/log"
+	"product_storage/internal/entity/product"
+	"product_storage/internal/entity/stock"
+	"product_storage/internal/entity/template"
+	"product_storage/internal/transaction"
+	"product_storage/tools/sqlnull"
 )
 
 type Logger interface {

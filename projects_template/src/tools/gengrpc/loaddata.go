@@ -1,7 +1,7 @@
 package gengrpc
 
 import (
-	"projects_template/internal/entity/global"
+	"product_storage/internal/entity/global"
 
 	"google.golang.org/grpc/status"
 )

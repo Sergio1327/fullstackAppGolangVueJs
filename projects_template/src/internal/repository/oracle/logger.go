@@ -1,10 +1,10 @@
 package oracle
 
 import (
-	"projects_template/internal/entity/log"
-	"projects_template/internal/repository"
-	"projects_template/internal/transaction"
-	"projects_template/tools/sqlnull"
+	"product_storage/internal/entity/log"
+	"product_storage/internal/repository"
+	"product_storage/internal/transaction"
+	"product_storage/tools/sqlnull"
 
 	"github.com/mattn/go-oci8"
 )
