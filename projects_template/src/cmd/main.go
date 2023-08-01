@@ -7,6 +7,6 @@ var (
 )
 
 func main() {
-	log := logger.NewFileLogger("projects_template")
+	log := logger.NewFileLogger("projects_template.log")
 	log.Infoln("version", version)
 }

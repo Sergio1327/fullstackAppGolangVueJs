@@ -6,8 +6,8 @@ import (
 	"projects_template/config"
 	"projects_template/internal/transaction"
 	"projects_template/internal/usecase"
+	"projects_template/internal/usecase/product"
 	"projects_template/rimport"
-	"projects_template/tools/logger"
 
 	"github.com/sirupsen/logrus"
 )
@@ -37,7 +37,7 @@ func NewUsecaseImports(
 
 		Usecase: Usecase{
 			Logger:   usecase.NewLogger(log, ri),
-			Template: usecase.NewTemplate(logger.NewUsecaseLogger(log, "template"), dblog, ri, bi),
+			ProdcutUsecase: product.NewProductUseCaseImpl(log,dblog,ri),
 		},
 		BridgeImports: bi,
 	}
