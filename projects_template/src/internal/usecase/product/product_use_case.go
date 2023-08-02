@@ -27,7 +27,7 @@ func NewProductUseCaseImpl(log, dblog *logrus.Logger, ri rimport.RepositoryImpor
 		RepositoryImports: ri,
 	}
 }
-
+// AddProduct логика добавление продукта в базу
 func (u ProductUseCaseImpl) AddProduct(tx *sqlx.Tx, product product.Product) (productID int, err error) {
 	// если имя продукта не введено то возвращается ошибка
 	if product.Name == "" {
@@ -190,7 +190,7 @@ func (u ProductUseCaseImpl) FindProductInfoById(tx *sqlx.Tx, productID int) (pro
 	return productInfo, err
 }
 
-// LoadProductList логика получения списка продуктов по тегу и лимиту
+// FindProductList логика получения списка продуктов по тегу и лимиту
 func (u ProductUseCaseImpl) FindProductList(tx *sqlx.Tx, tag string, limit int) (products []product.ProductInfo, err error) {
 
 	// если лимит не указан или некорректен то по умолчанию устанавливается 3
@@ -373,7 +373,7 @@ func (u ProductUseCaseImpl) Buy(tx *sqlx.Tx, p product.Sale) (saleID int, err er
 	return saleID, err
 }
 
-// LoadSales получение списка всех продаж или списка продаж по фильтрам
+// FindSales получение списка всех продаж или списка продаж по фильтрам
 func (u ProductUseCaseImpl) FindSaleList(tx *sqlx.Tx, sq product.SaleQuery) (sales []product.Sale, err error) {
 
 	// если лимит не указан то по умолчанию устанавливается 3

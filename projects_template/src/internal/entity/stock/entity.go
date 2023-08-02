@@ -13,6 +13,7 @@ type AddProductInStock struct {
 	Quantity  int       `json:"quantity" db:"quantity"`     // кол-во продукта добавленного на склад
 }
 
+// IsNullFields проверка полей на нулевые значения
 func (a AddProductInStock) IsNullFields() error {
 	if a.StorageID == 0 || a.VariantID == 0 || a.AddedAt == (time.Time{}) || a.Quantity == 0 {
 		return errors.New("поля: variant_id, storage_id, added_at, quantity не должны быть пустыми")

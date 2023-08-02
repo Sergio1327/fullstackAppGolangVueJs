@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AddProduct добавление товара
+// addProduct добавление товара
 func (g *GinServer) addProduct(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()
@@ -44,7 +44,7 @@ func (g *GinServer) addProduct(c *gin.Context) {
 	}
 }
 
-// AddProductPrice добавляет цену продукта
+// addProductPrice добавляет цену продукта
 func (g *GinServer) addProductPrice(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()
@@ -76,6 +76,7 @@ func (g *GinServer) addProductPrice(c *gin.Context) {
 	}
 }
 
+// addProductInStock добавляет продукт в склад
 func (g *GinServer) addProductInStock(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()
@@ -107,6 +108,7 @@ func (g *GinServer) addProductInStock(c *gin.Context) {
 	c.JSON(http.StatusOK, response.NewSuccessResponse(productStockID, "product_stock_ID"))
 }
 
+// findProductInfoById выводит данные о продукте по его id
 func (g *GinServer) findProductInfoById(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()
@@ -137,6 +139,7 @@ func (g *GinServer) findProductInfoById(c *gin.Context) {
 	c.JSON(http.StatusOK, response.NewSuccessResponse(productInfo, "product_info"))
 }
 
+// findProductList выводит список продуктов по тегам и лимитам
 func (g *GinServer) findProductList(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()
@@ -168,6 +171,7 @@ func (g *GinServer) findProductList(c *gin.Context) {
 	c.JSON(http.StatusOK, response.NewSuccessResponse(productList, "product_list"))
 }
 
+// findProductListInStock выводит информацию о складах и продуктах в них
 func (g *GinServer) findProductListInStock(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()
@@ -203,6 +207,7 @@ func (g *GinServer) findProductListInStock(c *gin.Context) {
 	c.JSON(http.StatusOK, response.NewSuccessResponse(stockList, "stock_list"))
 }
 
+// buy запись сделанной продажи в базу
 func (g *GinServer) buy(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()
@@ -234,6 +239,7 @@ func (g *GinServer) buy(c *gin.Context) {
 	c.JSON(http.StatusOK, response.NewSuccessResponse(saleID, "sale_id"))
 }
 
+// findSales выводит информацию о продажах по фильтрам или без них
 func (g *GinServer) FindSaleList(c *gin.Context) {
 	ts := g.SessionManager.CreateSession()
 	err := ts.Start()

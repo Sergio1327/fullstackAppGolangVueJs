@@ -34,7 +34,7 @@ func main() {
 	repo := rimport.NewRepositoryImports(sm)
 
 	dbLog := logger.NewDBLog("product_storage", repo)
-	
+
 	useCase := uimport.NewUsecaseImports(log, dbLog, repo, repo.SessionManager)
 
 	ginServer := restapi.NewGinServer(log, dbLog, useCase)

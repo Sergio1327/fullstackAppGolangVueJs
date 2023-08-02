@@ -56,6 +56,7 @@ type Sale struct {
 	TotalPrice  float64            `db:"total_price"`                  // общая стоимость с учетом кол-ва продукта
 }
 
+// IsNullFields проверка полей нва нулевые значения
 func (s Sale) IsNullFields() error {
 	if s.VariantID == 0 || s.StorageID == 0 || s.Quantity == 0 {
 		return errors.New("variant_id, storage_id или quantity являются пустыми полями")
