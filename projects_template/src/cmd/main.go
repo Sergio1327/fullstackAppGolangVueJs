@@ -20,8 +20,6 @@ func init() {
 	}
 }
 
-var ()
-
 func main() {
 	version := os.Getenv("VERSION")
 	db := pgdb.SqlxDB(os.Getenv("PG_URL"))
