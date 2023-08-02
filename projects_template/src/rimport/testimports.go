@@ -53,12 +53,12 @@ func (t *TestRepositoryImports) MockSessionWithCommit() *transaction.MockSession
 	return ts
 }
 
-func (t *TestRepositoryImports) RepositoryImports() RepositoryImports {
-	return RepositoryImports{
-		SessionManager: t.SessionManager,
-		Config:         t.Config,
-		Repository: Repository{
-			Template: t.MockRepository.Template,
-		},
-	}
-}
+// func (t *TestRepositoryImports) RepositoryImports() RepositoryImports {
+// 	return RepositoryImports{
+// 		SessionManager: t.SessionManager,
+// 		Config:         t.Config,
+// 		Repository: Repository{
+// 			Product: t.MockRepository.,
+// 		},
+// 	}
+// }

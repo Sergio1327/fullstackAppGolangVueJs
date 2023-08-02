@@ -4,7 +4,6 @@ import "product_storage/internal/repository"
 
 type Repository struct {
 	Logger   repository.Logger
-	Template repository.Template
 	Product  repository.ProductRepository
 }
 
