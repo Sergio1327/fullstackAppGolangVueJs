@@ -27,6 +27,12 @@ func (g *GinServer) Run() {
 
 	g.server.POST("/product/add", g.addProduct)
 	g.server.POST("/product/price", g.addProductPrice)
+	g.server.POST("/product/add", g.addProductInStock)
+	g.server.GET("/product/:id", g.findProductInfoById)
+	g.server.GET("/product_list", g.findProductList)
+	g.server.GET("/stock", g.findProductListInStock)
+	g.server.POST("/buy", g.buy)
+	g.server.POST("/sales", g.FindSaleList)
 
 	g.server.Run(":8080")
 }

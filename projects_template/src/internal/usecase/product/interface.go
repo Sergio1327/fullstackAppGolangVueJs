@@ -15,5 +15,5 @@ type ProductUseCase interface {
 	FindProductList(tx *sqlx.Tx, tag string, limit int) ([]product.ProductInfo, error)
 	FindProductsInStock(tx *sqlx.Tx, productID int) ([]stock.Stock, error)
 	Buy(tx *sqlx.Tx, p product.Sale) (int, error)
-	FindSales(tx *sqlx.Tx, sq product.SaleQuery) ([]product.Sale, error)
+	FindSaleList(tx *sqlx.Tx, sq product.SaleQuery) ([]product.Sale, error)
 }

@@ -374,7 +374,7 @@ func (u ProductUseCaseImpl) Buy(tx *sqlx.Tx, p product.Sale) (saleID int, err er
 }
 
 // LoadSales получение списка всех продаж или списка продаж по фильтрам
-func (u ProductUseCaseImpl) FindSales(tx *sqlx.Tx, sq product.SaleQuery) (sales []product.Sale, err error) {
+func (u ProductUseCaseImpl) FindSaleList(tx *sqlx.Tx, sq product.SaleQuery) (sales []product.Sale, err error) {
 
 	// если лимит не указан то по умолчанию устанавливается 3
 	if !sq.Limit.Valid {
