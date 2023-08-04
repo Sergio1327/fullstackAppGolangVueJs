@@ -27,6 +27,7 @@ func NewProductUseCaseImpl(log, dblog *logrus.Logger, ri rimport.RepositoryImpor
 		RepositoryImports: ri,
 	}
 }
+
 // AddProduct логика добавление продукта в базу
 func (u ProductUseCaseImpl) AddProduct(tx *sqlx.Tx, product product.Product) (productID int, err error) {
 	// если имя продукта не введено то возвращается ошибка

@@ -4,11 +4,10 @@ import (
 	"product_storage/internal/entity/log"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
-	"product_storage/internal/entity/template"
 	"product_storage/internal/transaction"
 	"product_storage/tools/sqlnull"
 
-	"github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx"	
 )
 
 type Logger interface {
@@ -17,10 +16,7 @@ type Logger interface {
 	SaveLogDetails(ts transaction.Session, logID int, details map[string]string) error
 }
 
-type Template interface {
-	FindTemplateObj(ts transaction.Session, id int) (template.TemplateObject, error)
-	LoadAllTemplateObj(ts transaction.Session) ([]template.TemplateObject, error)
-}
+//go:generate mockgen -source=interface.go -destination=mocks/mock.go
 
 type ProductRepository interface {
 	AddProduct(tx *sqlx.Tx, product product.Product) (productID int, err error)

@@ -21,8 +21,10 @@ func init() {
 }
 
 func main() {
+
 	version := os.Getenv("VERSION")
 	db := pgdb.SqlxDB(os.Getenv("PG_URL"))
+	defer db.Close()
 
 	log := logger.NewFileLogger("product_storage")
 	log.Infoln("version", version)

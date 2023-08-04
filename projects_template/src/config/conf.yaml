@@ -1,2 +1,2 @@
-redis:
-  cacheTime: 720
+config:
+  CONF_PATH:"./config" 

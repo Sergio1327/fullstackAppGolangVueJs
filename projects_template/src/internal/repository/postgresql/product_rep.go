@@ -8,11 +8,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+
 type PostgresProductRepository struct {
 }
 
 func NewPostgresProductRepository() PostgresProductRepository {
 	return PostgresProductRepository{}
+
 }
 
 // AddProduct вставка названия,описания,времени добавления и тегов в базу
