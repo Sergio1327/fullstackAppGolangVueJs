@@ -22,17 +22,17 @@ func NewGinServer(log, dblog *logrus.Logger, U uimport.UsecaseImports) *GinServe
 	}
 }
 
-func (g *GinServer) Run() {
-	g.server = gin.Default()
+func (e *GinServer) Run() {
+	e.server = gin.Default()
 
-	g.server.POST("/product/add", g.addProduct)
-	g.server.POST("/product/price", g.addProductPrice)
-	g.server.POST("/product/add/stock", g.addProductInStock)
-	g.server.GET("/product/:id", g.findProductInfoById)
-	g.server.GET("/product_list", g.findProductList)
-	g.server.GET("/stock", g.findProductListInStock)
-	g.server.POST("/buy", g.buy)
-	g.server.POST("/sales", g.FindSaleList)
+	e.server.POST("/product/add", e.addProduct)
+	e.server.POST("/product/price", e.addProductPrice)
+	e.server.POST("/product/add/stock", e.addProductInStock)
+	e.server.GET("/product/:id", e.findProductInfoById)
+	e.server.GET("/product_list", e.findProductList)
+	e.server.GET("/stock", e.findProductListInStock)
+	e.server.POST("/buy", e.buy)
+	e.server.POST("/sales", e.FindSaleList)
 
-	g.server.Run(":8080")
+	e.server.Run(":8080")
 }
