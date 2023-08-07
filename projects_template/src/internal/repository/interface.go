@@ -7,7 +7,6 @@ import (
 	"product_storage/internal/transaction"
 	"product_storage/tools/sqlnull"
 
-	"github.com/jmoiron/sqlx"	
 )
 
 type Logger interface {
@@ -19,32 +18,32 @@ type Logger interface {
 //go:generate mockgen -source=interface.go -destination=mocks/mock.go
 
 type ProductRepository interface {
-	AddProduct(tx *sqlx.Tx, product product.Product) (productID int, err error)
-	AddProductVariantList(tx *sqlx.Tx, productID int, variant product.Variant) error
+	AddProduct(ts transaction.Session, product product.Product) (productID int, err error)
+	AddProductVariantList(ts transaction.Session, productID int, variant product.Variant) error
 
-	CheckExists(tx *sqlx.Tx, p product.ProductPrice) (int, error)
-	UpdateProductPrice(tx *sqlx.Tx, p product.ProductPrice, id int) error
-	AddProductPrice(tx *sqlx.Tx, p product.ProductPrice) (int, error)
+	CheckExists(ts transaction.Session, p product.ProductPrice) (int, error)
+	UpdateProductPrice(ts transaction.Session, p product.ProductPrice, id int) error
+	AddProductPrice(ts transaction.Session, p product.ProductPrice) (int, error)
 
-	CheckProductInStock(tx *sqlx.Tx, p stock.AddProductInStock) (bool, error)
-	UpdateProductInstock(tx *sqlx.Tx, p stock.AddProductInStock) (int, error)
-	AddProductInStock(tx *sqlx.Tx, p stock.AddProductInStock) (int, error)
+	CheckProductInStock(ts transaction.Session, p stock.AddProductInStock) (bool, error)
+	UpdateProductInstock(ts transaction.Session, p stock.AddProductInStock) (int, error)
+	AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (int, error)
 
-	LoadProductInfo(tx *sqlx.Tx, productID int) (product.ProductInfo, error)
-	FindProductVariantList(tx *sqlx.Tx, productID int) ([]product.Variant, error)
-	FindCurrentPrice(tx *sqlx.Tx, variantID int) (float64, error)
-	InStorages(tx *sqlx.Tx, variantID int) ([]int, error)
+	LoadProductInfo(ts transaction.Session, productID int) (product.ProductInfo, error)
+	FindProductVariantList(ts transaction.Session, productID int) ([]product.Variant, error)
+	FindCurrentPrice(ts transaction.Session, variantID int) (float64, error)
+	InStorages(ts transaction.Session, variantID int) ([]int, error)
 
-	FindProductListByTag(tx *sqlx.Tx, tag string, limit int) ([]product.ProductInfo, error)
-	LoadProductList(tx *sqlx.Tx, limit int) ([]product.ProductInfo, error)
+	FindProductListByTag(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error)
+	LoadProductList(ts transaction.Session, limit int) ([]product.ProductInfo, error)
 
-	LoadStockList(tx *sqlx.Tx) ([]stock.Stock, error)
-	FindStockListByProductId(tx *sqlx.Tx, productID int) ([]stock.Stock, error)
-	FindStocksVariantList(tx *sqlx.Tx, storageID int) ([]stock.AddProductInStock, error)
+	LoadStockList(ts transaction.Session) ([]stock.Stock, error)
+	FindStockListByProductId(ts transaction.Session, productID int) ([]stock.Stock, error)
+	FindStocksVariantList(ts transaction.Session, storageID int) ([]stock.AddProductInStock, error)
 
-	Buy(tx *sqlx.Tx, s product.Sale) (int, error)
-	FindPrice(tx *sqlx.Tx, variantID int) (float64, error)
+	Buy(ts transaction.Session, s product.Sale) (int, error)
+	FindPrice(ts transaction.Session, variantID int) (float64, error)
 
-	FindSaleListOnlyBySoldDate(tx *sqlx.Tx, sq product.SaleQueryOnlyBySoldDate) ([]product.Sale, error)
-	FindSaleListByFilters(tx *sqlx.Tx, sq product.SaleQuery) ([]product.Sale, error)
+	FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDate) ([]product.Sale, error)
+	FindSaleListByFilters(ts transaction.Session, sq product.SaleQuery) ([]product.Sale, error)
 }

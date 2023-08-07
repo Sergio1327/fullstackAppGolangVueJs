@@ -34,13 +34,11 @@ func TestAddProduct(t *testing.T) {
 		Tags:    "ddd",
 	}
 
-	tx := postgresql.SqlxTx(ts)
-
-	id, err := repo.Repository.Product.AddProduct(tx, p1)
+	id, err := repo.Repository.Product.AddProduct(ts, p1)
 	r.NoError(err)
 	r.NotEmpty(id)
 
-	productInfo, err := repo.Repository.Product.LoadProductInfo(tx, id)
+	productInfo, err := repo.Repository.Product.LoadProductInfo(ts, id)
 	r.NoError(err)
 	r.NotEmpty(productInfo)
 
@@ -50,7 +48,7 @@ func TestAddProduct(t *testing.T) {
 	// Второй тестовый случай - добавление продукта без имени, ожидается ошибка
 	p2 := product.Product{}
 
-	id2, err := repo.Repository.Product.AddProduct(tx, p2)
+	id2, err := repo.Repository.Product.AddProduct(ts, p2)
 	r.NoError(err)
 	r.NotEmpty(id2)
 }
@@ -65,14 +63,13 @@ func TestAddProductVariantList(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	id := 1
 	variant := product.Variant{
 		Weight: 200,
 		Unit:   "г",
 	}
-	err := repo.Repository.Product.AddProductVariantList(tx, id, variant)
+	err := repo.Repository.Product.AddProductVariantList(ts, id, variant)
 	r.NoError(err)
 
 	id = -1
@@ -80,7 +77,7 @@ func TestAddProductVariantList(t *testing.T) {
 		Weight: 300,
 		Unit:   "кг",
 	}
-	err = repo.Repository.Product.AddProductVariantList(tx, id, variant)
+	err = repo.Repository.Product.AddProductVariantList(ts, id, variant)
 	r.Error(err)
 }
 
@@ -94,14 +91,13 @@ func TestCheckExists(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	productPrice := product.ProductPrice{
 		VariantID: 2,
 		StartDate: time.Now(),
 	}
 
-	id, err := repo.Repository.Product.CheckExists(tx, productPrice)
+	id, err := repo.Repository.Product.CheckExists(ts, productPrice)
 	r.NoError(err)
 	r.Zero(id)
 }
@@ -116,18 +112,17 @@ func TestUpdateProductPrice(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	expectedProductPrice := product.ProductPrice{
 		PriceID: 2,
 		EndDate: sqlnull.NewNullTime(time.Now()),
 	}
 
-	err := repo.Repository.Product.UpdateProductPrice(tx, expectedProductPrice, expectedProductPrice.PriceID)
+	err := repo.Repository.Product.UpdateProductPrice(ts, expectedProductPrice, expectedProductPrice.PriceID)
 	r.NoError(err)
 
 	var productPrice product.ProductPrice
-	err = tx.Get(&productPrice,
+	err = postgresql.SqlxTx(ts).Get(&productPrice,
 		`select price_id 
 	     from product_prices
 		 where price_id = $1 
@@ -148,7 +143,6 @@ func TestAddProductPrice(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
@@ -159,12 +153,12 @@ func TestAddProductPrice(t *testing.T) {
 		Price:     18.99,
 	}
 
-	priceID, err := repo.Repository.Product.AddProductPrice(tx, expectedProductPrice)
+	priceID, err := repo.Repository.Product.AddProductPrice(ts, expectedProductPrice)
 	r.NoError(err)
 	r.NotEmpty(priceID)
 
 	var productPrice product.ProductPrice
-	err = tx.Get(&productPrice,
+	err = postgresql.SqlxTx(ts).Get(&productPrice,
 		`select variant_id, price
 		 from product_prices
 		 where variant_id = $1
@@ -187,7 +181,6 @@ func TestCheckProductsInStock(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	productInStock := stock.AddProductInStock{
 		VariantID: 4,
@@ -195,13 +188,13 @@ func TestCheckProductsInStock(t *testing.T) {
 		Quantity:  10,
 	}
 
-	_, err := tx.Exec(
+	_, err := postgresql.SqlxTx(ts).Exec(
 		`insert into products_in_storage
 		 ( variant_id, storage_id, quantity ) 
 		 values( $1, $2, $3 )`, productInStock.VariantID, productInStock.StorageID, productInStock.Quantity)
 	r.NoError(err)
 
-	isExists, err := repo.Repository.Product.CheckProductInStock(tx, productInStock)
+	isExists, err := repo.Repository.Product.CheckProductInStock(ts, productInStock)
 	r.NoError(err)
 	r.True(isExists)
 }
@@ -217,7 +210,6 @@ func TestUpdateProductsnStock(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	productInStock := stock.AddProductInStock{
 		VariantID: 4,
@@ -225,13 +217,13 @@ func TestUpdateProductsnStock(t *testing.T) {
 		Quantity:  10,
 	}
 
-	_, err := tx.Exec(
+	_, err := postgresql.SqlxTx(ts).Exec(
 		`insert into products_in_storage
 		 ( variant_id, storage_id, quantity )
 		 values ( $1, $2, $3 )`, productInStock.VariantID, productInStock.StorageID, productInStock.Quantity)
 	r.NoError(err)
 
-	productStockID, err := repo.Repository.Product.UpdateProductInstock(tx, stock.AddProductInStock{
+	productStockID, err := repo.Repository.Product.UpdateProductInstock(ts, stock.AddProductInStock{
 		VariantID: 4,
 		StorageID: 2,
 		Quantity:  5,
@@ -251,7 +243,6 @@ func TestAddProductInStock(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	expectedProduct := stock.AddProductInStock{
 		VariantID: 3,
@@ -259,12 +250,12 @@ func TestAddProductInStock(t *testing.T) {
 		AddedAt:   time.Now(),
 		Quantity:  5,
 	}
-	productStockID, err := repo.Repository.Product.AddProductInStock(tx, expectedProduct)
+	productStockID, err := repo.Repository.Product.AddProductInStock(ts, expectedProduct)
 	r.NotZero(productStockID)
 	r.NoError(err)
 
 	var productInStock stock.AddProductInStock
-	err = tx.Get(&productInStock, `
+	err = postgresql.SqlxTx(ts).Get(&productInStock, `
 	select variant_id, storage_id, quantity
 	from products_in_storage
 	where variant_id = $1 and storage_id = $2 and quantity = $3`,
@@ -287,7 +278,6 @@ func TestLoadProductInfo(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	product := product.Product{
 		Name:    "Имя продукта",
@@ -296,11 +286,11 @@ func TestLoadProductInfo(t *testing.T) {
 		Tags:    "tag",
 	}
 
-	id, err := repo.Repository.Product.AddProduct(tx, product)
+	id, err := repo.Repository.Product.AddProduct(ts, product)
 	r.NoError(err)
 	r.NotEmpty(id)
 
-	productInfo, err := repo.Repository.Product.LoadProductInfo(tx, id)
+	productInfo, err := repo.Repository.Product.LoadProductInfo(ts, id)
 	r.NoError(err)
 	r.NotEmpty(productInfo)
 	r.Equal(product.Name, productInfo.Name)
@@ -318,7 +308,6 @@ func TestFindProductVariantList(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	varquery := product.Variant{
 		Weight: 500,
@@ -326,16 +315,16 @@ func TestFindProductVariantList(t *testing.T) {
 	}
 
 	id := 2
-	err := repo.Repository.Product.AddProductVariantList(tx, id, varquery)
+	err := repo.Repository.Product.AddProductVariantList(ts, id, varquery)
 	r.NoError(err)
 
-	variants, err := repo.Repository.Product.FindProductVariantList(tx, id)
+	variants, err := repo.Repository.Product.FindProductVariantList(ts, id)
 	r.NoError(err)
 	r.NotEmpty(variants)
 
 	var variant product.Variant
 
-	err = tx.Get(&variant,
+	err = postgresql.SqlxTx(ts).Get(&variant,
 		`select  weight, unit 
 		 from product_variants
 		 where product_id = $1
@@ -360,7 +349,6 @@ func TestFindCurrentPrice(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	pp := product.ProductPrice{
 		VariantID: 1,
@@ -369,7 +357,7 @@ func TestFindCurrentPrice(t *testing.T) {
 	}
 
 	var id int
-	err := tx.QueryRow(
+	err := postgresql.SqlxTx(ts).QueryRow(
 		`insert into product_prices
 		 ( variant_id, price, start_date )
 	 	 values( $1, $2, $3 ) 
@@ -377,7 +365,7 @@ func TestFindCurrentPrice(t *testing.T) {
 		pp.VariantID, pp.Price, pp.StartDate).Scan(&id)
 	r.NoError(err)
 
-	price, err := repo.Repository.Product.FindCurrentPrice(tx, id)
+	price, err := repo.Repository.Product.FindCurrentPrice(ts, id)
 	r.NoError(err)
 	r.NotEmpty(price)
 }
@@ -393,7 +381,6 @@ func TestInStorages(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	var id int
 	product := stock.AddProductInStock{
@@ -403,7 +390,7 @@ func TestInStorages(t *testing.T) {
 		Quantity:  3,
 	}
 
-	err := tx.QueryRow(
+	err := postgresql.SqlxTx(ts).QueryRow(
 		`insert into products_in_storage
 		 ( variant_id, storage_id, added_at, quantity )
 		 values( $1, $2, $3, $4 )
@@ -411,7 +398,7 @@ func TestInStorages(t *testing.T) {
 		product.VariantID, product.StorageID, product.AddedAt, product.Quantity).Scan(&id)
 	r.NoError(err)
 
-	inStorages, err := repo.Repository.Product.InStorages(tx, id)
+	inStorages, err := repo.Repository.Product.InStorages(ts, id)
 	r.NoError(err)
 	r.NotEmpty(inStorages)
 }
@@ -427,7 +414,6 @@ func TestFindProductListByTag(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	p1 := product.Product{
 		Name:    "sldlsd",
@@ -443,14 +429,14 @@ func TestFindProductListByTag(t *testing.T) {
 		Tags:    "стирка",
 	}
 
-	_, err := tx.Exec(`
+	_, err := postgresql.SqlxTx(ts).Exec(`
 	insert into products
 	( name, description, added_at, tags )
 	values( $1, $2, $3, $4 )`,
 		p1.Name, p1.Descr, p1.AddetAt, p1.Tags)
 	r.NoError(err)
 
-	_, err = tx.Exec(`
+	_, err = postgresql.SqlxTx(ts).Exec(`
 	insert into products
 	(name, description, added_at, tags )
 	values($1, $2, $3, $4 )`,
@@ -460,14 +446,14 @@ func TestFindProductListByTag(t *testing.T) {
 	tag := "напиток"
 	limit := 3
 
-	products, err := repo.Repository.Product.FindProductListByTag(tx, tag, limit)
+	products, err := repo.Repository.Product.FindProductListByTag(ts, tag, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
 
 	tag = "стирка"
 	limit = 1
 
-	products, err = repo.Repository.Product.FindProductListByTag(tx, tag, limit)
+	products, err = repo.Repository.Product.FindProductListByTag(ts, tag, limit)
 	r.NoError(err)
 	r.NotEmpty(products)
 }
@@ -483,15 +469,14 @@ func TestFindStockVariantList(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	storageId := 1
-	variants, err := repo.Repository.Product.FindStocksVariantList(tx, storageId)
+	variants, err := repo.Repository.Product.FindStocksVariantList(ts, storageId)
 	r.NoError(err)
 	r.NotEmpty(variants)
 
 	storageId = 2
-	variants, err = repo.Repository.Product.FindStocksVariantList(tx, storageId)
+	variants, err = repo.Repository.Product.FindStocksVariantList(ts, storageId)
 	r.NoError(err)
 	r.NotEmpty(variants)
 }
@@ -507,7 +492,6 @@ func TestFindPrice(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	var variantID int
 	priceQuery := product.ProductPrice{
@@ -516,7 +500,7 @@ func TestFindPrice(t *testing.T) {
 		StartDate: time.Now(),
 	}
 
-	err := tx.QueryRow(`
+	err := postgresql.SqlxTx(ts).QueryRow(`
 	insert into product_prices
 	( variant_id, price, start_date )
 	values ( $1, $2, $3 ) 
@@ -524,7 +508,7 @@ func TestFindPrice(t *testing.T) {
 		priceQuery.VariantID, priceQuery.Price, priceQuery.StartDate).Scan(&variantID)
 	r.NoError(err)
 
-	price, err := repo.Repository.Product.FindPrice(tx, variantID)
+	price, err := repo.Repository.Product.FindPrice(ts, variantID)
 	r.NoError(err)
 	r.NotEmpty(price)
 }
@@ -540,7 +524,6 @@ func TestBuy(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	saleQuery := product.Sale{
 		VariantID:  1,
@@ -549,11 +532,11 @@ func TestBuy(t *testing.T) {
 		TotalPrice: 19.99,
 	}
 
-	saleID, err := repo.Repository.Product.Buy(tx, saleQuery)
+	saleID, err := repo.Repository.Product.Buy(ts, saleQuery)
 	r.NoError(err)
 
 	var sale product.Sale
-	err = tx.Get(&sale, `
+	err = postgresql.SqlxTx(ts).Get(&sale, `
 	select variant_id 
 	from sales 
 	where variant_id = $1 
@@ -575,14 +558,13 @@ func TestFindSaleList(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 	endDate, err := time.Parse("02.01.2006", "20.07.2023")
 	r.NoError(err)
 
-	sales, err := repo.Repository.Product.FindSaleListOnlyBySoldDate(tx, product.SaleQueryOnlyBySoldDate{
+	sales, err := repo.Repository.Product.FindSaleListOnlyBySoldDate(ts, product.SaleQueryOnlyBySoldDate{
 		Limit:     sqlnull.NewInt64(3),
 		StartDate: startDate,
 		EndDate:   endDate,
@@ -602,19 +584,18 @@ func TestFindSaleListByFilters(t *testing.T) {
 	ts := sm.CreateSession()
 	ts.Start()
 	defer ts.Rollback()
-	tx := postgresql.SqlxTx(ts)
 
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
-	data, err := repo.Repository.Product.FindSaleListByFilters(tx, product.SaleQuery{
+	data, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 	})
 	r.NoError(err)
 	r.NotEmpty(data)
 
-	data2, err := repo.Repository.Product.FindSaleListByFilters(tx, product.SaleQuery{
+	data2, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 		StorageId: sqlnull.NewInt64(1),
@@ -623,7 +604,7 @@ func TestFindSaleListByFilters(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(data2)
 
-	data3, err := repo.Repository.Product.FindSaleListByFilters(tx, product.SaleQuery{
+	data3, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
 		StartDate:   startDate,
 		EndDate:     startDate.AddDate(0, 1, 0),
 		StorageId:   sqlnull.NewInt64(1),

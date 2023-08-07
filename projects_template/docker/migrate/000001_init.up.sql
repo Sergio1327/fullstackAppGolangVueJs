@@ -51,6 +51,9 @@ create table sales (
     total_price decimal(10, 2) not null
 );
 
+create table LOG_TABLE(
+    
+)
 
 INSERT INTO
     products (name, description, tags)

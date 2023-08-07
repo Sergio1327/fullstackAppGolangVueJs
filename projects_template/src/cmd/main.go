@@ -21,7 +21,6 @@ func init() {
 }
 
 func main() {
-
 	version := os.Getenv("VERSION")
 	db := pgdb.SqlxDB(os.Getenv("PG_URL"))
 	defer db.Close()
@@ -39,5 +38,4 @@ func main() {
 
 	ginServer := restapi.NewGinServer(log, dbLog, useCase)
 	ginServer.Run()
-
 }

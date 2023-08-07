@@ -1,15 +1,13 @@
 package restapi
 
 import (
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
-	"product_storage/internal/repository/postgresql"
 	"product_storage/tools/response"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
 // addProduct добавление товара
@@ -28,7 +26,7 @@ func (g *GinServer) addProduct(c *gin.Context) {
 		return
 	}
 
-	productID, err := g.Usecase.ProdcutUsecase.AddProduct(postgresql.SqlxTx(ts), product)
+	productID, err := g.Usecase.ProdcutUsecase.AddProduct(ts, product)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -61,7 +59,7 @@ func (g *GinServer) addProductPrice(c *gin.Context) {
 		return
 	}
 
-	priceID, err := g.Usecase.ProdcutUsecase.AddProductPrice(postgresql.SqlxTx(ts), productPrice)
+	priceID, err := g.Usecase.ProdcutUsecase.AddProductPrice(ts, productPrice)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -93,7 +91,7 @@ func (g *GinServer) addProductInStock(c *gin.Context) {
 		return
 	}
 
-	productStockID, err := g.Usecase.ProdcutUsecase.AddProductInStock(postgresql.SqlxTx(ts), addProduct)
+	productStockID, err := g.Usecase.ProdcutUsecase.AddProductInStock(ts, addProduct)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -124,7 +122,7 @@ func (g *GinServer) findProductInfoById(c *gin.Context) {
 		return
 	}
 
-	productInfo, err := g.Usecase.ProdcutUsecase.FindProductInfoById(postgresql.SqlxTx(ts), productID)
+	productInfo, err := g.Usecase.ProdcutUsecase.FindProductInfoById(ts, productID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -156,7 +154,7 @@ func (g *GinServer) findProductList(c *gin.Context) {
 		limit = 3
 	}
 
-	productList, err := g.Usecase.ProdcutUsecase.FindProductList(postgresql.SqlxTx(ts), tag, limit)
+	productList, err := g.Usecase.ProdcutUsecase.FindProductList(ts, tag, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -192,7 +190,7 @@ func (g *GinServer) findProductListInStock(c *gin.Context) {
 		return
 	}
 
-	stockList, err := g.Usecase.ProdcutUsecase.FindProductsInStock(postgresql.SqlxTx(ts), productId)
+	stockList, err := g.Usecase.ProdcutUsecase.FindProductsInStock(ts, productId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -224,7 +222,7 @@ func (g *GinServer) buy(c *gin.Context) {
 		return
 	}
 
-	saleID, err := g.Usecase.ProdcutUsecase.Buy(postgresql.SqlxTx(ts), sale)
+	saleID, err := g.Usecase.ProdcutUsecase.Buy(ts, sale)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -256,7 +254,7 @@ func (g *GinServer) FindSaleList(c *gin.Context) {
 		return
 	}
 
-	saleList, err := g.Usecase.ProdcutUsecase.FindSaleList(postgresql.SqlxTx(ts), saleQuery)
+	saleList, err := g.Usecase.ProdcutUsecase.FindSaleList(ts, saleQuery)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
