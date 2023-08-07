@@ -6,11 +6,10 @@ import (
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
 	"product_storage/tools/sqlnull"
-
 )
 
 type Logger interface {
-	SaveLog(ts transaction.Session, row log.Row, contractID, seID sqlnull.NullInt64, operLogin sqlnull.NullString) error
+	SaveLog(ts transaction.Session, row log.Row, operLogin sqlnull.NullString) error
 	SaveLogWithReturnID(ts transaction.Session, row log.Row, contractID, seID sqlnull.NullInt64, operLogin sqlnull.NullString) (logID int, err error)
 	SaveLogDetails(ts transaction.Session, logID int, details map[string]string) error
 }

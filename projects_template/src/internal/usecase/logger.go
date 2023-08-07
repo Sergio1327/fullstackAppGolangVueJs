@@ -75,7 +75,7 @@ func (u *LoggerUsecase) SaveLog(row log.Row) error {
 		}
 
 	} else {
-		if err := u.ri.Repository.Logger.SaveLog(ts, row, contractID, seID, operLogin); err != nil {
+		if err := u.ri.Repository.Logger.SaveLog(ts, row, operLogin); err != nil {
 			u.log.Errorln(u.logPrefix(), "не удается сохранить данные в детали лога", err)
 			return err
 		}

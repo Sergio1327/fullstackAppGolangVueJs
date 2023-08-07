@@ -51,10 +51,21 @@ create table sales (
     total_price decimal(10, 2) not null
 );
 
-create table LOG_TABLE(
-    
-)
+create table log_table (
+    date timestamptz not null,
+    flag varchar(255),
+    msg text not null,
+    module varchar(255),
+    fl varchar(255) not null,
+    line varchar(255) not null,
+    login varchar(255)
+);
 
+create table log_details (
+    LOG_ID serial primary key,
+    NAME text not null,
+    VALUE text not null
+)
 INSERT INTO
     products (name, description, tags)
 VALUES
