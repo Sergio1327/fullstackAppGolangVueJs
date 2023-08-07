@@ -123,11 +123,6 @@ func (e *GinServer) findProductInfoById(c *gin.Context) {
 		return
 	}
 
-	if err := ts.Commit(); err != nil {
-		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
-		return
-	}
-
 	c.JSON(http.StatusOK, response.NewSuccessResponse(productInfo, "product_info"))
 }
 
@@ -150,11 +145,6 @@ func (e *GinServer) findProductList(c *gin.Context) {
 
 	productList, err := e.Usecase.ProdcutUsecase.FindProductList(ts, tag, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
-		return
-	}
-
-	if err := ts.Commit(); err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
 	}
@@ -185,11 +175,6 @@ func (e *GinServer) findProductListInStock(c *gin.Context) {
 
 	stockList, err := e.Usecase.ProdcutUsecase.FindProductsInStock(ts, productId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
-		return
-	}
-
-	if err := ts.Commit(); err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
 	}
@@ -251,10 +236,5 @@ func (e *GinServer) FindSaleList(c *gin.Context) {
 		return
 	}
 
-	if err := ts.Commit(); err != nil {
-		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
-		return
-	}
-	
 	c.JSON(http.StatusOK, response.NewSuccessResponse(saleList, "sale_list"))
 }
