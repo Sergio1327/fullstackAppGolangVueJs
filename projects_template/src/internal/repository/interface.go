@@ -16,7 +16,7 @@ type Logger interface {
 
 //go:generate mockgen -source=interface.go -destination=mocks/mock.go
 
-type ProductRepository interface {
+type Product interface {
 	AddProduct(ts transaction.Session, product product.Product) (productID int, err error)
 	AddProductVariantList(ts transaction.Session, productID int, variant product.Variant) error
 

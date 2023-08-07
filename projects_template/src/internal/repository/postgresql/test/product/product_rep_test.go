@@ -1,4 +1,4 @@
-package postgresql_test
+package product_test
 
 import (
 	"product_storage/internal/entity/product"

@@ -10,7 +10,7 @@ import (
 type PostgresProductRepository struct {
 }
 
-func NewPostgresProductRepository() PostgresProductRepository {
+func NewProduct() PostgresProductRepository {
 	return PostgresProductRepository{}
 
 }

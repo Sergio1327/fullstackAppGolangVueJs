@@ -26,7 +26,7 @@ func NewRepositoryImports(
 		Config:         config,
 		SessionManager: sessionManager,
 		Repository: Repository{
-			Product: postgresql.NewPostgresProductRepository(),
+			Product: postgresql.NewProduct(),
 		},
 	}
 }
