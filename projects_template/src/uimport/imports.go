@@ -6,7 +6,6 @@ import (
 	"product_storage/config"
 	"product_storage/internal/transaction"
 	"product_storage/internal/usecase"
-	"product_storage/internal/usecase/product"
 	"product_storage/rimport"
 
 	"github.com/sirupsen/logrus"
@@ -36,7 +35,7 @@ func NewUsecaseImports(
 
 		Usecase: Usecase{
 			Logger:         usecase.NewLogger(log, ri),
-			ProdcutUsecase: product.NewProductUseCaseImpl(log, dblog, ri),
+			ProdcutUsecase: usecase.NewProduct(log, dblog, ri),
 		},
 	}
 
