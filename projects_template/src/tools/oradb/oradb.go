@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-oci8"
 )
 
 // AlterOracleFloatParseFix fix for float
