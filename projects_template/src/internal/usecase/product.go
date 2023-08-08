@@ -3,7 +3,7 @@ package usecase
 import (
 	"database/sql"
 	"errors"
-	"log"
+	"github.com/sirupsen/logrus"
 	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
@@ -11,8 +11,6 @@ import (
 	"product_storage/rimport"
 	"strconv"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 type ProductImpl struct {
@@ -33,27 +31,26 @@ func NewProduct(log, dblog *logrus.Logger, ri rimport.RepositoryImports) *Produc
 func (u *ProductImpl) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
 	// если имя продукта не введено то возвращается ошибка
 	if product.Name == "" {
+		u.log.Error(errors.New("имя продукта не может быть пустым"))
 		return 0, errors.New("имя продукта не может быть пустым")
 	}
 
 	// добавляется продукт в базу
 	productID, err = u.Repository.Product.AddProduct(ts, product)
 	if err != nil {
+		u.log.Error(err)
 		return 0, errors.New("не удалось добавить продукт в базу данных")
 	}
 
 	// если пользователь не ввел варианты продукта то данные о продукте просто запишутся в базу
 	if product.VariantList == nil {
-		if err != nil {
-			return 0, errors.New("ошибка в добавлении вариантов продукта")
-		}
-
 		return productID, nil
 	} else {
 		// добавляются варианты продукта
 		for _, v := range product.VariantList {
 			err := u.Repository.Product.AddProductVariantList(ts, productID, v)
 			if err != nil {
+				u.log.Error(err)
 				return 0, errors.New("не удалось добавить варианты продукта")
 			}
 		}
@@ -82,6 +79,7 @@ func (u *ProductImpl) AddProductPrice(ts transaction.Session, p product.ProductP
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
 	isExistsID, err := u.Repository.Product.CheckExists(ts, p)
 	if err != nil {
+		u.log.Error(err)
 		return 0, errors.New("ошибка при проверке цен в базе данных")
 	}
 
@@ -90,6 +88,7 @@ func (u *ProductImpl) AddProductPrice(ts transaction.Session, p product.ProductP
 		p.EndDate.Scan(time.Now())
 		err := u.Repository.Product.UpdateProductPrice(ts, p, isExistsID)
 		if err != nil {
+			u.log.Error(err)
 			return 0, errors.New("не удалось обновить цену")
 		}
 
@@ -98,6 +97,7 @@ func (u *ProductImpl) AddProductPrice(ts transaction.Session, p product.ProductP
 		// если записи нет то цена вставляется в базу
 		priceID, err = u.Repository.Product.AddProductPrice(ts, p)
 		if err != nil {
+			u.log.Error(err)
 			return 0, errors.New("не удалось добавить цену")
 		}
 	}
@@ -117,6 +117,7 @@ func (u *ProductImpl) AddProductInStock(ts transaction.Session, p stock.AddProdu
 	// проверка есть ли уже продукт на складе
 	isExist, err := u.Repository.Product.CheckProductInStock(ts, p)
 	if err != nil {
+		u.log.Error(err)
 		return 0, errors.New("ошибка при проверке наличия продукта на складе")
 	}
 
@@ -124,12 +125,14 @@ func (u *ProductImpl) AddProductInStock(ts transaction.Session, p stock.AddProdu
 	if isExist {
 		productStockID, err = u.Repository.Product.UpdateProductInstock(ts, p)
 		if err != nil {
+			u.log.Error(err)
 			return 0, errors.New("не удалось обновить кол-во продуктов на складе")
 		}
 	} else {
 		// если продукта нет на складе то он просто добавляется на склад
 		productStockID, err = u.Repository.Product.AddProductInStock(ts, p)
 		if err != nil {
+			u.log.Error(err)
 			return 0, errors.New("не удалось добавить продукт на склад")
 		}
 	}
@@ -148,6 +151,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 	// поиск продукта по его id
 	productInfo, err = u.Repository.Product.LoadProductInfo(ts, productID)
 	if err != nil {
+		u.log.Error(err)
 		return product.ProductInfo{}, errors.New("не удалось получить информацию о продукте")
 	}
 
@@ -169,6 +173,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 			case sql.ErrNoRows:
 				continue
 			default:
+				u.log.Error(err)
 				return product.ProductInfo{}, errors.New("не удалось найти актуальную цену варианта продукта")
 			}
 		}
@@ -183,6 +188,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 			case sql.ErrNoRows:
 				continue
 			default:
+				u.log.Error()
 				return product.ProductInfo{}, errors.New("не удалось найти склады в которых есть продукт")
 			}
 		}
@@ -204,6 +210,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 	if tag != "" {
 		products, err = u.Repository.Product.FindProductListByTag(ts, tag, limit)
 		if err != nil {
+			u.log.Error(err)
 			return nil, errors.New("не удалось найти продукты по данному тегу")
 		}
 
@@ -214,6 +221,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				case sql.ErrNoRows:
 					return products, nil
 				default:
+					u.log.Error(err)
 					return nil, errors.New("не удалось найти варианты продукта")
 				}
 			}
@@ -226,6 +234,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 					case sql.ErrNoRows:
 						continue
 					default:
+						u.log.Error(err)
 						return nil, errors.New("не удалось найти актуальную цену продукта")
 					}
 				}
@@ -237,6 +246,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 					case sql.ErrNoRows:
 						continue
 					default:
+						u.log.Error(err)
 						return nil, errors.New("не удалось найти склады в которых есть продукт")
 					}
 				}
@@ -249,6 +259,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 		// если пользователь не ввел тег то просто прозойдет поиск всех продуктов с лимитом вывода
 		products, err = u.Repository.Product.LoadProductList(ts, limit)
 		if err != nil {
+			u.log.Error(err)
 			return nil, err
 		}
 
@@ -259,6 +270,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				case sql.ErrNoRows:
 					return products, nil
 				default:
+					u.log.Error(err)
 					return nil, err
 				}
 			}
@@ -272,6 +284,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 					case sql.ErrNoRows:
 						continue
 					default:
+						u.log.Error(err)
 						return nil, err
 					}
 				}
@@ -283,6 +296,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 					case sql.ErrNoRows:
 						continue
 					default:
+						u.log.Error(err)
 						return nil, err
 					}
 				}
@@ -307,6 +321,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 	if productID == 0 {
 		stocks, err = u.Repository.Product.LoadStockList(ts)
 		if err != nil {
+			u.log.Error(err)
 			return nil, errors.New("не удалось найти склады")
 		}
 		for i, v := range stocks {
@@ -316,6 +331,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 				case sql.ErrNoRows:
 					return stocks, nil
 				default:
+					u.log.Error(err)
 					return nil, errors.New("не удалось найти варианты продукта на складе")
 				}
 			}
@@ -326,6 +342,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 		//Если же пользователь ввел id продукта то произойдет фильтрация складов по id продукта
 		stocks, err = u.Repository.Product.FindStockListByProductId(ts, productID)
 		if err != nil {
+			u.log.Error(err)
 			return nil, errors.New("не удалось найти склады с продуктами по данному id ")
 		}
 		for i, v := range stocks {
@@ -335,6 +352,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 				case sql.ErrNoRows:
 					return stocks, nil
 				default:
+					u.log.Error(err)
 					return nil, errors.New("не удалось найти варианты продукта на складе")
 				}
 			}
@@ -360,6 +378,7 @@ func (u *ProductImpl) Buy(ts transaction.Session, p product.Sale) (saleID int, e
 	// получение цены варианта
 	price, err := u.Repository.Product.FindPrice(ts, p.VariantID)
 	if err != nil {
+		u.log.Error(err)
 		return 0, errors.New("не удалось найти цену продукта")
 	}
 
@@ -369,6 +388,7 @@ func (u *ProductImpl) Buy(ts transaction.Session, p product.Sale) (saleID int, e
 	// запись продажи в базу
 	saleID, err = u.Repository.Product.Buy(ts, p)
 	if err != nil {
+		u.log.Error(err)
 		return 0, errors.New("не удалось записать продажу в базу")
 	}
 
@@ -393,13 +413,14 @@ func (u *ProductImpl) FindSaleList(ts transaction.Session, sq params.SaleQuery) 
 
 		sales, err = u.Repository.Product.FindSaleListOnlyBySoldDate(ts, s)
 		if err != nil {
+			u.log.Error(err)
 			return nil, errors.New("не удалось найти продажи")
 		}
 	} else {
 		//  если имя продукта или id склада указан то произойдет фильтрация по этим параметрам
 		sales, err = u.Repository.Product.FindSaleListByFilters(ts, sq)
 		if err != nil {
-			log.Println(err)
+			u.log.Error(err)
 			return nil, errors.New("не удалось найти продажи по данным фильтрам")
 		}
 	}
