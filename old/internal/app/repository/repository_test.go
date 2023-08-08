@@ -86,7 +86,7 @@ func TestAddProductVariantList(t *testing.T) {
 	r.NotEmpty(variant)
 }
 
-func TestCheckExists(t *testing.T) {
+func TestCheckExists(t *testing.T) { 
 	r := require.New(t)
 
 	conStr := "dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable"
@@ -359,13 +359,14 @@ func TestFindCurrentPrice(t *testing.T) {
 	r.NoError(err)
 	defer tx.Rollback()
 
-	var id int
+	
 	pp := domain.ProductPrice{
 		VariantID: 1,
 		Price:     14.99,
 		StartDate: time.Now(),
 	}
-
+	
+	var id int
 	err = tx.QueryRow(
 		`insert into product_prices
 		 ( variant_id, price, start_date )

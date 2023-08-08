@@ -44,6 +44,8 @@ func (u *ProductImpl) AddProduct(ts transaction.Session, product product.Product
 
 	// если пользователь не ввел варианты продукта то данные о продукте просто запишутся в базу
 	if product.VariantList == nil {
+		u.log.WithFields(logrus.Fields{"product_id": productID}).Info("продукт успешно добавлен в базу данных")
+
 		return productID, nil
 	} else {
 		// добавляются варианты продукта
@@ -55,6 +57,7 @@ func (u *ProductImpl) AddProduct(ts transaction.Session, product product.Product
 			}
 		}
 
+		u.log.WithFields(logrus.Fields{"product_id": productID}).Info("продукт успешно добавлен в базу данных")
 		return productID, err
 	}
 }
@@ -102,6 +105,7 @@ func (u *ProductImpl) AddProductPrice(ts transaction.Session, p product.ProductP
 		}
 	}
 
+	u.log.WithFields(logrus.Fields{"price_id": priceID}).Info("цена продукта успешно добавлена в базу данных")
 	return priceID, err
 }
 
@@ -137,6 +141,7 @@ func (u *ProductImpl) AddProductInStock(ts transaction.Session, p stock.AddProdu
 		}
 	}
 
+	u.log.WithFields(logrus.Fields{"product_stock_id": productStockID}).Info("Продукт успешно добавлен на склад")
 	return productStockID, err
 }
 
@@ -192,9 +197,11 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 				return product.ProductInfo{}, errors.New("не удалось найти склады в которых есть продукт")
 			}
 		}
+		
 		productInfo.VariantList[i].InStorages = inStorages
 	}
 
+	u.log.WithFields(logrus.Fields{"product_info": productInfo}).Info("Успешно получена информация о продукте")
 	return productInfo, err
 }
 
@@ -254,7 +261,6 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				variantList[j].InStorages = inStorages
 			}
 		}
-
 	} else {
 		// если пользователь не ввел тег то просто прозойдет поиск всех продуктов с лимитом вывода
 		products, err = u.Repository.Product.LoadProductList(ts, limit)
@@ -304,9 +310,9 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				variants[j].InStorages = inStorages
 			}
 		}
-
 	}
 
+	u.log.WithFields(logrus.Fields{"product_list": products}).Info("Успешно получен список продуктов")
 	return products, err
 }
 
@@ -335,6 +341,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 					return nil, errors.New("не удалось найти варианты продукта на складе")
 				}
 			}
+
 			stocks[i].ProductVariantList = variants
 		}
 	} else {
@@ -356,10 +363,12 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 					return nil, errors.New("не удалось найти варианты продукта на складе")
 				}
 			}
+
 			stocks[i].ProductVariantList = variants
 		}
 	}
 
+	u.log.WithFields(logrus.Fields{"stock_list": stocks}).Info("Успешно найдены склады и продукты в них")
 	return stocks, err
 }
 
@@ -392,6 +401,7 @@ func (u *ProductImpl) Buy(ts transaction.Session, p product.Sale) (saleID int, e
 		return 0, errors.New("не удалось записать продажу в базу")
 	}
 
+	u.log.WithFields(logrus.Fields{"sale_id": saleID}).Info("Продажа успешно добавлена в базу данных")
 	return saleID, err
 }
 
@@ -425,5 +435,6 @@ func (u *ProductImpl) FindSaleList(ts transaction.Session, sq params.SaleQuery) 
 		}
 	}
 
+	u.log.WithFields(logrus.Fields{"sale_list": sales}).Info("Успешно получены продажи по заданным фильтрам")
 	return sales, err
 }

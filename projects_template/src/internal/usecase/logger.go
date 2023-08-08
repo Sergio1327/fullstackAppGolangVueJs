@@ -27,7 +27,7 @@ func (u *Logger) logPrefix() string {
 }
 
 func (u *Logger) SpecialFields() []string {
-	return []string{"c_id", "se_id", "oper_login"}
+	return []string{"product_id", "variant_id", "stock_id"}
 }
 
 func (u *Logger) SaveLog(row log.Row) error {
