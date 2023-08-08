@@ -1,12 +1,14 @@
 package restapi
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/tools/response"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // addProduct добавление товара
@@ -223,7 +225,7 @@ func (e *GinServer) FindSaleList(c *gin.Context) {
 	}
 	defer ts.Rollback()
 
-	var saleQuery product.SaleQuery
+	var saleQuery params.SaleQuery
 
 	if err := c.ShouldBindJSON(&saleQuery); err != nil {
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))

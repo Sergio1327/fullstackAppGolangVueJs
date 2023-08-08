@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"database/sql"
+	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
@@ -241,7 +242,7 @@ func (r PostgresProductRepository) Buy(ts transaction.Session, sale product.Sale
 }
 
 // FindSaleListOnlyBySoldDate получение списка всех продаж
-func (r PostgresProductRepository) FindSaleListOnlyBySoldDate(ts transaction.Session, saleFilters product.SaleQueryOnlyBySoldDate) (saleList []product.Sale, err error) {
+func (r PostgresProductRepository) FindSaleListOnlyBySoldDate(ts transaction.Session, saleFilters params.SaleQueryOnlyBySoldDate) (saleList []product.Sale, err error) {
 	query := `
 	SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
 	FROM sales s
@@ -256,7 +257,7 @@ func (r PostgresProductRepository) FindSaleListOnlyBySoldDate(ts transaction.Ses
 }
 
 // FindSaleListByFilters получение списка продаж по фильтрам
-func (r PostgresProductRepository) FindSaleListByFilters(ts transaction.Session, saleFilters product.SaleQuery) (saleList []product.Sale, err error) {
+func (r PostgresProductRepository) FindSaleListByFilters(ts transaction.Session, saleFilters params.SaleQuery) (saleList []product.Sale, err error) {
 	query := `
 	SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
 	FROM sales s

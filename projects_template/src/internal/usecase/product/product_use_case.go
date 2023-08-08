@@ -3,14 +3,16 @@ package product
 import (
 	"database/sql"
 	"errors"
-	"github.com/sirupsen/logrus"
 	"log"
+	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
 	"product_storage/rimport"
 	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type ProductUseCaseImpl struct {
@@ -374,7 +376,7 @@ func (u ProductUseCaseImpl) Buy(ts transaction.Session, p product.Sale) (saleID 
 }
 
 // FindSales получение списка всех продаж или списка продаж по фильтрам
-func (u ProductUseCaseImpl) FindSaleList(ts transaction.Session, sq product.SaleQuery) (sales []product.Sale, err error) {
+func (u ProductUseCaseImpl) FindSaleList(ts transaction.Session, sq params.SaleQuery) (sales []product.Sale, err error) {
 
 	// если лимит не указан то по умолчанию устанавливается 3
 	if !sq.Limit.Valid {
@@ -383,7 +385,7 @@ func (u ProductUseCaseImpl) FindSaleList(ts transaction.Session, sq product.Sale
 
 	// если не указано имя продукта или id склада то произойдет фильтрация только по датам
 	if !sq.ProductName.Valid && !sq.StorageId.Valid {
-		s := product.SaleQueryOnlyBySoldDate{
+		s := params.SaleQueryOnlyBySoldDate{
 			StartDate: sq.StartDate,
 			EndDate:   sq.EndDate,
 			Limit:     sq.Limit,
