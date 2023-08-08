@@ -75,7 +75,7 @@ func (u *Logger) SaveLog(row log.Row) error {
 		}
 
 	} else {
-		if err := u.ri.Repository.Logger.SaveLog(ts, row, operLogin); err != nil {
+		if err := u.ri.Repository.Logger.SaveLog(ts, row); err != nil {
 			u.log.Errorln(u.logPrefix(), "не удается сохранить данные в детали лога", err)
 			return err
 		}

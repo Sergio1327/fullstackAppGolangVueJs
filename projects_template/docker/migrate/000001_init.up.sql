@@ -52,13 +52,13 @@ create table sales (
 );
 
 create table log_table (
-    date timestamptz not null,
+    time timestamptz not null,
     flag varchar(255),
     msg text not null,
     module varchar(255),
+    login varchar(255),
     fl varchar(255) not null,
     line varchar(255) not null,
-    login varchar(255)
 );
 
 create table log_details (

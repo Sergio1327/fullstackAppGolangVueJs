@@ -15,11 +15,10 @@ func NewLoggerRepository() repository.Logger {
 
 func (l *loggerRepository) SaveLog(
 	ts transaction.Session,
-	row log.Row,
-	operLogin sqlnull.NullString) error {
+	row log.Row,) error {
 	sqlQuery := `
 	insert into log_table 
-	( time, flag, msg, module, oper_login, caller, line_no ) 
+	( time, flag, msg, module, fl, line ) 
 	values ( $1, $2, $3, $4, $5, $6, $7 )`
 
 	_, err := SqlxTx(ts).Exec(sqlQuery,
@@ -27,7 +26,6 @@ func (l *loggerRepository) SaveLog(
 		row.Flag,
 		row.Message,
 		row.Module,
-		operLogin,
 		row.File,
 		row.Line,
 	)

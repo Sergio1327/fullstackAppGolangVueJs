@@ -384,7 +384,7 @@ func (u *ProductImpl) FindSaleList(ts transaction.Session, sq params.SaleQuery) 
 	}
 
 	// если не указано имя продукта или id склада то произойдет фильтрация только по датам
-	if !sq.ProductName.Valid && !sq.StorageId.Valid {
+	if !sq.ProductName.Valid && !sq.StorageID.Valid {
 		s := params.SaleQueryOnlyBySoldDate{
 			StartDate: sq.StartDate,
 			EndDate:   sq.EndDate,

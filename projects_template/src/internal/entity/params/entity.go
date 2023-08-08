@@ -10,7 +10,7 @@ type SaleQuery struct {
 	StartDate   time.Time          `json:"start_date" db:"start_date"`     // дата начала продаж(обязательные поля)
 	EndDate     time.Time          `json:"end_date"  db:"end_date"`        // дата конца прдаж (обязательные поля)
 	Limit       sqlnull.NullInt64  `json:"limit" db:"limit"`               // лимит вывода продаж
-	StorageId   sqlnull.NullInt64  `json:"storage_id" db:"storage_id"`     // id склада
+	StorageID   sqlnull.NullInt64  `json:"storage_id" db:"storage_id"`     // id склада
 	ProductName sqlnull.NullString `json:"product_name" db:"product_name"` // название продукта
 }
 

@@ -1,12 +1,13 @@
 package postgresql
 
 import (
-	"database/sql"
+	"product_storage/internal/entity/global"
 	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/repository"
 	"product_storage/internal/transaction"
+	"product_storage/tools/gensql"
 )
 
 type PostgresProduct struct {
@@ -49,10 +50,10 @@ func (r *PostgresProduct) CheckExists(ts transaction.Session, p product.ProductP
 	and start_date = $2 
 	and( end_date = $3 or end_date is null )`
 
-	err = SqlxTx(ts).Get(&isExistsID, query, p.VariantID, p.StartDate, p.EndDate)
+	isExistsID, err = gensql.Get[int](SqlxTx(ts), query, p.VariantID, p.StartDate, p.EndDate)
 	if err != nil {
 		switch err {
-		case sql.ErrNoRows:
+		case global.ErrNoData:
 			return 0, nil
 		default:
 			return 0, err
@@ -87,13 +88,13 @@ func (r *PostgresProduct) AddProductPrice(ts transaction.Session, price product.
 
 // CheckProductInStock проверка есть ли на скалде продукт
 func (r *PostgresProduct) CheckProductInStock(ts transaction.Session, productInStock stock.AddProductInStock) (isExists bool, err error) {
-	err = SqlxTx(ts).Get(&isExists,
-		`select exists
-		 (select 1 
-		 from products_in_storage 
-		 where variant_id = $1 
-		 and storage_id = $2)`,
-		productInStock.VariantID, productInStock.StorageID)
+	query := `select exists
+	(select 1 
+	from products_in_storage 
+	where variant_id = $1 
+	and storage_id = $2)`
+
+	isExists, err = gensql.Get[bool](SqlxTx(ts), query, productInStock.VariantID, productInStock.StorageID)
 
 	return isExists, err
 }
@@ -125,107 +126,125 @@ func (r *PostgresProduct) AddProductInStock(ts transaction.Session, productInSto
 
 // LoadProductInfo получение информации о продукте
 func (r *PostgresProduct) LoadProductInfo(ts transaction.Session, productId int) (productInfo product.ProductInfo, err error) {
-	err = SqlxTx(ts).Get(&productInfo,
-		`select product_id, name, description  
-	 	 from products 
-	     where product_id = $1`, productId)
+	query := `
+	select product_id, name, description  
+	from products 
+    where product_id = $1`
+
+	productInfo, err = gensql.Get[product.ProductInfo](SqlxTx(ts), query, productId)
 
 	return productInfo, err
 }
 
 // FindProductVariantList получение вариантов продукта по его id
 func (r *PostgresProduct) FindProductVariantList(ts transaction.Session, productID int) (variantList []product.Variant, err error) {
-	err = SqlxTx(ts).Select(&variantList,
-		`select product_id, variant_id, weight, unit, added_at
-		 from product_variants	
-		 where product_id = $1`, productID)
+	query := `
+	select product_id, variant_id, weight, unit, added_at
+	from product_variants	
+	where product_id = $1`
+
+	variantList, err = gensql.Select[product.Variant](SqlxTx(ts), query, productID)
 
 	return variantList, err
 }
 
 // FindCurrentPrice получение актуальной цены
 func (r *PostgresProduct) FindCurrentPrice(ts transaction.Session, variantID int) (price float64, err error) {
-	err = SqlxTx(ts).Get(&price,
-		`select price 
-		 from product_prices 
-		 where variant_id = $1 
-		 and start_date < now() 
-		 and ( end_date is null or end_date > now() )`,
-		variantID)
+	query := `
+	select price 
+	from product_prices 
+	where variant_id = $1 
+	and start_date < now() 
+	and ( end_date is null or end_date > now() )`
+
+	price, err = gensql.Get[float64](SqlxTx(ts), query, variantID)
 
 	return price, err
 }
 
 // InStorages нахождение id складов в которых находится продукт
 func (r *PostgresProduct) InStorages(ts transaction.Session, varantID int) (inStorages []int, err error) {
-	err = SqlxTx(ts).Select(&inStorages,
-		`SELECT storage_id 
-	 	 FROM products_in_storage 
-		 WHERE variant_id = $1`, varantID)
+	query := `
+	SELECT storage_id 
+	FROM products_in_storage 
+    WHERE variant_id = $1`
+
+	inStorages, err = gensql.Select[int](SqlxTx(ts), query, varantID)
 
 	return inStorages, err
 }
 
 // FindProductListByTag  поиск информации о продукте по его тегу
 func (r *PostgresProduct) FindProductListByTag(ts transaction.Session, tag string, limit int) (productList []product.ProductInfo, err error) {
-	err = SqlxTx(ts).Select(&productList,
-		`select product_id, name, description
-	 	 from products 
-	 	 where $1 = any ( string_to_array( tags,',' )) 
-	 	 limit $2`,
-		tag, limit)
+	query := `
+	select product_id, name, description
+	from products 
+	where $1 = any ( string_to_array( tags,',' )) 
+	limit $2`
+
+	productList, err = gensql.Select[product.ProductInfo](SqlxTx(ts), query, tag, limit)
 
 	return productList, err
 }
 
 // LoadProductList получение списка продуктов с лимитом
 func (r *PostgresProduct) LoadProductList(ts transaction.Session, limit int) (productList []product.ProductInfo, err error) {
-	err = SqlxTx(ts).Select(&productList,
-		`select product_id, name, description
-	 	 from products
-	     limit $1`, limit)
+	query := `
+	select product_id, name, description
+	from products
+    limit $1`
+
+	productList, err = gensql.Select[product.ProductInfo](SqlxTx(ts), query, limit)
 
 	return productList, err
 }
 
 // LoadStockList получение информации о складах
 func (r *PostgresProduct) LoadStockList(ts transaction.Session) (stockList []stock.Stock, err error) {
-	err = SqlxTx(ts).Select(&stockList,
-		`select  storage_id, name
-		 from storages`)
+	query := `
+	select  storage_id, name
+	from storages`
+
+	stockList, err = gensql.Select[stock.Stock](SqlxTx(ts), query)
 
 	return stockList, err
 }
 
 // FindStockListByProductId получение информации о складах где есть определенный продукт
 func (r *PostgresProduct) FindStockListByProductId(ts transaction.Session, productID int) (stockList []stock.Stock, err error) {
-	err = SqlxTx(ts).Select(&stockList, `
+	query := `
 	select s.storage_id ,s.name 
 	from storages s
 	join products_in_storage pis ON (s.storage_id = pis.storage_id)
 	join product_variants pv ON (pis.variant_id = pv.variant_id)
 	join products p ON (pv.product_id = p.product_id)
-	where p.product_id = $1`, productID)
+	where p.product_id = $1`
+
+	stockList, err = gensql.Select[stock.Stock](SqlxTx(ts), query, productID)
 
 	return stockList, err
 }
 
 // FindStocksVariantList получение вариантов продукта на складе
 func (r *PostgresProduct) FindStocksVariantList(ts transaction.Session, storageID int) (variantList []stock.AddProductInStock, err error) {
-	err = SqlxTx(ts).Select(&variantList,
-		`select variant_id, storage_id, added_at, quantity
-	     from products_in_storage 
-	     where storage_id = $1 `, storageID)
+	query := `
+	select variant_id, storage_id, added_at, quantity
+	from products_in_storage 
+	where storage_id = $1 `
+
+	variantList, err = gensql.Select[stock.AddProductInStock](SqlxTx(ts), query, storageID)
 
 	return variantList, err
 }
 
 // FindPrice получение цены
 func (r *PostgresProduct) FindPrice(ts transaction.Session, variantID int) (price float64, err error) {
-	err = SqlxTx(ts).Get(&price,
+	query :=
 		`select price
 	 	 from product_prices
-	  	 where variant_id = $1`, variantID)
+	 	 where variant_id = $1`
+
+	price, err = gensql.Get[float64](SqlxTx(ts), query, variantID)
 
 	return price, err
 }
@@ -252,7 +271,7 @@ func (r *PostgresProduct) FindSaleListOnlyBySoldDate(ts transaction.Session, sal
 	WHERE s.sold_at >= $1 AND s.sold_at <= $2
 	LIMIT $3`
 
-	err = SqlxTx(ts).Select(&saleList, query, saleFilters.StartDate, saleFilters.EndDate, saleFilters.Limit)
+	saleList, err = gensql.Select[product.Sale](SqlxTx(ts), query, saleFilters.StartDate, saleFilters.EndDate, saleFilters.Limit)
 
 	return saleList, err
 }
@@ -268,6 +287,16 @@ func (r *PostgresProduct) FindSaleListByFilters(ts transaction.Session, saleFilt
 	AND ( cast(:product_name as varchar) IS NULL OR p.name = :product_name )
 	AND ( cast(:storage_id as integer) IS NULL OR s.storage_id = :storage_id ) 
 	LIMIT :limit`
+
+	params:=map[string]interface{}{
+		"start_date":saleFilters.StartDate,
+		"end_date":saleFilters.EndDate,
+		"limit":saleFilters.Limit,
+		"product_name":saleFilters.ProductName,
+		"storage_id":saleFilters.StorageID,
+	}
+
+	saleList, err = gensql.SelectNamed[product.Sale](SqlxTx(ts), query, params)
 
 	stmt, err := SqlxTx(ts).PrepareNamed(query)
 	if err != nil {

@@ -2,7 +2,6 @@ package uimport
 
 import (
 	"os"
-	"product_storage/bimport"
 	"product_storage/config"
 	"product_storage/internal/transaction"
 	"product_storage/internal/usecase"
@@ -15,7 +14,6 @@ type UsecaseImports struct {
 	Config         config.Config
 	SessionManager transaction.SessionManager
 	Usecase        Usecase
-	*bimport.BridgeImports
 }
 
 func NewUsecaseImports(

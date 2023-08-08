@@ -599,7 +599,7 @@ func TestFindSaleListByFilters(t *testing.T) {
 	data2, err := repo.Repository.Product.FindSaleListByFilters(ts, params.SaleQuery{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
-		StorageId: sqlnull.NewInt64(1),
+		StorageID: sqlnull.NewInt64(1),
 	})
 
 	r.NoError(err)
@@ -608,7 +608,7 @@ func TestFindSaleListByFilters(t *testing.T) {
 	data3, err := repo.Repository.Product.FindSaleListByFilters(ts, params.SaleQuery{
 		StartDate:   startDate,
 		EndDate:     startDate.AddDate(0, 1, 0),
-		StorageId:   sqlnull.NewInt64(1),
+		StorageID:   sqlnull.NewInt64(1),
 		ProductName: sqlnull.NewString("Вода Hydrolife"),
 	})
 
