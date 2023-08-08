@@ -19,7 +19,7 @@ func (l *loggerRepository) SaveLog(
 	operLogin sqlnull.NullString) error {
 	sqlQuery := `
 	insert into log_table 
-	( time, flag, msg, c_id, module, se_id, oper_login, caller, line_no ) 
+	( time, flag, msg, module, oper_login, caller, line_no ) 
 	values ( $1, $2, $3, $4, $5, $6, $7 )`
 
 	_, err := SqlxTx(ts).Exec(sqlQuery,

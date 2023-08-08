@@ -8,16 +8,16 @@ import (
 	"product_storage/internal/transaction"
 )
 
-type PostgresProductRepository struct {
+type PostgresProduct struct {
 }
 
-func NewProduct() PostgresProductRepository {
-	return PostgresProductRepository{}
+func NewProduct() PostgresProduct {
+	return PostgresProduct{}
 
 }
 
 // AddProduct вставка названия,описания,времени добавления и тегов в базу
-func (r PostgresProductRepository) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
+func (r PostgresProduct) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
 	query := `insert into products
 	(name, description, added_at, tags)
 	values ($1, $2, $3, $4) 
@@ -29,7 +29,7 @@ func (r PostgresProductRepository) AddProduct(ts transaction.Session, product pr
 }
 
 // AddProductVariantList добавление вариантов продукта в продукт по его id
-func (r PostgresProductRepository) AddProductVariantList(ts transaction.Session, productID int, variant product.Variant) error {
+func (r PostgresProduct) AddProductVariantList(ts transaction.Session, productID int, variant product.Variant) error {
 	query := `
 	insert into product_variants 
 	(product_id, weight, unit) 
@@ -40,7 +40,7 @@ func (r PostgresProductRepository) AddProductVariantList(ts transaction.Session,
 }
 
 // CheckExists проверка наличия цен варианта продукта в указаный диапазон времени
-func (r PostgresProductRepository) CheckExists(ts transaction.Session, p product.ProductPrice) (isExistsID int, err error) {
+func (r PostgresProduct) CheckExists(ts transaction.Session, p product.ProductPrice) (isExistsID int, err error) {
 	query := `
 	select price_id 
 	from product_prices
@@ -62,7 +62,7 @@ func (r PostgresProductRepository) CheckExists(ts transaction.Session, p product
 }
 
 // UpdateProductPrice обновление цены варианта продукта
-func (r PostgresProductRepository) UpdateProductPrice(ts transaction.Session, price product.ProductPrice, priceID int) error {
+func (r PostgresProduct) UpdateProductPrice(ts transaction.Session, price product.ProductPrice, priceID int) error {
 	_, err := SqlxTx(ts).Exec(`
 	update product_prices
 	set end_date = $1 
@@ -73,7 +73,7 @@ func (r PostgresProductRepository) UpdateProductPrice(ts transaction.Session, pr
 }
 
 // AddProductPrice вставка цены варианта продукта в базу
-func (r PostgresProductRepository) AddProductPrice(ts transaction.Session, price product.ProductPrice) (priceID int, err error) {
+func (r PostgresProduct) AddProductPrice(ts transaction.Session, price product.ProductPrice) (priceID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	insert into product_prices
 	( variant_id, price, start_date, end_date )
@@ -85,7 +85,7 @@ func (r PostgresProductRepository) AddProductPrice(ts transaction.Session, price
 }
 
 // CheckProductInStock проверка есть ли на скалде продукт
-func (r PostgresProductRepository) CheckProductInStock(ts transaction.Session, productInStock stock.AddProductInStock) (isExists bool, err error) {
+func (r PostgresProduct) CheckProductInStock(ts transaction.Session, productInStock stock.AddProductInStock) (isExists bool, err error) {
 	err = SqlxTx(ts).Get(&isExists,
 		`select exists
 		 (select 1 
@@ -98,7 +98,7 @@ func (r PostgresProductRepository) CheckProductInStock(ts transaction.Session, p
 }
 
 // UpdateProductInstock обновление колличества продукта
-func (r PostgresProductRepository) UpdateProductInstock(ts transaction.Session, productInStock stock.AddProductInStock) (productStockID int, err error) {
+func (r PostgresProduct) UpdateProductInstock(ts transaction.Session, productInStock stock.AddProductInStock) (productStockID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	update products_in_storage 
 	set quantity = $1
@@ -111,7 +111,7 @@ func (r PostgresProductRepository) UpdateProductInstock(ts transaction.Session, 
 }
 
 // AddProductInStock добавление продукта на склад
-func (r PostgresProductRepository) AddProductInStock(ts transaction.Session, productInStock stock.AddProductInStock) (productStockID int, err error) {
+func (r PostgresProduct) AddProductInStock(ts transaction.Session, productInStock stock.AddProductInStock) (productStockID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	 insert into products_in_storage
 	 ( variant_id, storage_id, added_at, quantity )
@@ -123,7 +123,7 @@ func (r PostgresProductRepository) AddProductInStock(ts transaction.Session, pro
 }
 
 // LoadProductInfo получение информации о продукте
-func (r PostgresProductRepository) LoadProductInfo(ts transaction.Session, productId int) (productInfo product.ProductInfo, err error) {
+func (r PostgresProduct) LoadProductInfo(ts transaction.Session, productId int) (productInfo product.ProductInfo, err error) {
 	err = SqlxTx(ts).Get(&productInfo,
 		`select product_id, name, description  
 	 	 from products 
@@ -133,7 +133,7 @@ func (r PostgresProductRepository) LoadProductInfo(ts transaction.Session, produ
 }
 
 // FindProductVariantList получение вариантов продукта по его id
-func (r PostgresProductRepository) FindProductVariantList(ts transaction.Session, productID int) (variantList []product.Variant, err error) {
+func (r PostgresProduct) FindProductVariantList(ts transaction.Session, productID int) (variantList []product.Variant, err error) {
 	err = SqlxTx(ts).Select(&variantList,
 		`select product_id, variant_id, weight, unit, added_at
 		 from product_variants	
@@ -143,7 +143,7 @@ func (r PostgresProductRepository) FindProductVariantList(ts transaction.Session
 }
 
 // FindCurrentPrice получение актуальной цены
-func (r PostgresProductRepository) FindCurrentPrice(ts transaction.Session, variantID int) (price float64, err error) {
+func (r PostgresProduct) FindCurrentPrice(ts transaction.Session, variantID int) (price float64, err error) {
 	err = SqlxTx(ts).Get(&price,
 		`select price 
 		 from product_prices 
@@ -156,7 +156,7 @@ func (r PostgresProductRepository) FindCurrentPrice(ts transaction.Session, vari
 }
 
 // InStorages нахождение id складов в которых находится продукт
-func (r PostgresProductRepository) InStorages(ts transaction.Session, varantID int) (inStorages []int, err error) {
+func (r PostgresProduct) InStorages(ts transaction.Session, varantID int) (inStorages []int, err error) {
 	err = SqlxTx(ts).Select(&inStorages,
 		`SELECT storage_id 
 	 	 FROM products_in_storage 
@@ -166,7 +166,7 @@ func (r PostgresProductRepository) InStorages(ts transaction.Session, varantID i
 }
 
 // FindProductListByTag  поиск информации о продукте по его тегу
-func (r PostgresProductRepository) FindProductListByTag(ts transaction.Session, tag string, limit int) (productList []product.ProductInfo, err error) {
+func (r PostgresProduct) FindProductListByTag(ts transaction.Session, tag string, limit int) (productList []product.ProductInfo, err error) {
 	err = SqlxTx(ts).Select(&productList,
 		`select product_id, name, description
 	 	 from products 
@@ -178,7 +178,7 @@ func (r PostgresProductRepository) FindProductListByTag(ts transaction.Session, 
 }
 
 // LoadProductList получение списка продуктов с лимитом
-func (r PostgresProductRepository) LoadProductList(ts transaction.Session, limit int) (productList []product.ProductInfo, err error) {
+func (r PostgresProduct) LoadProductList(ts transaction.Session, limit int) (productList []product.ProductInfo, err error) {
 	err = SqlxTx(ts).Select(&productList,
 		`select product_id, name, description
 	 	 from products
@@ -188,7 +188,7 @@ func (r PostgresProductRepository) LoadProductList(ts transaction.Session, limit
 }
 
 // LoadStockList получение информации о складах
-func (r PostgresProductRepository) LoadStockList(ts transaction.Session) (stockList []stock.Stock, err error) {
+func (r PostgresProduct) LoadStockList(ts transaction.Session) (stockList []stock.Stock, err error) {
 	err = SqlxTx(ts).Select(&stockList,
 		`select  storage_id, name
 		 from storages`)
@@ -197,7 +197,7 @@ func (r PostgresProductRepository) LoadStockList(ts transaction.Session) (stockL
 }
 
 // FindStockListByProductId получение информации о складах где есть определенный продукт
-func (r PostgresProductRepository) FindStockListByProductId(ts transaction.Session, productID int) (stockList []stock.Stock, err error) {
+func (r PostgresProduct) FindStockListByProductId(ts transaction.Session, productID int) (stockList []stock.Stock, err error) {
 	err = SqlxTx(ts).Select(&stockList, `
 	select s.storage_id ,s.name 
 	from storages s
@@ -210,7 +210,7 @@ func (r PostgresProductRepository) FindStockListByProductId(ts transaction.Sessi
 }
 
 // FindStocksVariantList получение вариантов продукта на складе
-func (r PostgresProductRepository) FindStocksVariantList(ts transaction.Session, storageID int) (variantList []stock.AddProductInStock, err error) {
+func (r PostgresProduct) FindStocksVariantList(ts transaction.Session, storageID int) (variantList []stock.AddProductInStock, err error) {
 	err = SqlxTx(ts).Select(&variantList,
 		`select variant_id, storage_id, added_at, quantity
 	     from products_in_storage 
@@ -220,7 +220,7 @@ func (r PostgresProductRepository) FindStocksVariantList(ts transaction.Session,
 }
 
 // FindPrice получение цены
-func (r PostgresProductRepository) FindPrice(ts transaction.Session, variantID int) (price float64, err error) {
+func (r PostgresProduct) FindPrice(ts transaction.Session, variantID int) (price float64, err error) {
 	err = SqlxTx(ts).Get(&price,
 		`select price
 	 	 from product_prices
@@ -230,7 +230,7 @@ func (r PostgresProductRepository) FindPrice(ts transaction.Session, variantID i
 }
 
 // Buy запись о покупке в базу
-func (r PostgresProductRepository) Buy(ts transaction.Session, sale product.Sale) (saleID int, err error) {
+func (r PostgresProduct) Buy(ts transaction.Session, sale product.Sale) (saleID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	insert into sales
 	( variant_id, storage_id, sold_at, quantity, total_price )
@@ -242,7 +242,7 @@ func (r PostgresProductRepository) Buy(ts transaction.Session, sale product.Sale
 }
 
 // FindSaleListOnlyBySoldDate получение списка всех продаж
-func (r PostgresProductRepository) FindSaleListOnlyBySoldDate(ts transaction.Session, saleFilters params.SaleQueryOnlyBySoldDate) (saleList []product.Sale, err error) {
+func (r PostgresProduct) FindSaleListOnlyBySoldDate(ts transaction.Session, saleFilters params.SaleQueryOnlyBySoldDate) (saleList []product.Sale, err error) {
 	query := `
 	SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
 	FROM sales s
@@ -257,7 +257,7 @@ func (r PostgresProductRepository) FindSaleListOnlyBySoldDate(ts transaction.Ses
 }
 
 // FindSaleListByFilters получение списка продаж по фильтрам
-func (r PostgresProductRepository) FindSaleListByFilters(ts transaction.Session, saleFilters params.SaleQuery) (saleList []product.Sale, err error) {
+func (r PostgresProduct) FindSaleListByFilters(ts transaction.Session, saleFilters params.SaleQuery) (saleList []product.Sale, err error) {
 	query := `
 	SELECT s.sales_id, s.variant_id, s.storage_id, s.sold_at, s.quantity, s.total_price, p.name 
 	FROM sales s
