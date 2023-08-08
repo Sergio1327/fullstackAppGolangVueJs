@@ -288,12 +288,12 @@ func (r *PostgresProduct) FindSaleListByFilters(ts transaction.Session, saleFilt
 	AND ( cast(:storage_id as integer) IS NULL OR s.storage_id = :storage_id ) 
 	LIMIT :limit`
 
-	params:=map[string]interface{}{
-		"start_date":saleFilters.StartDate,
-		"end_date":saleFilters.EndDate,
-		"limit":saleFilters.Limit,
-		"product_name":saleFilters.ProductName,
-		"storage_id":saleFilters.StorageID,
+	params := map[string]interface{}{
+		"start_date":   saleFilters.StartDate,
+		"end_date":     saleFilters.EndDate,
+		"limit":        saleFilters.Limit,
+		"product_name": saleFilters.ProductName,
+		"storage_id":   saleFilters.StorageID,
 	}
 
 	saleList, err = gensql.SelectNamed[product.Sale](SqlxTx(ts), query, params)

@@ -1,9 +1,8 @@
 package usecase
 
 import (
-	"database/sql"
 	"errors"
-	"github.com/sirupsen/logrus"
+	"product_storage/internal/entity/global"
 	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
@@ -11,6 +10,8 @@ import (
 	"product_storage/rimport"
 	"strconv"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type ProductImpl struct {
@@ -163,7 +164,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 	productInfo.VariantList, err = u.Repository.Product.FindProductVariantList(ts, productInfo.ProductID)
 	if err != nil {
 		switch err {
-		case sql.ErrNoRows:
+		case global.ErrNoData:
 			return productInfo, nil
 		default:
 			return product.ProductInfo{}, errors.New("не удалось найти варианты продукта")
@@ -175,7 +176,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 		price, err := u.Repository.Product.FindCurrentPrice(ts, v.VariantID)
 		if err != nil {
 			switch err {
-			case sql.ErrNoRows:
+			case global.ErrNoData:
 				continue
 			default:
 				u.log.Error(err)
@@ -190,7 +191,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 		inStorages, err := u.Repository.Product.InStorages(ts, v.VariantID)
 		if err != nil {
 			switch err {
-			case sql.ErrNoRows:
+			case global.ErrNoData:
 				continue
 			default:
 				u.log.Error()
@@ -225,7 +226,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 			vars, err := u.Repository.Product.FindProductVariantList(ts, products[i].ProductID)
 			if err != nil {
 				switch err {
-				case sql.ErrNoRows:
+				case global.ErrNoData:
 					return products, nil
 				default:
 					u.log.Error(err)
@@ -238,7 +239,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				price, err := u.Repository.Product.FindCurrentPrice(ts, variantList[j].VariantID)
 				if err != nil {
 					switch err {
-					case sql.ErrNoRows:
+					case global.ErrNoData:
 						continue
 					default:
 						u.log.Error(err)
@@ -250,7 +251,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				inStorages, err := u.Repository.Product.InStorages(ts, variantList[j].VariantID)
 				if err != nil {
 					switch err {
-					case sql.ErrNoRows:
+					case global.ErrNoData:
 						continue
 					default:
 						u.log.Error(err)
@@ -273,7 +274,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 			vars, err := u.Repository.Product.FindProductVariantList(ts, products[i].ProductID)
 			if err != nil {
 				switch err {
-				case sql.ErrNoRows:
+				case global.ErrNoData:
 					return products, nil
 				default:
 					u.log.Error(err)
@@ -287,7 +288,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				price, err := u.Repository.Product.FindCurrentPrice(ts, variants[j].VariantID)
 				if err != nil {
 					switch err {
-					case sql.ErrNoRows:
+					case global.ErrNoData:
 						continue
 					default:
 						u.log.Error(err)
@@ -299,7 +300,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 				inStorages, err := u.Repository.Product.InStorages(ts, variants[j].VariantID)
 				if err != nil {
 					switch err {
-					case sql.ErrNoRows:
+					case global.ErrNoData:
 						continue
 					default:
 						u.log.Error(err)
@@ -334,7 +335,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 			variants, err := u.Repository.Product.FindStocksVariantList(ts, v.StorageID)
 			if err != nil {
 				switch err {
-				case sql.ErrNoRows:
+				case global.ErrNoData:
 					return stocks, nil
 				default:
 					u.log.Error(err)
@@ -356,7 +357,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 			variants, err := u.Repository.Product.FindStocksVariantList(ts, v.StorageID)
 			if err != nil {
 				switch err {
-				case sql.ErrNoRows:
+				case global.ErrNoData:
 					return stocks, nil
 				default:
 					u.log.Error(err)
