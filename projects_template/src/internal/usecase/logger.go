@@ -8,29 +8,29 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type LoggerUsecase struct {
+type Logger struct {
 	log *logrus.Logger
 	ri  rimport.RepositoryImports
 }
 
 func NewLogger(log *logrus.Logger,
 	ri rimport.RepositoryImports,
-) *LoggerUsecase {
-	return &LoggerUsecase{
+) *Logger {
+	return &Logger{
 		log: log,
 		ri:  ri,
 	}
 }
 
-func (u *LoggerUsecase) logPrefix() string {
+func (u *Logger) logPrefix() string {
 	return "[logger_usecase]"
 }
 
-func (u *LoggerUsecase) SpecialFields() []string {
+func (u *Logger) SpecialFields() []string {
 	return []string{"c_id", "se_id", "oper_login"}
 }
 
-func (u *LoggerUsecase) SaveLog(row log.Row) error {
+func (u *Logger) SaveLog(row log.Row) error {
 	ts := u.ri.SessionManager.CreateSession()
 	if err := ts.Start(); err != nil {
 		u.log.Errorln(u.logPrefix(), "не удается стартовать транзакцию", err)

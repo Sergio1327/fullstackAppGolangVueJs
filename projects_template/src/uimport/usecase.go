@@ -5,6 +5,6 @@ import (
 )
 
 type Usecase struct {
-	Logger         *usecase.LoggerUsecase
-	ProdcutUsecase usecase.Product
+	Logger  *usecase.Logger
+	Product *usecase.ProductImpl
 }

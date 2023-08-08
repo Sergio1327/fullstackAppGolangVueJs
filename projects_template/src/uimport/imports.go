@@ -34,8 +34,8 @@ func NewUsecaseImports(
 		SessionManager: sessionManager,
 
 		Usecase: Usecase{
-			Logger:         usecase.NewLogger(log, ri),
-			ProdcutUsecase: usecase.NewProduct(log, dblog, ri),
+			Logger:  usecase.NewLogger(log, ri),
+			Product: usecase.NewProduct(log, dblog, ri),
 		},
 	}
 

@@ -27,7 +27,7 @@ func (e *GinServer) addProduct(c *gin.Context) {
 		return
 	}
 
-	productID, err := e.Usecase.ProdcutUsecase.AddProduct(ts, product)
+	productID, err := e.Usecase.Product.AddProduct(ts, product)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -58,7 +58,7 @@ func (e *GinServer) addProductPrice(c *gin.Context) {
 		return
 	}
 
-	priceID, err := e.Usecase.ProdcutUsecase.AddProductPrice(ts, productPrice)
+	priceID, err := e.Usecase.Product.AddProductPrice(ts, productPrice)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -89,7 +89,7 @@ func (e *GinServer) addProductInStock(c *gin.Context) {
 		return
 	}
 
-	productStockID, err := e.Usecase.ProdcutUsecase.AddProductInStock(ts, addProduct)
+	productStockID, err := e.Usecase.Product.AddProductInStock(ts, addProduct)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -119,7 +119,7 @@ func (e *GinServer) findProductInfoById(c *gin.Context) {
 		return
 	}
 
-	productInfo, err := e.Usecase.ProdcutUsecase.FindProductInfoById(ts, productID)
+	productInfo, err := e.Usecase.Product.FindProductInfoById(ts, productID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -145,7 +145,7 @@ func (e *GinServer) findProductList(c *gin.Context) {
 		limit = 3
 	}
 
-	productList, err := e.Usecase.ProdcutUsecase.FindProductList(ts, tag, limit)
+	productList, err := e.Usecase.Product.FindProductList(ts, tag, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -175,7 +175,7 @@ func (e *GinServer) findProductListInStock(c *gin.Context) {
 		return
 	}
 
-	stockList, err := e.Usecase.ProdcutUsecase.FindProductsInStock(ts, productId)
+	stockList, err := e.Usecase.Product.FindProductsInStock(ts, productId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -201,7 +201,7 @@ func (e *GinServer) buy(c *gin.Context) {
 		return
 	}
 
-	saleID, err := e.Usecase.ProdcutUsecase.Buy(ts, sale)
+	saleID, err := e.Usecase.Product.Buy(ts, sale)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
@@ -232,7 +232,7 @@ func (e *GinServer) FindSaleList(c *gin.Context) {
 		return
 	}
 
-	saleList, err := e.Usecase.ProdcutUsecase.FindSaleList(ts, saleQuery)
+	saleList, err := e.Usecase.Product.FindSaleList(ts, saleQuery)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
