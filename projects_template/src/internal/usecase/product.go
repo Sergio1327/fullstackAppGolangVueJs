@@ -198,7 +198,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 				return product.ProductInfo{}, errors.New("не удалось найти склады в которых есть продукт")
 			}
 		}
-		
+
 		productInfo.VariantList[i].InStorages = inStorages
 	}
 
@@ -382,14 +382,13 @@ func (u *ProductImpl) Buy(ts transaction.Session, p product.Sale) (saleID int, e
 		return 0, err
 	}
 
-	// устанавливаем текущую дату как дату продажи
-	p.SoldAt = time.Now()
 
 	// получение цены варианта
 	price, err := u.Repository.Product.FindPrice(ts, p.VariantID)
 	if err != nil {
 		u.log.Error(err)
-		return 0, errors.New("не удалось найти цену продукта")
+		err = global.ErrInternalError
+		return 0, err
 	}
 
 	// подсчет общей цены продажи

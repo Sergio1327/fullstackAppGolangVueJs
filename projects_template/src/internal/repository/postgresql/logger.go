@@ -19,7 +19,7 @@ func (l *loggerRepository) SaveLog(
 	sqlQuery := `
 	insert into log_table 
 	( time, flag, msg, module, fl, line ) 
-	values ( $1, $2, $3, $4, $5, $6, $7 )`
+	values ( $1, $2, $3, $4, $5, $6, )`
 
 	_, err := SqlxTx(ts).Exec(sqlQuery,
 		row.Time,
