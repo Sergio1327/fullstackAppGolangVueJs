@@ -34,5 +34,5 @@ func (e *GinServer) Run() {
 	e.server.POST("/buy", e.buy)
 	e.server.POST("/sales", e.FindSaleList)
 
-	e.server.Run(":8080")
+	e.server.Run(":9000")
 }

@@ -1,33 +1,30 @@
 package main
 
 import (
-	"log"
 	"os"
+
 	restapi "product_storage/external/restAPI"
 	"product_storage/internal/transaction"
 	"product_storage/rimport"
 	"product_storage/tools/logger"
 	"product_storage/tools/pgdb"
 	"product_storage/uimport"
-
-	"github.com/joho/godotenv"
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+
 }
 
 func main() {
 	version := os.Getenv("VERSION")
-	db := pgdb.SqlxDB(os.Getenv("PG_URL"))
+	pgURL := os.Getenv("PG_URL")
+
+	db := pgdb.SqlxDB(pgURL)
 	defer db.Close()
 
 	log := logger.NewFileLogger("product_storage")
 	log.Infoln("version", version)
-	log.Debugln("pg", os.Getenv("PG_URL"))
+	log.Info("pg", os.Getenv("PG_URL"))
 
 	sm := transaction.NewSQLSessionManager(db)
 	repo := rimport.NewRepositoryImports(sm)

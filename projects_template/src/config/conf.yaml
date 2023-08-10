@@ -1,2 +1,1 @@
-config:
-  CONF_PATH:"./config" 
+config: CONF_PATH:"./config" 

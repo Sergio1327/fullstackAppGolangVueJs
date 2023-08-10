@@ -25,7 +25,7 @@ services:
     image: migrate/migrate
     volumes:
         - ./migrate:/migrations
-    command: ["-path", "/migrations", "-database",  "postgres://test_db:test_db@db:5432/test_db?sslmode=disable", "up", "1"]
+    command: ["-path", "/migrations", "-database",  "postgres://test_db:test_db@db:5432/test_db?sslmode=disable", "up"]
   web:
     image: ${NAME}:${VERSION}
     build: 
@@ -37,7 +37,7 @@ services:
     environment:
       DEBUG: 'true'
       SERVER_IP_PORT: 127.0.0.1:9000
-      PG_URL: test_db:test_db@db:5432
+      PG_URL: postgresql://test_db:test_db@db:5432/test_db?sslmode=disable
       VERSION: ${VERSION}
     volumes:
       - ./volumes/web/log:/app/log
