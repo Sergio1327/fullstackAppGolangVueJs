@@ -5,7 +5,6 @@ import (
 	"product_storage/internal/entity/log"
 	"product_storage/internal/repository"
 	"product_storage/internal/transaction"
-	"product_storage/tools/sqlnull"
 )
 
 type loggerRepository struct{}
@@ -16,7 +15,7 @@ func NewLoggerRepository() repository.Logger {
 
 func (l *loggerRepository) SaveLog(
 	ts transaction.Session,
-	row log.Row,) error {
+	row log.Row) error {
 	sqlQuery := `
 	insert into log_table 
 	( logtime, flag, msg, module, fl, ln ) 
@@ -35,10 +34,8 @@ func (l *loggerRepository) SaveLog(
 
 func (l *loggerRepository) SaveLogWithReturnID(
 	ts transaction.Session,
-	row log.Row,
-	contractID,
-	seID sqlnull.NullInt64,
-	operLogin sqlnull.NullString) (logID int, err error) {
+	row log.Row,) (logID int, err error) {
+
 	sqlQuery := `
 	insert into log_table
 	( logtime, flag, msg, module, fl, ln ) 
@@ -53,7 +50,7 @@ func (l *loggerRepository) SaveLogWithReturnID(
 		row.File,
 		row.Line,
 	).Scan(&logID)
-		fmt.Println(err)
+	fmt.Println(err)
 	return logID, err
 }
 
