@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"product_storage/internal/entity/global"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/repository"
@@ -50,15 +49,7 @@ func (r *productRepository) CheckExists(ts transaction.Session, p product.Produc
 	and( end_date = $3 or end_date is null )`
 
 	isExistsID, err = gensql.Get[int](SqlxTx(ts), query, p.VariantID, p.StartDate, p.EndDate)
-	if err != nil {
-		switch err {
-		case global.ErrNoData:
-			return 0, nil
-		default:
-			return 0, err
-		}
-	}
-
+	
 	return isExistsID, err
 }
 
@@ -296,14 +287,6 @@ func (r *productRepository) FindSaleListByFilters(ts transaction.Session, saleFi
 	}
 
 	saleList, err = gensql.SelectNamed[product.Sale](SqlxTx(ts), query, params)
-
-	stmt, err := SqlxTx(ts).PrepareNamed(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	err = stmt.Select(&saleList, saleFilters)
 
 	return saleList, err
 }

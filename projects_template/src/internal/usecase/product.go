@@ -82,8 +82,13 @@ func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.Produ
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
 	isExistsID, err := u.Repository.Product.CheckExists(ts, p)
 	if err != nil {
-		u.log.Error(err)
-		return 0, errors.New("ошибка при проверке цен в базе данных")
+		switch err {
+		case global.ErrNoData:
+			isExistsID = 0
+		default:
+			u.log.Error(err)
+			return 0, errors.New("ошибка при проверке цен в базе данных")
+		}
 	}
 
 	// если запись уже имеется устанавливается дата окончания цены

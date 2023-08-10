@@ -19,7 +19,7 @@ ENV TZ="Asia/Tashkent"
 ENV DEBIAN_FRONTEND=noninteractive
 RUN  apt-get update -qq \
     && apt-get install -yq \
-               o         tzdata \
+                        tzdata \
                         ca-certificates && \ 
                          ln -fs /usr/share/zoneinfo/Asia/Tashkent /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
