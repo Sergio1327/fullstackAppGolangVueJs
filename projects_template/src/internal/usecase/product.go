@@ -3,7 +3,6 @@ package usecase
 import (
 	"errors"
 	"product_storage/internal/entity/global"
-	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
@@ -405,7 +404,7 @@ func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int
 }
 
 // FindSales получение списка всех продаж или списка продаж по фильтрам
-func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq params.SaleQuery) (sales []product.Sale, err error) {
+func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq product.SaleQuery) (sales []product.Sale, err error) {
 
 	// если лимит не указан то по умолчанию устанавливается 3
 	if !sq.Limit.Valid {
@@ -414,7 +413,7 @@ func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq params.SaleQuer
 
 	// если не указано имя продукта или id склада то произойдет фильтрация только по датам
 	if !sq.ProductName.Valid && !sq.StorageID.Valid {
-		s := params.SaleQueryOnlyBySoldDate{
+		s := product.SaleQueryOnlyBySoldDate{
 			StartDate: sq.StartDate,
 			EndDate:   sq.EndDate,
 			Limit:     sq.Limit,

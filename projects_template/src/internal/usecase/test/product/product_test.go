@@ -45,7 +45,7 @@ func TestBuy(t *testing.T) {
 		err          error
 	}{
 		{
-			name: "Успешный результат",
+			name: "успешный результат",
 			prepare: func(f *fields) {
 				var price float64
 				saleID := 123

@@ -1,4 +1,4 @@
-package params
+package product
 
 import (
 	"product_storage/tools/sqlnull"

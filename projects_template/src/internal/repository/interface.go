@@ -2,7 +2,6 @@ package repository
 
 import (
 	"product_storage/internal/entity/log"
-	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
@@ -44,6 +43,6 @@ type Product interface {
 	Buy(ts transaction.Session, s product.Sale) (int, error)
 	FindPrice(ts transaction.Session, variantID int) (float64, error)
 
-	FindSaleListOnlyBySoldDate(ts transaction.Session, sq params.SaleQueryOnlyBySoldDate) ([]product.Sale, error)
-	FindSaleListByFilters(ts transaction.Session, sq params.SaleQuery) ([]product.Sale, error)
+	FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDate) ([]product.Sale, error)
+	FindSaleListByFilters(ts transaction.Session, sq product.SaleQuery) ([]product.Sale, error)
 }

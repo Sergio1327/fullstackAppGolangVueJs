@@ -1,7 +1,6 @@
 package product_test
 
 import (
-	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/repository/postgresql"
@@ -565,7 +564,7 @@ func TestFindSaleList(t *testing.T) {
 	endDate, err := time.Parse("02.01.2006", "20.07.2023")
 	r.NoError(err)
 
-	sales, err := repo.Repository.Product.FindSaleListOnlyBySoldDate(ts, params.SaleQueryOnlyBySoldDate{
+	sales, err := repo.Repository.Product.FindSaleListOnlyBySoldDate(ts, product.SaleQueryOnlyBySoldDate{
 		Limit:     sqlnull.NewInt64(3),
 		StartDate: startDate,
 		EndDate:   endDate,
@@ -589,14 +588,14 @@ func TestFindSaleListByFilters(t *testing.T) {
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
-	data, err := repo.Repository.Product.FindSaleListByFilters(ts, params.SaleQuery{
+	data, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 	})
 	r.NoError(err)
 	r.NotEmpty(data)
 
-	data2, err := repo.Repository.Product.FindSaleListByFilters(ts, params.SaleQuery{
+	data2, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 		StorageID: sqlnull.NewInt64(1),
@@ -605,7 +604,7 @@ func TestFindSaleListByFilters(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(data2)
 
-	data3, err := repo.Repository.Product.FindSaleListByFilters(ts, params.SaleQuery{
+	data3, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
 		StartDate:   startDate,
 		EndDate:     startDate.AddDate(0, 1, 0),
 		StorageID:   sqlnull.NewInt64(1),

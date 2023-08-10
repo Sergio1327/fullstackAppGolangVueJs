@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"product_storage/internal/entity/params"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
@@ -15,5 +14,5 @@ type Product interface {
 	FindProductList(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error)
 	FindProductsInStock(ts transaction.Session, productID int) ([]stock.Stock, error)
 	Buy(ts transaction.Session, p product.Sale) (int, error)
-	FindSaleList(ts transaction.Session, sq params.SaleQuery) ([]product.Sale, error)
+	FindSaleList(ts transaction.Session, sq product.SaleQuery) ([]product.Sale, error)
 }
