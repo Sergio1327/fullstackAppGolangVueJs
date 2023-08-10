@@ -52,6 +52,7 @@ create table sales (
 );
 
 create table log_table (
+    log_id serial primary key,
     logtime timestamptz not null,
     flag varchar(255),
     msg text not null,

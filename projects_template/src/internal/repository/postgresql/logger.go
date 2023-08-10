@@ -1,6 +1,7 @@
 package postgresql
 
 import (
+	"fmt"
 	"product_storage/internal/entity/log"
 	"product_storage/internal/repository"
 	"product_storage/internal/transaction"
@@ -18,8 +19,8 @@ func (l *loggerRepository) SaveLog(
 	row log.Row,) error {
 	sqlQuery := `
 	insert into log_table 
-	( time, flag, msg, module, fl, line ) 
-	values ( $1, $2, $3, $4, $5, $6, )`
+	( logtime, flag, msg, module, fl, ln ) 
+	values ( $1, $2, $3, $4, $5, $6)`
 
 	_, err := SqlxTx(ts).Exec(sqlQuery,
 		row.Time,
@@ -40,8 +41,8 @@ func (l *loggerRepository) SaveLogWithReturnID(
 	operLogin sqlnull.NullString) (logID int, err error) {
 	sqlQuery := `
 	insert into log_table
-	( time, flag, msg, module, fl , line ) values
-	( $1, $2, $3, $4, $5, $6 )
+	( logtime, flag, msg, module, fl, ln ) 
+	values ( $1, $2, $3, $4, $5, $6 )
 	returning log_id
 	`
 	err = SqlxTx(ts).QueryRow(sqlQuery,
@@ -52,7 +53,7 @@ func (l *loggerRepository) SaveLogWithReturnID(
 		row.File,
 		row.Line,
 	).Scan(&logID)
-
+		fmt.Println(err)
 	return logID, err
 }
 
