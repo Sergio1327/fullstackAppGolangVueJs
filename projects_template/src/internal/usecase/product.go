@@ -142,7 +142,7 @@ func (u *ProductUseCase) AddProductInStock(ts transaction.Session, p stock.AddPr
 		}
 	}
 
-	u.log.WithFields(logrus.Fields{"product_stock_id": productStockID}).Info("Продукт успешно добавлен на склад")
+	u.log.WithFields(logrus.Fields{"product_stock_id": productStockID}).Info("продукт успешно добавлен на склад")
 	return productStockID, err
 }
 
@@ -202,7 +202,7 @@ func (u *ProductUseCase) FindProductInfoById(ts transaction.Session, productID i
 		productInfo.VariantList[i].InStorages = inStorages
 	}
 
-	u.log.WithFields(logrus.Fields{"product_info": productInfo}).Info("Успешно получена информация о продукте")
+	u.log.WithFields(logrus.Fields{"product_info": productInfo}).Info("успешно получена информация о продукте")
 	return productInfo, err
 }
 
@@ -313,7 +313,7 @@ func (u *ProductUseCase) FindProductList(ts transaction.Session, tag string, lim
 		}
 	}
 
-	u.log.WithFields(logrus.Fields{"product_list": products}).Info("Успешно получен список продуктов")
+	u.log.WithFields(logrus.Fields{"product_list": products}).Info("успешно получен список продуктов")
 	return products, err
 }
 
@@ -369,7 +369,7 @@ func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID i
 		}
 	}
 
-	u.log.WithFields(logrus.Fields{"stock_list": stocks}).Info("Успешно найдены склады и продукты в них")
+	u.log.WithFields(logrus.Fields{"stock_list": stocks}).Info("успешно найдены склады и продукты в них")
 	return stocks, err
 }
 
@@ -400,7 +400,7 @@ func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int
 		return 0, errors.New("не удалось записать продажу в базу")
 	}
 
-	u.log.WithFields(logrus.Fields{"sale_id": saleID}).Info("Продажа успешно добавлена в базу данных")
+	u.log.WithFields(logrus.Fields{"sale_id": saleID}).Info("продажа успешно добавлена в базу данных")
 	return saleID, err
 }
 
@@ -434,6 +434,6 @@ func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq params.SaleQuer
 		}
 	}
 
-	u.log.WithFields(logrus.Fields{"sale_list": sales}).Info("Успешно получены продажи по заданным фильтрам")
+	u.log.WithFields(logrus.Fields{"sale_list": sales}).Info("успешно получены продажи по заданным фильтрам")
 	return sales, err
 }
