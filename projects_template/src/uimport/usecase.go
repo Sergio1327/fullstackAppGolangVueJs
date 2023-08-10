@@ -6,5 +6,5 @@ import (
 
 type Usecase struct {
 	Logger  *usecase.Logger
-	Product *usecase.ProductImpl
+	Product *usecase.ProductUseCase
 }

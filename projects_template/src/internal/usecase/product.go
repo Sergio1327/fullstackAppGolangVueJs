@@ -14,14 +14,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type ProductImpl struct {
+type ProductUseCase struct {
 	log   *logrus.Logger
 	dbLog *logrus.Logger
 	rimport.RepositoryImports
 }
 
-func NewProduct(log, dblog *logrus.Logger, ri rimport.RepositoryImports) *ProductImpl {
-	return &ProductImpl{
+func NewProduct(log, dblog *logrus.Logger, ri rimport.RepositoryImports) *ProductUseCase {
+	return &ProductUseCase{
 		log:               log,
 		dbLog:             dblog,
 		RepositoryImports: ri,
@@ -29,7 +29,7 @@ func NewProduct(log, dblog *logrus.Logger, ri rimport.RepositoryImports) *Produc
 }
 
 // AddProduct логика добавление продукта в базу
-func (u *ProductImpl) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
+func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
 	// если имя продукта не введено то возвращается ошибка
 	if product.Name == "" {
 		u.log.Error(errors.New("имя продукта не может быть пустым"))
@@ -64,7 +64,7 @@ func (u *ProductImpl) AddProduct(ts transaction.Session, product product.Product
 }
 
 // AddProductPrice логика проверки цены и вставки в базу
-func (u *ProductImpl) AddProductPrice(ts transaction.Session, p product.ProductPrice) (priceID int, err error) {
+func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.ProductPrice) (priceID int, err error) {
 	variantID := strconv.Itoa(p.VariantID)
 
 	//проверка  id варианта, цены, даты начала цены на нулевые значения
@@ -111,7 +111,7 @@ func (u *ProductImpl) AddProductPrice(ts transaction.Session, p product.ProductP
 }
 
 // AddProductInStock логика проверка продукта на складе и обновления или добавления на базу
-func (u *ProductImpl) AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (productStockID int, err error) {
+func (u *ProductUseCase) AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (productStockID int, err error) {
 
 	// проверка запроса на нулевые значения
 	err = p.IsNullFields()
@@ -147,7 +147,7 @@ func (u *ProductImpl) AddProductInStock(ts transaction.Session, p stock.AddProdu
 }
 
 // FindProductInfoById логика получения всей информации о продукте и его вариантах по id
-func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int) (productInfo product.ProductInfo, err error) {
+func (u *ProductUseCase) FindProductInfoById(ts transaction.Session, productID int) (productInfo product.ProductInfo, err error) {
 
 	// если пользователь не ввел id выводится ошибка
 	if productID <= 0 {
@@ -207,7 +207,7 @@ func (u *ProductImpl) FindProductInfoById(ts transaction.Session, productID int)
 }
 
 // FindProductList логика получения списка продуктов по тегу и лимиту
-func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit int) (products []product.ProductInfo, err error) {
+func (u *ProductUseCase) FindProductList(ts transaction.Session, tag string, limit int) (products []product.ProductInfo, err error) {
 
 	// если лимит не указан или некорректен то по умолчанию устанавливается 3
 	if limit == 0 || limit < 0 {
@@ -318,7 +318,7 @@ func (u *ProductImpl) FindProductList(ts transaction.Session, tag string, limit 
 }
 
 // FindProductsInStock логика получения всех складов и продуктов в ней или фильтрация по продукту
-func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int) (stocks []stock.Stock, err error) {
+func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID int) (stocks []stock.Stock, err error) {
 
 	if productID < 0 {
 		return nil, errors.New("id продукта не может быть меньше нуля")
@@ -374,7 +374,7 @@ func (u *ProductImpl) FindProductsInStock(ts transaction.Session, productID int)
 }
 
 // Buy логuка записи о покупке в базу
-func (u *ProductImpl) Buy(ts transaction.Session, p product.Sale) (saleID int, err error) {
+func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int, err error) {
 
 	// проверка фильтров на нулевые значения ,которые ввел пользователь
 	err = p.IsNullFields()
@@ -405,7 +405,7 @@ func (u *ProductImpl) Buy(ts transaction.Session, p product.Sale) (saleID int, e
 }
 
 // FindSales получение списка всех продаж или списка продаж по фильтрам
-func (u *ProductImpl) FindSaleList(ts transaction.Session, sq params.SaleQuery) (sales []product.Sale, err error) {
+func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq params.SaleQuery) (sales []product.Sale, err error) {
 
 	// если лимит не указан то по умолчанию устанавливается 3
 	if !sq.Limit.Valid {
