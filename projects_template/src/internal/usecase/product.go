@@ -382,7 +382,6 @@ func (u *ProductImpl) Buy(ts transaction.Session, p product.Sale) (saleID int, e
 		return 0, err
 	}
 
-
 	// получение цены варианта
 	price, err := u.Repository.Product.FindPrice(ts, p.VariantID)
 	if err != nil {

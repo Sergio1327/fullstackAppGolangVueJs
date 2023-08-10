@@ -40,18 +40,15 @@ func (l *loggerRepository) SaveLogWithReturnID(
 	operLogin sqlnull.NullString) (logID int, err error) {
 	sqlQuery := `
 	insert into log_table
-	( time, flag, msg, module, oper_login, caller, line_no ) values
-	( $1, $2, $3, $4, $5, $6, $7 )
+	( time, flag, msg, module, fl , line ) values
+	( $1, $2, $3, $4, $5, $6 )
 	returning log_id
 	`
 	err = SqlxTx(ts).QueryRow(sqlQuery,
 		row.Time,
 		row.Flag,
 		row.Message,
-		contractID,
 		row.Module,
-		seID,
-		operLogin,
 		row.File,
 		row.Line,
 	).Scan(&logID)

@@ -65,7 +65,7 @@ func TestBuy(t *testing.T) {
 			name: "безуспешный результат",
 			prepare: func(f *fields) {
 				var price float64
-				// saleID := 0
+
 				gomock.InOrder(
 					f.ri.MockRepository.Product.EXPECT().FindPrice(f.ts, argSale.VariantID).Return(price, global.ErrNoData),
 				)
