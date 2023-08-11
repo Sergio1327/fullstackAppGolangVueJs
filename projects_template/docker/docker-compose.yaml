@@ -39,6 +39,7 @@ services:
       SERVER_IP_PORT: 127.0.0.1:9000
       PG_URL: postgresql://test_db:test_db@db:5432/test_db?sslmode=disable
       VERSION: ${VERSION}
+      CONF_PATH: ""
     volumes:
       - ./volumes/web/log:/app/log
     depends_on:

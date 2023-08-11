@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"fmt"
 	"product_storage/internal/entity/log"
 	"product_storage/internal/repository"
 	"product_storage/internal/transaction"
@@ -50,7 +49,6 @@ func (l *loggerRepository) SaveLogWithReturnID(
 		row.File,
 		row.Line,
 	).Scan(&logID)
-	fmt.Println(err)
 	return logID, err
 }
 
