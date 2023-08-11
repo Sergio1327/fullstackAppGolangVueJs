@@ -48,9 +48,7 @@ func (r *productRepository) CheckExists(ts transaction.Session, p product.Produc
 	and start_date = $2 
 	and( end_date = $3 or end_date is null )`
 
-	isExistsID, err = gensql.Get[int](SqlxTx(ts), query, p.VariantID, p.StartDate, p.EndDate)
-
-	return isExistsID, err
+	return gensql.Get[int](SqlxTx(ts), query, p.VariantID, p.StartDate, p.EndDate)
 }
 
 // UpdateProductPrice обновление цены варианта продукта
@@ -84,9 +82,7 @@ func (r *productRepository) CheckProductInStock(ts transaction.Session, productI
 	where variant_id = $1 
 	and storage_id = $2)`
 
-	isExists, err = gensql.Get[bool](SqlxTx(ts), query, productInStock.VariantID, productInStock.StorageID)
-
-	return isExists, err
+	return gensql.Get[bool](SqlxTx(ts), query, productInStock.VariantID, productInStock.StorageID)
 }
 
 // UpdateProductInstock обновление колличества продукта
@@ -121,9 +117,7 @@ func (r *productRepository) LoadProductInfo(ts transaction.Session, productId in
 	from products 
     where product_id = $1`
 
-	productInfo, err = gensql.Get[product.ProductInfo](SqlxTx(ts), query, productId)
-
-	return productInfo, err
+	return gensql.Get[product.ProductInfo](SqlxTx(ts), query, productId)
 }
 
 // FindProductVariantList получение вариантов продукта по его id
@@ -133,9 +127,7 @@ func (r *productRepository) FindProductVariantList(ts transaction.Session, produ
 	from product_variants	
 	where product_id = $1`
 
-	variantList, err = gensql.Select[product.Variant](SqlxTx(ts), query, productID)
-
-	return variantList, err
+	return gensql.Select[product.Variant](SqlxTx(ts), query, productID)
 }
 
 // FindCurrentPrice получение актуальной цены
@@ -147,9 +139,7 @@ func (r *productRepository) FindCurrentPrice(ts transaction.Session, variantID i
 	and start_date < now() 
 	and ( end_date is null or end_date > now() )`
 
-	price, err = gensql.Get[float64](SqlxTx(ts), query, variantID)
-
-	return price, err
+	return gensql.Get[float64](SqlxTx(ts), query, variantID)
 }
 
 // InStorages нахождение id складов в которых находится продукт
@@ -159,8 +149,7 @@ func (r *productRepository) InStorages(ts transaction.Session, varantID int) (in
 	FROM products_in_storage 
     WHERE variant_id = $1`
 
-	inStorages, err = gensql.Select[int](SqlxTx(ts), query, varantID)
-	return inStorages, err
+	return gensql.Select[int](SqlxTx(ts), query, varantID)
 }
 
 // FindProductListByTag  поиск информации о продукте по его тегу
@@ -171,9 +160,7 @@ func (r *productRepository) FindProductListByTag(ts transaction.Session, tag str
 	where $1 = any ( string_to_array( tags,',' )) 
 	limit $2`
 
-	productList, err = gensql.Select[product.ProductInfo](SqlxTx(ts), query, tag, limit)
-
-	return productList, err
+	return gensql.Select[product.ProductInfo](SqlxTx(ts), query, tag, limit)
 }
 
 // LoadProductList получение списка продуктов с лимитом
@@ -183,9 +170,7 @@ func (r *productRepository) LoadProductList(ts transaction.Session, limit int) (
 	from products
     limit $1`
 
-	productList, err = gensql.Select[product.ProductInfo](SqlxTx(ts), query, limit)
-
-	return productList, err
+	return gensql.Select[product.ProductInfo](SqlxTx(ts), query, limit)
 }
 
 // LoadStockList получение информации о складах
@@ -194,9 +179,7 @@ func (r *productRepository) LoadStockList(ts transaction.Session) (stockList []s
 	select  storage_id, name
 	from storages`
 
-	stockList, err = gensql.Select[stock.Stock](SqlxTx(ts), query)
-
-	return stockList, err
+	return gensql.Select[stock.Stock](SqlxTx(ts), query)
 }
 
 // FindStockListByProductId получение информации о складах где есть определенный продукт
@@ -209,9 +192,7 @@ func (r *productRepository) FindStockListByProductId(ts transaction.Session, pro
 	join products p ON (pv.product_id = p.product_id)
 	where p.product_id = $1`
 
-	stockList, err = gensql.Select[stock.Stock](SqlxTx(ts), query, productID)
-
-	return stockList, err
+	return gensql.Select[stock.Stock](SqlxTx(ts), query, productID)
 }
 
 // FindStocksVariantList получение вариантов продукта на складе
@@ -221,9 +202,7 @@ func (r *productRepository) FindStocksVariantList(ts transaction.Session, storag
 	from products_in_storage 
 	where storage_id = $1 `
 
-	variantList, err = gensql.Select[stock.AddProductInStock](SqlxTx(ts), query, storageID)
-
-	return variantList, err
+	return gensql.Select[stock.AddProductInStock](SqlxTx(ts), query, storageID)
 }
 
 func (r *productRepository) CalculateTotalPrice(price float64, quantity int) float64 {
@@ -237,9 +216,7 @@ func (r *productRepository) FindPrice(ts transaction.Session, variantID int) (pr
 	 	 from product_prices
 	 	 where variant_id = $1`
 
-	price, err = gensql.Get[float64](SqlxTx(ts), query, variantID)
-
-	return price, err
+	return gensql.Get[float64](SqlxTx(ts), query, variantID)
 }
 
 // Buy запись о покупке в базу
@@ -264,9 +241,7 @@ func (r *productRepository) FindSaleListOnlyBySoldDate(ts transaction.Session, s
 	WHERE s.sold_at >= $1 AND s.sold_at <= $2
 	LIMIT $3`
 
-	saleList, err = gensql.Select[product.Sale](SqlxTx(ts), query, saleFilters.StartDate, saleFilters.EndDate, saleFilters.Limit)
-
-	return saleList, err
+	return gensql.Select[product.Sale](SqlxTx(ts), query, saleFilters.StartDate, saleFilters.EndDate, saleFilters.Limit)
 }
 
 // FindSaleListByFilters получение списка продаж по фильтрам
@@ -289,7 +264,5 @@ func (r *productRepository) FindSaleListByFilters(ts transaction.Session, saleFi
 		"storage_id":   saleFilters.StorageID,
 	}
 
-	saleList, err = gensql.SelectNamed[product.Sale](SqlxTx(ts), query, params)
-
-	return saleList, err
+	return gensql.SelectNamed[product.Sale](SqlxTx(ts), query, params)
 }
