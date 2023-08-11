@@ -31,7 +31,8 @@ func NewProduct(log, dblog *logrus.Logger, ri rimport.RepositoryImports) *Produc
 func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
 	// если имя продукта не введено то возвращается ошибка
 	if product.Name == "" {
-		return 0, errors.New("имя продукта не может быть пустым")
+		err = errors.New("имя продукта не может быть пустым")
+		return
 	}
 
 	// добавляется продукт в базу
@@ -67,15 +68,18 @@ func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.Produ
 
 	//проверка  id варианта, цены, даты начала цены на нулевые значения
 	if variantID == "" {
-		return 0, errors.New("нет варианта продукта с таким id")
+		err = errors.New("нет варианта продукта с таким id")
+		return
 	}
 
 	if p.Price == 0 {
-		return 0, errors.New("цена не может быть пустой или равна 0")
+		err = errors.New("цена не может быть пустой или равна 0")
+		return
 	}
 
 	if p.StartDate == (time.Time{}) {
-		return 0, errors.New("дата не может быть пустой")
+		err = errors.New("дата не может быть пустой")
+		return
 	}
 
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
@@ -117,8 +121,7 @@ func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.Produ
 func (u *ProductUseCase) AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (productStockID int, err error) {
 
 	// проверка запроса на нулевые значения
-	err = p.IsNullFields()
-	if err != nil {
+	if err := p.IsNullFields(); err != nil {
 		return 0, err
 	}
 
@@ -154,7 +157,8 @@ func (u *ProductUseCase) FindProductInfoById(ts transaction.Session, productID i
 
 	// если пользователь не ввел id выводится ошибка
 	if productID <= 0 {
-		return product.ProductInfo{}, errors.New("id не может быть меньше или равен 0")
+		err = errors.New("id не может быть меньше или равен 0")
+		return
 	}
 
 	// поиск продукта по его id
@@ -325,7 +329,8 @@ func (u *ProductUseCase) FindProductList(ts transaction.Session, tag string, lim
 func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID int) (stocks []stock.Stock, err error) {
 
 	if productID < 0 {
-		return nil, errors.New("id продукта не может быть меньше нуля")
+		err = errors.New("id продукта не может быть меньше нуля")
+		return
 	}
 
 	// если пользователь не ввел id продукта то будет выполнен поиск всех складов
@@ -381,8 +386,7 @@ func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID i
 func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int, err error) {
 
 	// проверка фильтров на нулевые значения ,которые ввел пользователь
-	err = p.IsNullFields()
-	if err != nil {
+	if err := p.IsNullFields(); err != nil {
 		return 0, err
 	}
 
