@@ -224,7 +224,7 @@ func (e *GinServer) FindSaleList(c *gin.Context) {
 	}
 	defer ts.Rollback()
 
-	var saleQuery product.SaleQuery
+	var saleQuery product.SaleQueryParam
 
 	if err := c.ShouldBindJSON(&saleQuery); err != nil {
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))

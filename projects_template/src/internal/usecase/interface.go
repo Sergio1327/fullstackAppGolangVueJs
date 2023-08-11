@@ -14,5 +14,5 @@ type Product interface {
 	FindProductList(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error)
 	FindProductsInStock(ts transaction.Session, productID int) ([]stock.Stock, error)
 	Buy(ts transaction.Session, p product.Sale) (int, error)
-	FindSaleList(ts transaction.Session, sq product.SaleQuery) ([]product.Sale, error)
+	FindSaleList(ts transaction.Session, sq product.SaleQueryParam) ([]product.Sale, error)
 }

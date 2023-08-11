@@ -282,7 +282,7 @@ func (mr *MockProductMockRecorder) FindProductVariantList(ts, productID interfac
 }
 
 // FindSaleListByFilters mocks base method.
-func (m *MockProduct) FindSaleListByFilters(ts transaction.Session, sq product.SaleQuery) ([]product.Sale, error) {
+func (m *MockProduct) FindSaleListByFilters(ts transaction.Session, sq product.SaleQueryParam) ([]product.Sale, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindSaleListByFilters", ts, sq)
 	ret0, _ := ret[0].([]product.Sale)
@@ -297,7 +297,7 @@ func (mr *MockProductMockRecorder) FindSaleListByFilters(ts, sq interface{}) *go
 }
 
 // FindSaleListOnlyBySoldDate mocks base method.
-func (m *MockProduct) FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDate) ([]product.Sale, error) {
+func (m *MockProduct) FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDateParam) ([]product.Sale, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindSaleListOnlyBySoldDate", ts, sq)
 	ret0, _ := ret[0].([]product.Sale)

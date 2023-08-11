@@ -6,7 +6,7 @@ import (
 )
 
 // SaleQuery фильтры продаж по которым нужно вывести информацию
-type SaleQuery struct {
+type SaleQueryParam struct {
 	StartDate   time.Time          `json:"start_date" db:"start_date"`     // дата начала продаж(обязательные поля)
 	EndDate     time.Time          `json:"end_date"  db:"end_date"`        // дата конца прдаж (обязательные поля)
 	Limit       sqlnull.NullInt64  `json:"limit" db:"limit"`               // лимит вывода продаж
@@ -15,7 +15,7 @@ type SaleQuery struct {
 }
 
 // SaleQuery фильтер продаж только дата продажи по которым нужно вывести информацию
-type SaleQueryOnlyBySoldDate struct {
+type SaleQueryOnlyBySoldDateParam struct {
 	StartDate time.Time         `json:"start_date" db:"sold_at"` // дата начала продаж
 	EndDate   time.Time         `json:"end_date" db:"sold_at"`   // дата конца продаж
 	Limit     sqlnull.NullInt64 `json:"limit" db:"limit"`        // лимит вывода

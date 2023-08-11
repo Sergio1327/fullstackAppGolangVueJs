@@ -591,7 +591,7 @@ func TestFindSaleList(t *testing.T) {
 	endDate, err := time.Parse("02.01.2006", "20.07.2023")
 	r.NoError(err)
 
-	sales, err := repo.Repository.Product.FindSaleListOnlyBySoldDate(ts, product.SaleQueryOnlyBySoldDate{
+	sales, err := repo.Repository.Product.FindSaleListOnlyBySoldDate(ts, product.SaleQueryOnlyBySoldDateParam{
 		Limit:     sqlnull.NewInt64(3),
 		StartDate: startDate,
 		EndDate:   endDate,
@@ -615,14 +615,14 @@ func TestFindSaleListByFilters(t *testing.T) {
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
-	data, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
+	data, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQueryParam{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 	})
 	r.NoError(err)
 	r.NotEmpty(data)
 
-	data2, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
+	data2, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQueryParam{
 		StartDate: startDate,
 		EndDate:   startDate.AddDate(0, 1, 0),
 		StorageID: sqlnull.NewInt64(1),
@@ -631,7 +631,7 @@ func TestFindSaleListByFilters(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(data2)
 
-	data3, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQuery{
+	data3, err := repo.Repository.Product.FindSaleListByFilters(ts, product.SaleQueryParam{
 		StartDate:   startDate,
 		EndDate:     startDate.AddDate(0, 1, 0),
 		StorageID:   sqlnull.NewInt64(1),
