@@ -63,3 +63,27 @@ func TestSaveLogWithReturnID(t *testing.T) {
 	r.NoError(err)
 	r.NotZero(logID)
 }
+
+func TestSaveLogDetails(t *testing.T) {
+	r := require.New(t)
+
+	db := pgdb.SqlxDB("dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable")
+	defer db.Close()
+
+	repo := postgresql.NewLoggerRepository()
+
+	ts := transaction.NewSQLSession(db)
+	err := ts.Start()
+	r.NoError(err)
+	defer ts.Rollback()
+
+	logID := 1
+	details := map[string]string{
+		"detail":   "log_details",
+		"detail_1": "log_detail_1",
+	}
+
+	err = repo.SaveLogDetails(ts, logID, details)
+	r.NoError(err)
+
+}

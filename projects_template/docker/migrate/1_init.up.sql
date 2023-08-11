@@ -62,7 +62,7 @@ create table log_table (
 );
 
 create table log_details (
-    LOG_ID serial primary key,
+    LOG_ID integer not null,
     NAME text not null,
     VALUE text not null
 );

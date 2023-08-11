@@ -9,7 +9,6 @@ import (
 	product "product_storage/internal/entity/product"
 	stock "product_storage/internal/entity/stock"
 	transaction "product_storage/internal/transaction"
-	sqlnull "product_storage/tools/sqlnull"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -67,9 +66,9 @@ func (mr *MockLoggerMockRecorder) SaveLogDetails(ts, logID, details interface{})
 }
 
 // SaveLogWithReturnID mocks base method.
-func (m *MockLogger) SaveLogWithReturnID(ts transaction.Session, row log.Row, contractID, seID sqlnull.NullInt64, operLogin sqlnull.NullString) (int, error) {
+func (m *MockLogger) SaveLogWithReturnID(ts transaction.Session, row log.Row,) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveLogWithReturnID", ts, row, contractID, seID, operLogin)
+	ret := m.ctrl.Call(m, "SaveLogWithReturnID", ts, row)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1

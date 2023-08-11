@@ -63,7 +63,7 @@ func (u *Logger) SaveLog(row log.Row) error {
 	}
 
 	if row.Details != nil && len(row.Details) > 0 {
-		logID, err := u.ri.Repository.Logger.SaveLogWithReturnID(ts, row, contractID, seID, operLogin)
+		logID, err := u.ri.Repository.Logger.SaveLogWithReturnID(ts, row,)
 		if err != nil {
 			u.log.Errorln(u.logPrefix(), "не удается сохранить данные в лог", err)
 			return err
