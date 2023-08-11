@@ -41,6 +41,7 @@ type Product interface {
 
 	Buy(ts transaction.Session, s product.Sale) (int, error)
 	FindPrice(ts transaction.Session, variantID int) (float64, error)
+	CalculateTotalPrice(price float64, quantity int) float64
 
 	FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDate) ([]product.Sale, error)
 	FindSaleListByFilters(ts transaction.Session, sq product.SaleQuery) ([]product.Sale, error)

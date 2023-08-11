@@ -66,7 +66,7 @@ func (mr *MockLoggerMockRecorder) SaveLogDetails(ts, logID, details interface{})
 }
 
 // SaveLogWithReturnID mocks base method.
-func (m *MockLogger) SaveLogWithReturnID(ts transaction.Session, row log.Row,) (int, error) {
+func (m *MockLogger) SaveLogWithReturnID(ts transaction.Session, row log.Row) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveLogWithReturnID", ts, row)
 	ret0, _ := ret[0].(int)
@@ -75,9 +75,9 @@ func (m *MockLogger) SaveLogWithReturnID(ts transaction.Session, row log.Row,) (
 }
 
 // SaveLogWithReturnID indicates an expected call of SaveLogWithReturnID.
-func (mr *MockLoggerMockRecorder) SaveLogWithReturnID(ts, row, contractID, seID, operLogin interface{}) *gomock.Call {
+func (mr *MockLoggerMockRecorder) SaveLogWithReturnID(ts, row interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLogWithReturnID", reflect.TypeOf((*MockLogger)(nil).SaveLogWithReturnID), ts, row, contractID, seID, operLogin)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLogWithReturnID", reflect.TypeOf((*MockLogger)(nil).SaveLogWithReturnID), ts, row)
 }
 
 // MockProduct is a mock of Product interface.
@@ -175,6 +175,20 @@ func (m *MockProduct) Buy(ts transaction.Session, s product.Sale) (int, error) {
 func (mr *MockProductMockRecorder) Buy(ts, s interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Buy", reflect.TypeOf((*MockProduct)(nil).Buy), ts, s)
+}
+
+// CalculateTotalPrice mocks base method.
+func (m *MockProduct) CalculateTotalPrice(price float64, quantity int) float64 {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CalculateTotalPrice", price, quantity)
+	ret0, _ := ret[0].(float64)
+	return ret0
+}
+
+// CalculateTotalPrice indicates an expected call of CalculateTotalPrice.
+func (mr *MockProductMockRecorder) CalculateTotalPrice(price, quantity interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalculateTotalPrice", reflect.TypeOf((*MockProduct)(nil).CalculateTotalPrice), price, quantity)
 }
 
 // CheckExists mocks base method.

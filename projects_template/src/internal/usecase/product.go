@@ -395,8 +395,7 @@ func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int
 	}
 
 	// подсчет общей цены продажи
-	p.TotalPrice = price * float64(p.Quantity)
-
+	p.TotalPrice = u.Repository.Product.CalculateTotalPrice(price, p.Quantity)
 	// запись продажи в базу
 	saleID, err = u.Repository.Product.Buy(ts, p)
 	if err != nil {

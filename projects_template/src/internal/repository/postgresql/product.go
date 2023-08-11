@@ -49,7 +49,7 @@ func (r *productRepository) CheckExists(ts transaction.Session, p product.Produc
 	and( end_date = $3 or end_date is null )`
 
 	isExistsID, err = gensql.Get[int](SqlxTx(ts), query, p.VariantID, p.StartDate, p.EndDate)
-	
+
 	return isExistsID, err
 }
 
@@ -225,6 +225,10 @@ func (r *productRepository) FindStocksVariantList(ts transaction.Session, storag
 	variantList, err = gensql.Select[stock.AddProductInStock](SqlxTx(ts), query, storageID)
 
 	return variantList, err
+}
+
+func (r *productRepository) CalculateTotalPrice(price float64, quantity int) float64 {
+	return price * float64(quantity)
 }
 
 // FindPrice получение цены

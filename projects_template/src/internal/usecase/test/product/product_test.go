@@ -52,6 +52,7 @@ func TestBuy(t *testing.T) {
 
 				gomock.InOrder(
 					f.ri.MockRepository.Product.EXPECT().FindPrice(f.ts, argSale.VariantID).Return(price, nil),
+					f.ri.MockRepository.Product.EXPECT().CalculateTotalPrice(price,argSale.Quantity),
 					f.ri.MockRepository.Product.EXPECT().Buy(f.ts, argSale).Return(saleID, nil),
 				)
 			},
