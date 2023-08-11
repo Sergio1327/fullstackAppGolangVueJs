@@ -37,7 +37,8 @@ func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Prod
 	productID, err = u.Repository.Product.AddProduct(ts, product)
 	if err != nil {
 		u.log.Error("не удалось добавить продукт", err)
-		return 0, global.ErrInternalError
+		err = global.ErrInternalError
+		return
 	}
 
 	// если пользователь не ввел варианты продукта то данные о продукте просто запишутся в базу
@@ -48,10 +49,11 @@ func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Prod
 	} else {
 		// добавляются варианты продукта
 		for _, v := range product.VariantList {
-			err := u.Repository.Product.AddProductVariantList(ts, productID, v)
+			err = u.Repository.Product.AddProductVariantList(ts, productID, v)
 			if err != nil {
 				u.log.Error("не удалось добавить варианты продукта", err)
-				return 0, global.ErrInternalError
+				err = global.ErrInternalError
+				return
 			}
 		}
 
@@ -70,31 +72,31 @@ func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.Produ
 
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
 	isExistsID, err := u.Repository.Product.CheckExists(ts, p)
-	if err != nil {
-		switch err {
-		case global.ErrNoData:
-			// если записи нет то цена вставляется в базу
-			priceID, err = u.Repository.Product.AddProductPrice(ts, p)
-			if err != nil {
-				u.log.Error("не удалось добавить цену продукта в базу данных", err)
-				return 0, global.ErrInternalError
-			}
-
-		case nil:
-			// если запись уже имеется устанавливается дата окончания цены
-			p.EndDate.Scan(time.Now())
-			err := u.Repository.Product.UpdateProductPrice(ts, p, isExistsID)
-			if err != nil {
-				u.log.Error("не удалось обновить цену", err)
-				return 0, global.ErrInternalError
-			}
-
-			priceID = isExistsID
-
-		default:
-			u.log.Error("не удалось проверить наличие цен в базе данных", err)
-			return 0, global.ErrInternalError
+	switch err {
+	case global.ErrNoData:
+		// если записи нет то цена вставляется в базу
+		priceID, err = u.Repository.Product.AddProductPrice(ts, p)
+		if err != nil {
+			u.log.Error("не удалось добавить цену продукта в базу данных", err)
+			err = global.ErrInternalError
+			return
 		}
+
+	case nil:
+		// если запись уже имеется устанавливается дата окончания цены
+		p.EndDate.Scan(time.Now())
+		err = u.Repository.Product.UpdateProductPrice(ts, p, isExistsID)
+		if err != nil {
+			u.log.Error("не удалось обновить цену", err)
+			err = global.ErrInternalError
+			return
+		}
+
+		priceID = isExistsID
+
+	default:
+		u.log.Error("не удалось проверить наличие цен в базе данных", err)
+		return 0, global.ErrInternalError
 	}
 
 	u.log.WithFields(logrus.Fields{"price_id": priceID}).Info("цена продукта успешно добавлена в базу данных")
@@ -113,7 +115,8 @@ func (u *ProductUseCase) AddProductInStock(ts transaction.Session, p stock.AddPr
 	isExist, err := u.Repository.Product.CheckProductInStock(ts, p)
 	if err != nil {
 		u.log.Error("не удалось проверить наличие продуктов на складе", err)
-		return 0, global.ErrInternalError
+		err = global.ErrInternalError
+		return
 	}
 
 	// если продукт уже имеется в базе обновляется его кол-во
@@ -121,14 +124,16 @@ func (u *ProductUseCase) AddProductInStock(ts transaction.Session, p stock.AddPr
 		productStockID, err = u.Repository.Product.UpdateProductInstock(ts, p)
 		if err != nil {
 			u.log.Error("не удалось обновить кол-во продуктов на складе", err)
-			return 0, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
 	} else {
 		// если продукта нет на складе то он просто добавляется на склад
 		productStockID, err = u.Repository.Product.AddProductInStock(ts, p)
 		if err != nil {
 			u.log.Error("не удалось добавить продукт на склад", err)
-			return 0, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
 	}
 
@@ -149,31 +154,29 @@ func (u *ProductUseCase) FindProductInfoById(ts transaction.Session, productID i
 	productInfo, err = u.Repository.Product.LoadProductInfo(ts, productID)
 	if err != nil {
 		u.log.Error("не удалось найти информацию о продукте", err)
-		return product.ProductInfo{}, global.ErrInternalError
+		err = global.ErrInternalError
+		return
 	}
 
 	productInfo.VariantList, err = u.Repository.Product.FindProductVariantList(ts, productInfo.ProductID)
-	if err != nil {
-		switch err {
-		case global.ErrNoData:
-			return productInfo, nil
-		default:
-			u.log.Error("не удалось найти варианты продукта", err)
-			return product.ProductInfo{}, global.ErrInternalError
-		}
-
+	switch err {
+	case nil:
+	case global.ErrNoData:
+		return productInfo, nil
+	default:
+		u.log.Error("не удалось найти варианты продукта", err)
+		return product.ProductInfo{}, global.ErrInternalError
 	}
 
 	for i, v := range productInfo.VariantList {
 		price, err := u.Repository.Product.FindCurrentPrice(ts, v.VariantID)
-		if err != nil {
-			switch err {
-			case global.ErrNoData:
-				continue
-			default:
-				u.log.Error("не удалось найти актуальную цену варианта продукта", err)
-				return product.ProductInfo{}, global.ErrInternalError
-			}
+		switch err {
+		case nil:
+		case global.ErrNoData:
+			continue
+		default:
+			u.log.Error("не удалось найти актуальную цену варианта продукта", err)
+			return product.ProductInfo{}, global.ErrInternalError
 		}
 
 		// получение актуальной цены для каждого варианта продукта
@@ -181,14 +184,13 @@ func (u *ProductUseCase) FindProductInfoById(ts transaction.Session, productID i
 
 		// получение id складов в которых есть этот продукт
 		inStorages, err := u.Repository.Product.InStorages(ts, v.VariantID)
-		if err != nil {
-			switch err {
-			case global.ErrNoData:
-				continue
-			default:
-				u.log.Error("не удалось найти склады в которых есть продукт", err)
-				return product.ProductInfo{}, global.ErrInternalError
-			}
+		switch err {
+		case nil:
+		case global.ErrNoData:
+			continue
+		default:
+			u.log.Error("не удалось найти склады в которых есть продукт", err)
+			return product.ProductInfo{}, global.ErrInternalError
 		}
 
 		productInfo.VariantList[i].InStorages = inStorages
@@ -211,44 +213,44 @@ func (u *ProductUseCase) FindProductList(ts transaction.Session, tag string, lim
 		products, err = u.Repository.Product.FindProductListByTag(ts, tag, limit)
 		if err != nil {
 			u.log.Error("не удалось найти продукты по данному тегу", err)
-			return nil, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
 
+		// поиск вариантов продука
 		for i := range products {
 			vars, err := u.Repository.Product.FindProductVariantList(ts, products[i].ProductID)
-			if err != nil {
-				switch err {
-				case global.ErrNoData:
-					return products, nil
-				default:
-					u.log.Error("не удалось найти варианты продукта", err)
-					return nil, global.ErrInternalError
-				}
+			switch err {
+			case nil:
+			case global.ErrNoData:
+				return products, nil
+			default:
+				u.log.Error("не удалось найти варианты продукта", err)
+				return nil, global.ErrInternalError
 			}
+
 			products[i].VariantList = vars
 			variantList := products[i].VariantList
 			for j := range variantList {
 				price, err := u.Repository.Product.FindCurrentPrice(ts, variantList[j].VariantID)
-				if err != nil {
-					switch err {
-					case global.ErrNoData:
-						continue
-					default:
-						u.log.Error("не удалось найти актуальную цену продукта", err)
-						return nil, global.ErrInternalError
-					}
+				switch err {
+				case nil:
+				case global.ErrNoData:
+					continue
+				default:
+					u.log.Error("не удалось найти актуальную цену продукта", err)
+					return nil, global.ErrInternalError
 				}
 
 				variantList[j].CurrentPrice = price
 				inStorages, err := u.Repository.Product.InStorages(ts, variantList[j].VariantID)
-				if err != nil {
-					switch err {
-					case global.ErrNoData:
-						continue
-					default:
-						u.log.Error("не удалось найти склады в которых есть продукт", err)
-						return nil, global.ErrInternalError
-					}
+				switch err {
+				case nil:
+				case global.ErrNoData:
+					continue
+				default:
+					u.log.Error("не удалось найти склады в которых есть продукт", err)
+					return nil, global.ErrInternalError
 				}
 
 				variantList[j].InStorages = inStorages
@@ -259,45 +261,43 @@ func (u *ProductUseCase) FindProductList(ts transaction.Session, tag string, lim
 		products, err = u.Repository.Product.LoadProductList(ts, limit)
 		if err != nil {
 			u.log.Error("не удалось найти список продуктов", err)
-			return nil, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
 
 		for i := range products {
 			vars, err := u.Repository.Product.FindProductVariantList(ts, products[i].ProductID)
-			if err != nil {
-				switch err {
-				case global.ErrNoData:
-					return products, nil
-				default:
-					u.log.Error("не удалось найти варианты продукта", err)
-					return nil, global.ErrInternalError
-				}
+			switch err {
+			case nil:
+			case global.ErrNoData:
+				return products, nil
+			default:
+				u.log.Error("не удалось найти варианты продукта", err)
+				return nil, global.ErrInternalError
 			}
 
 			products[i].VariantList = vars
 			variants := products[i].VariantList
 			for j := range variants {
 				price, err := u.Repository.Product.FindCurrentPrice(ts, variants[j].VariantID)
-				if err != nil {
-					switch err {
-					case global.ErrNoData:
-						continue
-					default:
-						u.log.Error("не удалось найти актуальную цену продукта", err)
-						return nil, global.ErrInternalError
-					}
+				switch err {
+				case nil:
+				case global.ErrNoData:
+					continue
+				default:
+					u.log.Error("не удалось найти актуальную цену продукта", err)
+					return nil, global.ErrInternalError
 				}
 
 				variants[j].CurrentPrice = price
 				inStorages, err := u.Repository.Product.InStorages(ts, variants[j].VariantID)
-				if err != nil {
-					switch err {
-					case global.ErrNoData:
-						continue
-					default:
-						u.log.Error("не удалось найти склады в которых есть продукт", err)
-						return nil, global.ErrInternalError
-					}
+				switch err {
+				case nil:
+				case global.ErrNoData:
+					continue
+				default:
+					u.log.Error("не удалось найти склады в которых есть продукт", err)
+					return nil, global.ErrInternalError
 				}
 
 				variants[j].InStorages = inStorages
@@ -322,18 +322,19 @@ func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID i
 		stocks, err = u.Repository.Product.LoadStockList(ts)
 		if err != nil {
 			u.log.Error("не удалось найти список складов", err)
-			return nil, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
+
 		for i, v := range stocks {
 			variants, err := u.Repository.Product.FindStocksVariantList(ts, v.StorageID)
-			if err != nil {
-				switch err {
-				case global.ErrNoData:
-					return stocks, nil
-				default:
-					u.log.Error("не удалось найти варианты продукта на складе", err)
-					return nil, global.ErrInternalError
-				}
+			switch err {
+			case nil:
+			case global.ErrNoData:
+				return stocks, nil
+			default:
+				u.log.Error("не удалось найти варианты продукта на складе", err)
+				return nil, global.ErrInternalError
 			}
 
 			stocks[i].ProductVariantList = variants
@@ -344,18 +345,18 @@ func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID i
 		stocks, err = u.Repository.Product.FindStockListByProductId(ts, productID)
 		if err != nil {
 			u.log.Error("не удалось найти склады с продуктами по данному id", err)
-			return nil, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
 		for i, v := range stocks {
 			variants, err := u.Repository.Product.FindStocksVariantList(ts, v.StorageID)
-			if err != nil {
-				switch err {
-				case global.ErrNoData:
-					return stocks, nil
-				default:
-					u.log.Error("не удалось найти варианты продукта на складе", err)
-					return nil, global.ErrInternalError
-				}
+			switch err {
+			case nil:
+			case global.ErrNoData:
+				return stocks, nil
+			default:
+				u.log.Error("не удалось найти варианты продукта на складе", err)
+				return nil, global.ErrInternalError
 			}
 
 			stocks[i].ProductVariantList = variants
@@ -379,7 +380,7 @@ func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int
 	if err != nil {
 		u.log.Error("не удалось найти цену варианта продукта", err)
 		err = global.ErrInternalError
-		return 0, err
+		return
 	}
 
 	// подсчет общей цены продажи
@@ -388,7 +389,8 @@ func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int
 	saleID, err = u.Repository.Product.Buy(ts, p)
 	if err != nil {
 		u.log.Error("не удалось записать продажу в базу", err)
-		return 0, global.ErrInternalError
+		err = global.ErrInternalError
+		return
 	}
 
 	u.log.WithFields(logrus.Fields{"sale_id": saleID}).Info("продажа успешно добавлена в базу данных")
@@ -414,14 +416,16 @@ func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq product.SaleQue
 		sales, err = u.Repository.Product.FindSaleListOnlyBySoldDate(ts, s)
 		if err != nil {
 			u.log.Error("не удалось найти продажи", err)
-			return nil, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
 	} else {
 		//  если имя продукта или id склада указан то произойдет фильтрация по этим параметрам
 		sales, err = u.Repository.Product.FindSaleListByFilters(ts, sq)
 		if err != nil {
 			u.log.Error("не удалось найти продажи по данным фильтрам", err)
-			return nil, global.ErrInternalError
+			err = global.ErrInternalError
+			return
 		}
 	}
 
