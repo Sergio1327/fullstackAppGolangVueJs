@@ -37,6 +37,13 @@ type ProductPrice struct {
 	Price     float64          `json:"price" db:"price"`           // цена продукта
 }
 
+func (p ProductPrice) IsNullFields() error {
+	if p.VariantID == 0 || p.Price == 0 || p.StartDate == (time.Time{}) {
+		return errors.New("id варианта или цена или дата начала не могут быть пустыми")
+	}
+	return nil
+}
+
 // ProductInfo структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {
 	ProductID   int       `db:"product_id"`       // id продукта
@@ -63,4 +70,3 @@ func (s Sale) IsNullFields() error {
 	}
 	return nil
 }
-

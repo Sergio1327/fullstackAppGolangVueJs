@@ -2,15 +2,13 @@ package usecase
 
 import (
 	"errors"
+	"github.com/sirupsen/logrus"
 	"product_storage/internal/entity/global"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
 	"product_storage/rimport"
-	"strconv"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 type ProductUseCase struct {
@@ -64,22 +62,10 @@ func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Prod
 
 // AddProductPrice логика проверки цены и вставки в базу
 func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.ProductPrice) (priceID int, err error) {
-	variantID := strconv.Itoa(p.VariantID)
 
 	//проверка  id варианта, цены, даты начала цены на нулевые значения
-	if variantID == "" {
-		err = errors.New("нет варианта продукта с таким id")
-		return
-	}
-
-	if p.Price == 0 {
-		err = errors.New("цена не может быть пустой или равна 0")
-		return
-	}
-
-	if p.StartDate == (time.Time{}) {
-		err = errors.New("дата не может быть пустой")
-		return
+	if err := p.IsNullFields(); err != nil {
+		return 0, err
 	}
 
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
@@ -87,28 +73,26 @@ func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.Produ
 	if err != nil {
 		switch err {
 		case global.ErrNoData:
-			isExistsID = 0
+			// если записи нет то цена вставляется в базу
+			priceID, err = u.Repository.Product.AddProductPrice(ts, p)
+			if err != nil {
+				u.log.Error("не удалось добавить цену продукта в базу данных", err)
+				return 0, global.ErrInternalError
+			}
+
+		case nil:
+			// если запись уже имеется устанавливается дата окончания цены
+			p.EndDate.Scan(time.Now())
+			err := u.Repository.Product.UpdateProductPrice(ts, p, isExistsID)
+			if err != nil {
+				u.log.Error("не удалось обновить цену", err)
+				return 0, global.ErrInternalError
+			}
+
+			priceID = isExistsID
+
 		default:
 			u.log.Error("не удалось проверить наличие цен в базе данных", err)
-			return 0, global.ErrInternalError
-		}
-	}
-
-	// если запись уже имеется устанавливается дата окончания цены
-	if isExistsID > 0 {
-		p.EndDate.Scan(time.Now())
-		err := u.Repository.Product.UpdateProductPrice(ts, p, isExistsID)
-		if err != nil {
-			u.log.Error("не удалось обновить цену", err)
-			return 0, global.ErrInternalError
-		}
-
-		priceID = isExistsID
-	} else {
-		// если записи нет то цена вставляется в базу
-		priceID, err = u.Repository.Product.AddProductPrice(ts, p)
-		if err != nil {
-			u.log.Error("не удалось добавить цену продукта в базу данных", err)
 			return 0, global.ErrInternalError
 		}
 	}
