@@ -262,7 +262,7 @@ func (u *ProductUseCase) FindProductList(ts transaction.Session, tag string, lim
 						return nil, errors.New("не удалось найти склады в которых есть продукт")
 					}
 				}
-
+				
 				variantList[j].InStorages = inStorages
 			}
 		}

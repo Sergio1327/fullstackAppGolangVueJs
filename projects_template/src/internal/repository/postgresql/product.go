@@ -160,7 +160,6 @@ func (r *productRepository) InStorages(ts transaction.Session, varantID int) (in
     WHERE variant_id = $1`
 
 	inStorages, err = gensql.Select[int](SqlxTx(ts), query, varantID)
-
 	return inStorages, err
 }
 

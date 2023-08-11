@@ -1,11 +1,9 @@
 package usecase
 
 import (
+	"github.com/sirupsen/logrus"
 	"product_storage/internal/entity/log"
 	"product_storage/rimport"
-	"product_storage/tools/sqlnull"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Logger struct {
@@ -38,32 +36,8 @@ func (u *Logger) SaveLog(row log.Row) error {
 	}
 	defer ts.Rollback()
 
-	var (
-		contractID sqlnull.NullInt64
-		seID       sqlnull.NullInt64
-		operLogin  sqlnull.NullString
-	)
-
-	if data, exists := row.SpecialFields["c_id"]; exists {
-		if data.Type == "int" {
-			contractID.Scan(data.Value)
-		}
-	}
-
-	if data, exists := row.SpecialFields["se_id"]; exists {
-		if data.Type == "int" {
-			seID.Scan(data.Value)
-		}
-	}
-
-	if data, exists := row.SpecialFields["oper_login"]; exists {
-		if data.Type == "string" {
-			operLogin.Scan(data.Value)
-		}
-	}
-
 	if row.Details != nil && len(row.Details) > 0 {
-		logID, err := u.ri.Repository.Logger.SaveLogWithReturnID(ts, row,)
+		logID, err := u.ri.Repository.Logger.SaveLogWithReturnID(ts, row)
 		if err != nil {
 			u.log.Errorln(u.logPrefix(), "не удается сохранить данные в лог", err)
 			return err

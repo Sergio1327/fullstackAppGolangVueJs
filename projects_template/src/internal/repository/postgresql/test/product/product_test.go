@@ -98,8 +98,21 @@ func TestCheckExists(t *testing.T) {
 	}
 
 	id, err := repo.Repository.Product.CheckExists(ts, productPrice)
-	r.NoError(err)
+	r.Error(err)
 	r.Zero(id)
+
+	startDate := time.Date(2023, time.July, 1, 10, 0, 0, 0, time.Local)
+	endDate := time.Date(2024, time.July, 25, 10, 0, 0, 0, time.Local)
+
+	productPrice = product.ProductPrice{
+		VariantID: 1,
+		StartDate: startDate,
+		EndDate:   sqlnull.NewNullTime(endDate),
+	}
+
+	id, err = repo.Repository.Product.CheckExists(ts, productPrice)
+	r.NoError(err)
+	r.NotZero(id)
 }
 
 func TestUpdateProductPrice(t *testing.T) {
@@ -368,6 +381,20 @@ func TestFindCurrentPrice(t *testing.T) {
 	price, err := repo.Repository.Product.FindCurrentPrice(ts, id)
 	r.NoError(err)
 	r.NotEmpty(price)
+}
+
+func TestCalculateTotalPrice(t *testing.T) {
+	r := require.New(t)
+
+	db := pgdb.SqlxDB("dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable")
+	defer db.Close()
+	sm := transaction.NewSQLSessionManager(db)
+	repo := rimport.NewRepositoryImports(sm)
+
+	expected := 10.00
+	totalPrice := repo.Repository.Product.CalculateTotalPrice(5.00, 2)
+
+	r.Equal(expected, totalPrice)
 }
 
 func TestInStorages(t *testing.T) {
