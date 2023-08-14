@@ -6,16 +6,7 @@ import (
 	"time"
 )
 
-// Product cтруктура продукта для записи в базу
-type Product struct {
-	ProductID   int              `json:"product_id"`  // id продукта
-	Name        string           `json:"name"`        // название продукта
-	Descr       string           `json:"description"` // описание продукта
-	AddetAt     time.Time        `json:"added_at"`    // дата добавления продукта
-	RemovedAt   sqlnull.NullTime `json:"removed_at"`  // дата удаления продукта
-	Tags        string           `json:"tags"`        // теги продукта
-	VariantList []Variant        `json:"variants"`    // cписок вариантов продукта
-}
+
 
 // Variant структура варианта, продукта представляем с собой информацию о продукте который нужно внести в базу
 type Variant struct {
@@ -28,21 +19,6 @@ type Variant struct {
 	InStorages   []int     `json:"in_storages"`                // список id складов в которых есть этот вариант
 }
 
-// ProductPrice структура для вставки цены продукта
-type ProductPrice struct {
-	PriceID   int              `json:"price_id" db:"price_id"`     // id цены продукта
-	VariantID int              `json:"variant_id" db:"variant_id"` // id варианта продука
-	StartDate time.Time        `json:"start_date" db:"start_date"` // дата начала цены
-	EndDate   sqlnull.NullTime `json:"end_date" db:"end_date"`     // дата конца цены
-	Price     float64          `json:"price" db:"price"`           // цена продукта
-}
-
-func (p ProductPrice) IsNullFields() error {
-	if p.VariantID == 0 || p.Price == 0 || p.StartDate == (time.Time{}) {
-		return errors.New("id варианта или цена или дата начала не могут быть пустыми")
-	}
-	return nil
-}
 
 // ProductInfo структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {

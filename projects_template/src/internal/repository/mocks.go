@@ -104,7 +104,7 @@ func (m *MockProduct) EXPECT() *MockProductMockRecorder {
 }
 
 // AddProduct mocks base method.
-func (m *MockProduct) AddProduct(ts transaction.Session, product product.Product) (int, error) {
+func (m *MockProduct) AddProduct(ts transaction.Session, product product.ProductParams) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddProduct", ts, product)
 	ret0, _ := ret[0].(int)
@@ -134,7 +134,7 @@ func (mr *MockProductMockRecorder) AddProductInStock(ts, p interface{}) *gomock.
 }
 
 // AddProductPrice mocks base method.
-func (m *MockProduct) AddProductPrice(ts transaction.Session, p product.ProductPrice) (int, error) {
+func (m *MockProduct) AddProductPrice(ts transaction.Session, p product.ProductPriceParams) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddProductPrice", ts, p)
 	ret0, _ := ret[0].(int)
@@ -163,7 +163,7 @@ func (mr *MockProductMockRecorder) AddProductVariantList(ts, productID, variant 
 }
 
 // CheckExists mocks base method.
-func (m *MockProduct) CheckExists(ts transaction.Session, p product.ProductPrice) (int, error) {
+func (m *MockProduct) CheckExists(ts transaction.Session, p product.ProductPriceParams) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckExists", ts, p)
 	ret0, _ := ret[0].(int)
@@ -403,7 +403,7 @@ func (mr *MockProductMockRecorder) UpdateProductInstock(ts, p interface{}) *gomo
 }
 
 // UpdateProductPrice mocks base method.
-func (m *MockProduct) UpdateProductPrice(ts transaction.Session, p product.ProductPrice, id int) error {
+func (m *MockProduct) UpdateProductPrice(ts transaction.Session, p product.ProductPriceParams, id int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateProductPrice", ts, p, id)
 	ret0, _ := ret[0].(error)

@@ -26,7 +26,7 @@ func NewProduct(log, dblog *logrus.Logger, ri rimport.RepositoryImports) *Produc
 }
 
 // AddProduct логика добавление продукта в базу
-func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
+func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.ProductParams) (productID int, err error) {
 	// если имя продукта не введено то возвращается ошибка
 	if product.Name == "" {
 		err = errors.New("имя продукта не может быть пустым")
@@ -63,7 +63,7 @@ func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Prod
 }
 
 // AddProductPrice логика проверки цены и вставки в базу
-func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.ProductPrice) (priceID int, err error) {
+func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.ProductPriceParams) (priceID int, err error) {
 
 	//проверка  id варианта, цены, даты начала цены на нулевые значения
 	if err := p.IsNullFields(); err != nil {

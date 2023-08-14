@@ -7,8 +7,8 @@ import (
 )
 
 type Product interface {
-	AddProduct(ts transaction.Session, product product.Product) (productID int, err error)
-	AddProductPrice(ts transaction.Session, pr product.ProductPrice) (int, error)
+	AddProduct(ts transaction.Session, product product.ProductParams) (productID int, err error)
+	AddProductPrice(ts transaction.Session, pr product.ProductPriceParams) (int, error)
 	AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (int, error)
 	FindProductInfoById(ts transaction.Session, productID int) (product.ProductInfo, error)
 	FindProductList(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error)

@@ -16,12 +16,12 @@ type Logger interface {
 //go:generate mockgen -source=interface.go -destination=mocks/mock.go
 
 type Product interface {
-	AddProduct(ts transaction.Session, product product.Product) (productID int, err error)
+	AddProduct(ts transaction.Session, product product.ProductParams) (productID int, err error)
 	AddProductVariantList(ts transaction.Session, productID int, variant product.Variant) error
 
-	CheckExists(ts transaction.Session, p product.ProductPrice) (int, error)
-	UpdateProductPrice(ts transaction.Session, p product.ProductPrice, id int) error
-	AddProductPrice(ts transaction.Session, p product.ProductPrice) (int, error)
+	CheckExists(ts transaction.Session, p product.ProductPriceParams) (int, error)
+	UpdateProductPrice(ts transaction.Session, p product.ProductPriceParams, id int) error
+	AddProductPrice(ts transaction.Session, p product.ProductPriceParams) (int, error)
 
 	CheckProductInStock(ts transaction.Session, p stock.AddProductInStock) (bool, error)
 	UpdateProductInstock(ts transaction.Session, p stock.AddProductInStock) (int, error)

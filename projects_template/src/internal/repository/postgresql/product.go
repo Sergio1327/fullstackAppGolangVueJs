@@ -17,7 +17,7 @@ func NewProduct() repository.Product {
 }
 
 // AddProduct вставка названия,описания,времени добавления и тегов в базу
-func (r *productRepository) AddProduct(ts transaction.Session, product product.Product) (productID int, err error) {
+func (r *productRepository) AddProduct(ts transaction.Session, product product.ProductParams) (productID int, err error) {
 	query := `insert into products
 	(name, description, added_at, tags)
 	values ($1, $2, $3, $4) 
@@ -40,7 +40,7 @@ func (r *productRepository) AddProductVariantList(ts transaction.Session, produc
 }
 
 // CheckExists проверка наличия цен варианта продукта в указаный диапазон времени
-func (r *productRepository) CheckExists(ts transaction.Session, p product.ProductPrice) (isExistsID int, err error) {
+func (r *productRepository) CheckExists(ts transaction.Session, p product.ProductPriceParams) (isExistsID int, err error) {
 	query := `
 	select price_id 
 	from product_prices
@@ -52,7 +52,7 @@ func (r *productRepository) CheckExists(ts transaction.Session, p product.Produc
 }
 
 // UpdateProductPrice обновление цены варианта продукта
-func (r *productRepository) UpdateProductPrice(ts transaction.Session, price product.ProductPrice, priceID int) error {
+func (r *productRepository) UpdateProductPrice(ts transaction.Session, price product.ProductPriceParams, priceID int) error {
 	_, err := SqlxTx(ts).Exec(`
 	update product_prices
 	set end_date = $1 
@@ -63,7 +63,7 @@ func (r *productRepository) UpdateProductPrice(ts transaction.Session, price pro
 }
 
 // AddProductPrice вставка цены варианта продукта в базу
-func (r *productRepository) AddProductPrice(ts transaction.Session, price product.ProductPrice) (priceID int, err error) {
+func (r *productRepository) AddProductPrice(ts transaction.Session, price product.ProductPriceParams) (priceID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	insert into product_prices
 	( variant_id, price, start_date, end_date )

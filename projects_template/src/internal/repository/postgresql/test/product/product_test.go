@@ -27,7 +27,7 @@ func TestAddProduct(t *testing.T) {
 	defer ts.Rollback()
 
 	// Первый тестовый случай - успешное добавление продукта
-	p1 := product.Product{
+	p1 := product.ProductParams{
 		Name:    "sdlds",
 		Descr:   "dlldld",
 		AddetAt: time.Now(),
@@ -46,7 +46,7 @@ func TestAddProduct(t *testing.T) {
 	r.Equal(p1.Descr, productInfo.Descr)
 
 	// Второй тестовый случай - добавление продукта без имени, ожидается ошибка
-	p2 := product.Product{}
+	p2 := product.ProductParams{}
 
 	id2, err := repo.Repository.Product.AddProduct(ts, p2)
 	r.NoError(err)
@@ -92,7 +92,7 @@ func TestCheckExists(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	productPrice := product.ProductPrice{
+	productPrice := product.ProductPriceParams{
 		VariantID: 2,
 		StartDate: time.Now(),
 	}
@@ -104,7 +104,7 @@ func TestCheckExists(t *testing.T) {
 	startDate := time.Date(2023, time.July, 1, 10, 0, 0, 0, time.Local)
 	endDate := time.Date(2024, time.July, 25, 10, 0, 0, 0, time.Local)
 
-	productPrice = product.ProductPrice{
+	productPrice = product.ProductPriceParams{
 		VariantID: 1,
 		StartDate: startDate,
 		EndDate:   sqlnull.NewNullTime(endDate),
@@ -126,7 +126,7 @@ func TestUpdateProductPrice(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	expectedProductPrice := product.ProductPrice{
+	expectedProductPrice := product.ProductPriceParams{
 		PriceID: 2,
 		EndDate: sqlnull.NewNullTime(time.Now()),
 	}
@@ -134,7 +134,7 @@ func TestUpdateProductPrice(t *testing.T) {
 	err := repo.Repository.Product.UpdateProductPrice(ts, expectedProductPrice, expectedProductPrice.PriceID)
 	r.NoError(err)
 
-	var productPrice product.ProductPrice
+	var productPrice product.ProductPriceParams
 	err = postgresql.SqlxTx(ts).Get(&productPrice,
 		`select price_id 
 	     from product_prices
@@ -160,7 +160,7 @@ func TestAddProductPrice(t *testing.T) {
 	startDate, err := time.Parse("02.01.2006", "01.07.2023")
 	r.NoError(err)
 
-	expectedProductPrice := product.ProductPrice{
+	expectedProductPrice := product.ProductPriceParams{
 		VariantID: 5,
 		StartDate: startDate,
 		Price:     18.99,
@@ -170,7 +170,7 @@ func TestAddProductPrice(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(priceID)
 
-	var productPrice product.ProductPrice
+	var productPrice product.ProductPriceParams 
 	err = postgresql.SqlxTx(ts).Get(&productPrice,
 		`select variant_id, price
 		 from product_prices
@@ -292,7 +292,7 @@ func TestLoadProductInfo(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	product := product.Product{
+	product := product.ProductParams{
 		Name:    "Имя продукта",
 		Descr:   "Описание продукта",
 		AddetAt: time.Now(),
@@ -363,7 +363,7 @@ func TestFindCurrentPrice(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	pp := product.ProductPrice{
+	pp := product.ProductPriceParams{
 		VariantID: 1,
 		Price:     14.99,
 		StartDate: time.Now(),
@@ -428,14 +428,14 @@ func TestFindProductListByTag(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	p1 := product.Product{
+	p1 := product.ProductParams{
 		Name:    "sldlsd",
 		Descr:   "sdsdsdsds",
 		AddetAt: time.Now(),
 		Tags:    "напиток",
 	}
 
-	p2 := product.Product{
+	p2 := product.ProductParams{
 		Name:    "авывывы",
 		Descr:   "sdsdsdsds",
 		AddetAt: time.Now(),
@@ -507,7 +507,7 @@ func TestFindPrice(t *testing.T) {
 	defer ts.Rollback()
 
 	var variantID int
-	priceQuery := product.ProductPrice{
+	priceQuery := product.ProductPriceParams{
 		VariantID: 1,
 		Price:     9.99,
 		StartDate: time.Now(),

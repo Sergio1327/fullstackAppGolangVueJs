@@ -19,7 +19,7 @@ func (e *GinServer) addProduct(c *gin.Context) {
 		return
 	}
 	defer ts.Rollback()
-	var product product.Product
+	var product product.ProductParams
 
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))
@@ -50,7 +50,7 @@ func (e *GinServer) addProductPrice(c *gin.Context) {
 	}
 	defer ts.Rollback()
 
-	var productPrice product.ProductPrice
+	var productPrice product.ProductPriceParams
 
 	if err := c.ShouldBindJSON(&productPrice); err != nil {
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))
