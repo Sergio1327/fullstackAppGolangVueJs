@@ -39,9 +39,8 @@ type Product interface {
 	FindStockListByProductId(ts transaction.Session, productID int) ([]stock.Stock, error)
 	FindStocksVariantList(ts transaction.Session, storageID int) ([]stock.AddProductInStock, error)
 
-	Buy(ts transaction.Session, s product.Sale) (int, error)
+	SaveSale(ts transaction.Session, s product.Sale) (int, error)
 	FindPrice(ts transaction.Session, variantID int) (float64, error)
-	CalculateTotalPrice(price float64, quantity int) float64
 
 	FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDateParam) ([]product.Sale, error)
 	FindSaleListByFilters(ts transaction.Session, sq product.SaleQueryParam) ([]product.Sale, error)

@@ -1,8 +1,6 @@
 package test
 
 import (
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/require"
 	"product_storage/internal/entity/global"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/transaction"
@@ -11,13 +9,16 @@ import (
 	"product_storage/uimport"
 	"testing"
 	"time"
+
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
 )
 
 var (
 	testLogger = logger.NewNoFileLogger("test")
 )
 
-func TestBuy(t *testing.T) {
+func TestSaveSale(t *testing.T) {
 	r := require.New(t)
 
 	type fields struct {
@@ -30,52 +31,56 @@ func TestBuy(t *testing.T) {
 	}
 
 	fixedTime := time.Date(2023, 8, 9, 13, 52, 40, 0, time.UTC)
+
 	argSale := product.Sale{
 		VariantID: 1,
 		StorageID: 1,
 		SoldAt:    fixedTime,
-		Quantity:  10,
+		Quantity:  2,
 	}
 
 	tests := []struct {
-		name         string
-		prepare      func(f *fields)
-		expectedData int
-		args         args
-		err          error
+		name               string
+		prepare            func(f *fields)
+		expectedID         int
+		expectedTotalPrice float64
+		args               args
+		err                error
 	}{
 		{
 			name: "успешный результат",
 			prepare: func(f *fields) {
-				var price float64
+				price := 5.99
 				saleID := 123
-
-				gomock.InOrder(
-					f.ri.MockRepository.Product.EXPECT().FindPrice(f.ts, argSale.VariantID).Return(price, nil),
-					f.ri.MockRepository.Product.EXPECT().CalculateTotalPrice(price,argSale.Quantity),
-					f.ri.MockRepository.Product.EXPECT().Buy(f.ts, argSale).Return(saleID, nil),
-				)
+				sale := product.Sale{
+					VariantID:  1,
+					StorageID:  1,
+					Quantity:   2,
+					SoldAt:     fixedTime,
+					TotalPrice: price * float64(argSale.Quantity),
+				}
+				f.ri.MockRepository.Product.EXPECT().FindPrice(f.ts, sale.VariantID).Return(price, nil)
+				f.ri.MockRepository.Product.EXPECT().SaveSale(f.ts, sale).Return(saleID, nil)
 			},
 			args: args{
 				sale: argSale,
 			},
-			expectedData: 123,
-			err:          nil,
+			expectedID:         123,
+			expectedTotalPrice: 5.99,
+			err:                nil,
 		},
 		{
 			name: "безуспешный результат",
 			prepare: func(f *fields) {
-				var price float64
-
-				gomock.InOrder(
-					f.ri.MockRepository.Product.EXPECT().FindPrice(f.ts, argSale.VariantID).Return(price, global.ErrNoData),
-				)
+				price := 0.0 // Assuming price is 0.0 in this case
+				f.ri.MockRepository.Product.EXPECT().FindPrice(f.ts, argSale.VariantID).Return(price, global.ErrNoData)
 			},
 			args: args{
-				sale: argSale,
+				argSale,
 			},
-			expectedData: 0,
-			err:          global.ErrInternalError,
+			expectedTotalPrice: 0,
+			expectedID:         0,
+			err:                global.ErrInternalError,
 		},
 	}
 
@@ -96,10 +101,10 @@ func TestBuy(t *testing.T) {
 			sm := transaction.NewMockSessionManager(ctrl)
 			ui := uimport.NewUsecaseImports(testLogger, testLogger, f.ri.RepositoryImports(), sm)
 
-			data, err := ui.Usecase.Product.Buy(f.ts, tt.args.sale)
+			data, err := ui.Usecase.Product.SaveSale(f.ts, tt.args.sale)
 
 			r.Equal(tt.err, err)
-			r.Equal(tt.expectedData, data)
+			r.Equal(tt.expectedID, data)
 		})
 	}
 }

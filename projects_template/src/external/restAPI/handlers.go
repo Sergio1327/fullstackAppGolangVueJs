@@ -184,7 +184,7 @@ func (e *GinServer) findProductListInStock(c *gin.Context) {
 }
 
 // buy запись сделанной продажи в базу
-func (e *GinServer) buy(c *gin.Context) {
+func (e *GinServer) SaveSale(c *gin.Context) {
 	ts := e.SessionManager.CreateSession()
 	err := ts.Start()
 	if err != nil {
@@ -200,7 +200,7 @@ func (e *GinServer) buy(c *gin.Context) {
 		return
 	}
 
-	saleID, err := e.Usecase.Product.Buy(ts, sale)
+	saleID, err := e.Usecase.Product.SaveSale(ts, sale)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return

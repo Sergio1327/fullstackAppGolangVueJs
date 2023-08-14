@@ -205,10 +205,6 @@ func (r *productRepository) FindStocksVariantList(ts transaction.Session, storag
 	return gensql.Select[stock.AddProductInStock](SqlxTx(ts), query, storageID)
 }
 
-func (r *productRepository) CalculateTotalPrice(price float64, quantity int) float64 {
-	return price * float64(quantity)
-}
-
 // FindPrice получение цены
 func (r *productRepository) FindPrice(ts transaction.Session, variantID int) (price float64, err error) {
 	query :=
@@ -219,8 +215,8 @@ func (r *productRepository) FindPrice(ts transaction.Session, variantID int) (pr
 	return gensql.Get[float64](SqlxTx(ts), query, variantID)
 }
 
-// Buy запись о покупке в базу
-func (r *productRepository) Buy(ts transaction.Session, sale product.Sale) (saleID int, err error) {
+// SaveSale запись о покупке в базу
+func (r *productRepository) SaveSale(ts transaction.Session, sale product.Sale) (saleID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	insert into sales
 	( variant_id, storage_id, sold_at, quantity, total_price )

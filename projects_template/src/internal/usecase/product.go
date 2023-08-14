@@ -341,7 +341,7 @@ func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID i
 		}
 	} else {
 
-		//Если же пользователь ввел id продукта то произойдет фильтрация складов по id продукта
+		// если же пользователь ввел id продукта то произойдет фильтрация складов по id продукта
 		stocks, err = u.Repository.Product.FindStockListByProductId(ts, productID)
 		if err != nil {
 			u.log.Error("не удалось найти склады с продуктами по данному id", err)
@@ -367,8 +367,8 @@ func (u *ProductUseCase) FindProductsInStock(ts transaction.Session, productID i
 	return stocks, err
 }
 
-// Buy логuка записи о покупке в базу
-func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int, err error) {
+// SaveSale логuка записи о покупке в базу
+func (u *ProductUseCase) SaveSale(ts transaction.Session, p product.Sale) (saleID int, err error) {
 
 	// проверка фильтров на нулевые значения ,которые ввел пользователь
 	if err := p.IsNullFields(); err != nil {
@@ -378,15 +378,20 @@ func (u *ProductUseCase) Buy(ts transaction.Session, p product.Sale) (saleID int
 	// получение цены варианта
 	price, err := u.Repository.Product.FindPrice(ts, p.VariantID)
 	if err != nil {
-		u.log.Error("не удалось найти цену варианта продукта", err)
+		u.log.Error("не удалось найти цену варианта продукта ", err)
 		err = global.ErrInternalError
 		return
 	}
 
 	// подсчет общей цены продажи
-	p.TotalPrice = u.Repository.Product.CalculateTotalPrice(price, p.Quantity)
+	p.TotalPrice = price * float64(p.Quantity)
+	if p.TotalPrice == 0 {
+		u.log.Error("общая цена не может быть равна 0")
+		err = global.ErrInternalError
+		return
+	}
 	// запись продажи в базу
-	saleID, err = u.Repository.Product.Buy(ts, p)
+	saleID, err = u.Repository.Product.SaveSale(ts, p)
 	if err != nil {
 		u.log.Error("не удалось записать продажу в базу", err)
 		err = global.ErrInternalError

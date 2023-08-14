@@ -31,7 +31,7 @@ func (e *GinServer) Run() {
 	e.server.GET("/product/:id", e.findProductInfoById)
 	e.server.GET("/product_list", e.findProductList)
 	e.server.GET("/stock", e.findProductListInStock)
-	e.server.POST("/buy", e.buy)
+	e.server.POST("/buy", e.SaveSale)
 	e.server.POST("/sales", e.FindSaleList)
 
 	e.server.Run(":9000")

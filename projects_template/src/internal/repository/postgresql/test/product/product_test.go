@@ -383,20 +383,6 @@ func TestFindCurrentPrice(t *testing.T) {
 	r.NotEmpty(price)
 }
 
-func TestCalculateTotalPrice(t *testing.T) {
-	r := require.New(t)
-
-	db := pgdb.SqlxDB("dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable")
-	defer db.Close()
-	sm := transaction.NewSQLSessionManager(db)
-	repo := rimport.NewRepositoryImports(sm)
-
-	expected := 10.00
-	totalPrice := repo.Repository.Product.CalculateTotalPrice(5.00, 2)
-
-	r.Equal(expected, totalPrice)
-}
-
 func TestInStorages(t *testing.T) {
 	r := require.New(t)
 
@@ -540,7 +526,7 @@ func TestFindPrice(t *testing.T) {
 	r.NotEmpty(price)
 }
 
-func TestBuy(t *testing.T) {
+func TestSaveSale(t *testing.T) {
 	r := require.New(t)
 
 	db := pgdb.SqlxDB("dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable")
@@ -559,7 +545,7 @@ func TestBuy(t *testing.T) {
 		TotalPrice: 19.99,
 	}
 
-	saleID, err := repo.Repository.Product.Buy(ts, saleQuery)
+	saleID, err := repo.Repository.Product.SaveSale(ts, saleQuery)
 	r.NoError(err)
 
 	var sale product.Sale

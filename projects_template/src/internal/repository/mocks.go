@@ -162,35 +162,6 @@ func (mr *MockProductMockRecorder) AddProductVariantList(ts, productID, variant 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProductVariantList", reflect.TypeOf((*MockProduct)(nil).AddProductVariantList), ts, productID, variant)
 }
 
-// Buy mocks base method.
-func (m *MockProduct) Buy(ts transaction.Session, s product.Sale) (int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Buy", ts, s)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Buy indicates an expected call of Buy.
-func (mr *MockProductMockRecorder) Buy(ts, s interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Buy", reflect.TypeOf((*MockProduct)(nil).Buy), ts, s)
-}
-
-// CalculateTotalPrice mocks base method.
-func (m *MockProduct) CalculateTotalPrice(price float64, quantity int) float64 {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CalculateTotalPrice", price, quantity)
-	ret0, _ := ret[0].(float64)
-	return ret0
-}
-
-// CalculateTotalPrice indicates an expected call of CalculateTotalPrice.
-func (mr *MockProductMockRecorder) CalculateTotalPrice(price, quantity interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalculateTotalPrice", reflect.TypeOf((*MockProduct)(nil).CalculateTotalPrice), price, quantity)
-}
-
 // CheckExists mocks base method.
 func (m *MockProduct) CheckExists(ts transaction.Session, p product.ProductPrice) (int, error) {
 	m.ctrl.T.Helper()
@@ -399,6 +370,21 @@ func (m *MockProduct) LoadStockList(ts transaction.Session) ([]stock.Stock, erro
 func (mr *MockProductMockRecorder) LoadStockList(ts interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadStockList", reflect.TypeOf((*MockProduct)(nil).LoadStockList), ts)
+}
+
+// SaveSale mocks base method.
+func (m *MockProduct) SaveSale(ts transaction.Session, s product.Sale) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveSale", ts, s)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveSale indicates an expected call of SaveSale.
+func (mr *MockProductMockRecorder) SaveSale(ts, s interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSale", reflect.TypeOf((*MockProduct)(nil).SaveSale), ts, s)
 }
 
 // UpdateProductInstock mocks base method.
