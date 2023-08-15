@@ -119,7 +119,7 @@ func (mr *MockProductMockRecorder) AddProduct(ts, product interface{}) *gomock.C
 }
 
 // AddProductInStock mocks base method.
-func (m *MockProduct) AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (int, error) {
+func (m *MockProduct) AddProductInStock(ts transaction.Session, p stock.ProductInStockParams) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddProductInStock", ts, p)
 	ret0, _ := ret[0].(int)
@@ -178,7 +178,7 @@ func (mr *MockProductMockRecorder) CheckExists(ts, p interface{}) *gomock.Call {
 }
 
 // CheckProductInStock mocks base method.
-func (m *MockProduct) CheckProductInStock(ts transaction.Session, p stock.AddProductInStock) (bool, error) {
+func (m *MockProduct) CheckProductInStock(ts transaction.Session, p stock.ProductInStockParams) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckProductInStock", ts, p)
 	ret0, _ := ret[0].(bool)
@@ -298,10 +298,10 @@ func (mr *MockProductMockRecorder) FindStockListByProductId(ts, productID interf
 }
 
 // FindStocksVariantList mocks base method.
-func (m *MockProduct) FindStocksVariantList(ts transaction.Session, storageID int) ([]stock.AddProductInStock, error) {
+func (m *MockProduct) FindStocksVariantList(ts transaction.Session, storageID int) ([]stock.ProductInStockParams, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindStocksVariantList", ts, storageID)
-	ret0, _ := ret[0].([]stock.AddProductInStock)
+	ret0, _ := ret[0].([]stock.ProductInStockParams)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -373,7 +373,7 @@ func (mr *MockProductMockRecorder) LoadStockList(ts interface{}) *gomock.Call {
 }
 
 // SaveSale mocks base method.
-func (m *MockProduct) SaveSale(ts transaction.Session, s product.Sale) (int, error) {
+func (m *MockProduct) SaveSale(ts transaction.Session, s product.SaleParams) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveSale", ts, s)
 	ret0, _ := ret[0].(int)
@@ -388,7 +388,7 @@ func (mr *MockProductMockRecorder) SaveSale(ts, s interface{}) *gomock.Call {
 }
 
 // UpdateProductInstock mocks base method.
-func (m *MockProduct) UpdateProductInstock(ts transaction.Session, p stock.AddProductInStock) (int, error) {
+func (m *MockProduct) UpdateProductInstock(ts transaction.Session, p stock.ProductInStockParams) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateProductInstock", ts, p)
 	ret0, _ := ret[0].(int)

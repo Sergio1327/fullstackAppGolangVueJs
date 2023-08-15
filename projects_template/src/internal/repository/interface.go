@@ -23,9 +23,9 @@ type Product interface {
 	UpdateProductPrice(ts transaction.Session, p product.ProductPriceParams, id int) error
 	AddProductPrice(ts transaction.Session, p product.ProductPriceParams) (int, error)
 
-	CheckProductInStock(ts transaction.Session, p stock.AddProductInStock) (bool, error)
-	UpdateProductInstock(ts transaction.Session, p stock.AddProductInStock) (int, error)
-	AddProductInStock(ts transaction.Session, p stock.AddProductInStock) (int, error)
+	CheckProductInStock(ts transaction.Session, p stock.ProductInStockParams) (bool, error)
+	UpdateProductInstock(ts transaction.Session, p stock.ProductInStockParams) (int, error)
+	AddProductInStock(ts transaction.Session, p stock.ProductInStockParams) (int, error)
 
 	LoadProductInfo(ts transaction.Session, productID int) (product.ProductInfo, error)
 	FindProductVariantList(ts transaction.Session, productID int) ([]product.Variant, error)
@@ -37,9 +37,9 @@ type Product interface {
 
 	LoadStockList(ts transaction.Session) ([]stock.Stock, error)
 	FindStockListByProductId(ts transaction.Session, productID int) ([]stock.Stock, error)
-	FindStocksVariantList(ts transaction.Session, storageID int) ([]stock.AddProductInStock, error)
+	FindStocksVariantList(ts transaction.Session, storageID int) ([]stock.ProductInStockParams, error)
 
-	SaveSale(ts transaction.Session, s product.Sale) (int, error)
+	SaveSale(ts transaction.Session, s product.SaleParams) (int, error)
 	FindPrice(ts transaction.Session, variantID int) (float64, error)
 
 	FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDateParam) ([]product.Sale, error)

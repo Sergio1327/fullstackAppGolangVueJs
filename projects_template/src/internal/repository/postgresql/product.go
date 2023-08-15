@@ -75,7 +75,7 @@ func (r *productRepository) AddProductPrice(ts transaction.Session, price produc
 }
 
 // CheckProductInStock проверка есть ли на скалде продукт
-func (r *productRepository) CheckProductInStock(ts transaction.Session, productInStock stock.AddProductInStock) (isExists bool, err error) {
+func (r *productRepository) CheckProductInStock(ts transaction.Session, productInStock stock.ProductInStockParams) (isExists bool, err error) {
 	query := `select exists
 	(select 1 
 	from products_in_storage 
@@ -86,7 +86,7 @@ func (r *productRepository) CheckProductInStock(ts transaction.Session, productI
 }
 
 // UpdateProductInstock обновление колличества продукта
-func (r *productRepository) UpdateProductInstock(ts transaction.Session, productInStock stock.AddProductInStock) (productStockID int, err error) {
+func (r *productRepository) UpdateProductInstock(ts transaction.Session, productInStock stock.ProductInStockParams) (productStockID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	update products_in_storage 
 	set quantity = $1
@@ -99,7 +99,7 @@ func (r *productRepository) UpdateProductInstock(ts transaction.Session, product
 }
 
 // AddProductInStock добавление продукта на склад
-func (r *productRepository) AddProductInStock(ts transaction.Session, productInStock stock.AddProductInStock) (productStockID int, err error) {
+func (r *productRepository) AddProductInStock(ts transaction.Session, productInStock stock.ProductInStockParams) (productStockID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	 insert into products_in_storage
 	 ( variant_id, storage_id, added_at, quantity )
@@ -196,13 +196,13 @@ func (r *productRepository) FindStockListByProductId(ts transaction.Session, pro
 }
 
 // FindStocksVariantList получение вариантов продукта на складе
-func (r *productRepository) FindStocksVariantList(ts transaction.Session, storageID int) (variantList []stock.AddProductInStock, err error) {
+func (r *productRepository) FindStocksVariantList(ts transaction.Session, storageID int) (variantList []stock.ProductInStockParams, err error) {
 	query := `
 	select variant_id, storage_id, added_at, quantity
 	from products_in_storage 
 	where storage_id = $1 `
 
-	return gensql.Select[stock.AddProductInStock](SqlxTx(ts), query, storageID)
+	return gensql.Select[stock.ProductInStockParams](SqlxTx(ts), query, storageID)
 }
 
 // FindPrice получение цены
@@ -216,7 +216,7 @@ func (r *productRepository) FindPrice(ts transaction.Session, variantID int) (pr
 }
 
 // SaveSale запись о покупке в базу
-func (r *productRepository) SaveSale(ts transaction.Session, sale product.Sale) (saleID int, err error) {
+func (r *productRepository) SaveSale(ts transaction.Session, sale product.SaleParams) (saleID int, err error) {
 	err = SqlxTx(ts).QueryRow(`
 	insert into sales
 	( variant_id, storage_id, sold_at, quantity, total_price )

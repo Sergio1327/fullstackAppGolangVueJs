@@ -81,7 +81,7 @@ func (e *GinServer) addProductInStock(c *gin.Context) {
 	}
 	defer ts.Rollback()
 
-	var addProduct stock.AddProductInStock
+	var addProduct stock.ProductInStockParams
 
 	if err := c.ShouldBindJSON(&addProduct); err != nil {
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))
@@ -193,7 +193,7 @@ func (e *GinServer) SaveSale(c *gin.Context) {
 	}
 	defer ts.Rollback()
 
-	var sale product.Sale
+	var sale product.SaleParams
 
 	if err := c.ShouldBindJSON(&sale); err != nil {
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))

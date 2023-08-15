@@ -195,7 +195,7 @@ func TestCheckProductsInStock(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	productInStock := stock.AddProductInStock{
+	productInStock := stock.ProductInStockParams{
 		VariantID: 4,
 		StorageID: 2,
 		Quantity:  10,
@@ -224,7 +224,7 @@ func TestUpdateProductsnStock(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	productInStock := stock.AddProductInStock{
+	productInStock := stock.ProductInStockParams{
 		VariantID: 4,
 		StorageID: 2,
 		Quantity:  10,
@@ -236,7 +236,7 @@ func TestUpdateProductsnStock(t *testing.T) {
 		 values ( $1, $2, $3 )`, productInStock.VariantID, productInStock.StorageID, productInStock.Quantity)
 	r.NoError(err)
 
-	productStockID, err := repo.Repository.Product.UpdateProductInstock(ts, stock.AddProductInStock{
+	productStockID, err := repo.Repository.Product.UpdateProductInstock(ts, stock.ProductInStockParams{
 		VariantID: 4,
 		StorageID: 2,
 		Quantity:  5,
@@ -257,7 +257,7 @@ func TestAddProductInStock(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	expectedProduct := stock.AddProductInStock{
+	expectedProduct := stock.ProductInStockParams{
 		VariantID: 3,
 		StorageID: 1,
 		AddedAt:   time.Now(),
@@ -267,7 +267,7 @@ func TestAddProductInStock(t *testing.T) {
 	r.NotZero(productStockID)
 	r.NoError(err)
 
-	var productInStock stock.AddProductInStock
+	var productInStock stock.ProductInStockParams
 	err = postgresql.SqlxTx(ts).Get(&productInStock, `
 	select variant_id, storage_id, quantity
 	from products_in_storage
@@ -396,7 +396,7 @@ func TestInStorages(t *testing.T) {
 	defer ts.Rollback()
 
 	var id int
-	product := stock.AddProductInStock{
+	product := stock.ProductInStockParams{
 		VariantID: 5,
 		StorageID: 1,
 		AddedAt:   time.Now(),
@@ -538,7 +538,7 @@ func TestSaveSale(t *testing.T) {
 	ts.Start()
 	defer ts.Rollback()
 
-	saleQuery := product.Sale{
+	saleQuery := product.SaleParams{
 		VariantID:  1,
 		StorageID:  3,
 		Quantity:   2,

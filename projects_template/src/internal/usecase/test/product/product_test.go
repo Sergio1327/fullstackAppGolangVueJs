@@ -27,12 +27,12 @@ func TestSaveSale(t *testing.T) {
 	}
 
 	type args struct {
-		sale product.Sale
+		sale product.SaleParams
 	}
 
 	fixedTime := time.Date(2023, 8, 9, 13, 52, 40, 0, time.UTC)
 
-	argSale := product.Sale{
+	argSale := product.SaleParams{
 		VariantID: 1,
 		StorageID: 1,
 		SoldAt:    fixedTime,
