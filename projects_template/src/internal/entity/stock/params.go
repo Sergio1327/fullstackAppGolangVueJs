@@ -17,9 +17,14 @@ type ProductInStockParams struct {
 }
 
 func (p ProductInStockParams) Log() logrus.Fields {
-	return logrus.Fields{"product_in_stock_ID": p.ProductInStorageID}
+	return logrus.Fields{
+		"product_in_stock_ID": p.ProductInStorageID,
+		"variant_ID":          p.VariantID,
+		"storage_ID":          p.StorageID,
+		"added_at":            p.AddedAt,
+		"quantity":            p.Quantity,
+	}
 }
-
 
 // IsNullFields проверка полей на нулевые значения
 func (p ProductInStockParams) IsNullFields() error {

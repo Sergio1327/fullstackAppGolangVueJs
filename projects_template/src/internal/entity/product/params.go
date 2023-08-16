@@ -62,7 +62,13 @@ func (s SaleParams) IsNullFields() error {
 	return nil
 }
 func (s SaleParams) Log() logrus.Fields {
-	return logrus.Fields{"sale_ID": s.SaleID}
+	return logrus.Fields{
+		"sale_ID":    s.SaleID,
+		"variant_ID": s.VariantID,
+		"storage_ID": s.StorageID,
+		"sold_at":    s.SoldAt,
+		"quantity":   s.Quantity,
+	}
 }
 
 // SaleQuery фильтры продаж по которым нужно вывести информацию
@@ -75,7 +81,13 @@ type SaleQueryParam struct {
 }
 
 func (s SaleQueryParam) Log() logrus.Fields {
-	return logrus.Fields{"sale_query_params": s}
+	return logrus.Fields{
+		"start_date":   s.StartDate,
+		"end_date":     s.EndDate,
+		"limit":        s.Limit,
+		"storage_ID":   s.StorageID,
+		"product_name": s.ProductName,
+	}
 }
 
 // SaleQuery фильтер продаж только дата продажи по которым нужно вывести информацию
