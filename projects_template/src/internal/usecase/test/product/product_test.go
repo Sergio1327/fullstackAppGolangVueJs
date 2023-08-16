@@ -52,7 +52,7 @@ func TestSaveSale(t *testing.T) {
 			prepare: func(f *fields) {
 				price := 5.99
 				saleID := 123
-				sale := product.Sale{
+				sale := product.SaleParams{
 					VariantID:  1,
 					StorageID:  1,
 					Quantity:   2,
