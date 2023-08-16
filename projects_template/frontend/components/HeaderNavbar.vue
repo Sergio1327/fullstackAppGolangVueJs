@@ -15,7 +15,7 @@
             </div>
             <div class="navbar-menu" :class="{ 'is-active': isNavbarActive }" id="navbarMenu">
                 <div class="navbar-end">
-                    <nuxt-link class="navbar-item" to="/" :class="{ 'is-active': isActive('/') }">
+                    <nuxt-link class="navbar-item " to="/" :class="{ 'is-active': isActive('/') }">
                         Главная
                     </nuxt-link>
                     <nuxt-link class="navbar-item" to="/productList" :class="{ 'is-active': isActive('/productList') }">
@@ -54,6 +54,11 @@ export default {
 <style scoped>
 .img {
     border-radius: 50%;
+}
+
+.navbar {
+    position: fixed !important;
+    width: 100%;
 }
 
 .navbar-item.is-active {

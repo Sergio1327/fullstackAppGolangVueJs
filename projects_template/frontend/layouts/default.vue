@@ -1,7 +1,7 @@
 <template>
   <div>
     <HeaderNavbar />
-    <main>
+    <main class="main">
       <div class="container">
         <nuxt></nuxt>
       </div>
@@ -25,3 +25,10 @@ export default {
   },
 }
 </script>
+
+<style>
+.main {
+  padding-top: 140px;
+}
+</style>
+
