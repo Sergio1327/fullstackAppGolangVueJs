@@ -113,7 +113,7 @@ func (ph *ProductHandler) FindProductList(c *gin.Context) {
 	c.JSON(http.StatusOK, response.NewSuccessResponse(productList, "product_list"))
 }
 
-// LoadProductsInStock выводит информацию о складах и продуктах в них
+// FindProductListInStock выводит информацию о складах и продуктах в них
 func (ph *ProductHandler) FindProductListInStock(c *gin.Context) {
 	id := c.Query("product_id")
 	if id == "" {

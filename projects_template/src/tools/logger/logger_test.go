@@ -2,10 +2,10 @@ package logger
 
 import (
 	"os"
-	"projects_template/config"
-	"projects_template/internal/transaction"
-	"projects_template/rimport"
-	"projects_template/tools/oradb"
+	"product_storage/config"
+	"product_storage/internal/transaction"
+	"product_storage/rimport"
+	"product_storage/tools/oradb"
 	"testing"
 
 	"github.com/sirupsen/logrus"

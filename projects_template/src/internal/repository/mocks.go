@@ -5,10 +5,10 @@
 package repository
 
 import (
-	log "projects_template/internal/entity/log"
-	template "projects_template/internal/entity/template"
-	transaction "projects_template/internal/transaction"
-	sqlnull "projects_template/tools/sqlnull"
+	log "product_storage/internal/entity/log"
+	product "product_storage/internal/entity/product"
+	stock "product_storage/internal/entity/stock"
+	transaction "product_storage/internal/transaction"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -38,17 +38,17 @@ func (m *MockLogger) EXPECT() *MockLoggerMockRecorder {
 }
 
 // SaveLog mocks base method.
-func (m *MockLogger) SaveLog(ts transaction.Session, row log.Row, contractID, seID sqlnull.NullInt64, operLogin sqlnull.NullString) error {
+func (m *MockLogger) SaveLog(ts transaction.Session, row log.Row) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveLog", ts, row, contractID, seID, operLogin)
+	ret := m.ctrl.Call(m, "SaveLog", ts, row)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SaveLog indicates an expected call of SaveLog.
-func (mr *MockLoggerMockRecorder) SaveLog(ts, row, contractID, seID, operLogin interface{}) *gomock.Call {
+func (mr *MockLoggerMockRecorder) SaveLog(ts, row interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLog", reflect.TypeOf((*MockLogger)(nil).SaveLog), ts, row, contractID, seID, operLogin)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLog", reflect.TypeOf((*MockLogger)(nil).SaveLog), ts, row)
 }
 
 // SaveLogDetails mocks base method.
@@ -66,69 +66,352 @@ func (mr *MockLoggerMockRecorder) SaveLogDetails(ts, logID, details interface{})
 }
 
 // SaveLogWithReturnID mocks base method.
-func (m *MockLogger) SaveLogWithReturnID(ts transaction.Session, row log.Row, contractID, seID sqlnull.NullInt64, operLogin sqlnull.NullString) (int, error) {
+func (m *MockLogger) SaveLogWithReturnID(ts transaction.Session, row log.Row) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SaveLogWithReturnID", ts, row, contractID, seID, operLogin)
+	ret := m.ctrl.Call(m, "SaveLogWithReturnID", ts, row)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SaveLogWithReturnID indicates an expected call of SaveLogWithReturnID.
-func (mr *MockLoggerMockRecorder) SaveLogWithReturnID(ts, row, contractID, seID, operLogin interface{}) *gomock.Call {
+func (mr *MockLoggerMockRecorder) SaveLogWithReturnID(ts, row interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLogWithReturnID", reflect.TypeOf((*MockLogger)(nil).SaveLogWithReturnID), ts, row, contractID, seID, operLogin)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveLogWithReturnID", reflect.TypeOf((*MockLogger)(nil).SaveLogWithReturnID), ts, row)
 }
 
-// MockTemplate is a mock of Template interface.
-type MockTemplate struct {
+// MockProduct is a mock of Product interface.
+type MockProduct struct {
 	ctrl     *gomock.Controller
-	recorder *MockTemplateMockRecorder
+	recorder *MockProductMockRecorder
 }
 
-// MockTemplateMockRecorder is the mock recorder for MockTemplate.
-type MockTemplateMockRecorder struct {
-	mock *MockTemplate
+// MockProductMockRecorder is the mock recorder for MockProduct.
+type MockProductMockRecorder struct {
+	mock *MockProduct
 }
 
-// NewMockTemplate creates a new mock instance.
-func NewMockTemplate(ctrl *gomock.Controller) *MockTemplate {
-	mock := &MockTemplate{ctrl: ctrl}
-	mock.recorder = &MockTemplateMockRecorder{mock}
+// NewMockProduct creates a new mock instance.
+func NewMockProduct(ctrl *gomock.Controller) *MockProduct {
+	mock := &MockProduct{ctrl: ctrl}
+	mock.recorder = &MockProductMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockTemplate) EXPECT() *MockTemplateMockRecorder {
+func (m *MockProduct) EXPECT() *MockProductMockRecorder {
 	return m.recorder
 }
 
-// FindTemplateObj mocks base method.
-func (m *MockTemplate) FindTemplateObj(ts transaction.Session, id int) (template.TemplateObject, error) {
+// AddProduct mocks base method.
+func (m *MockProduct) AddProduct(ts transaction.Session, product product.ProductParams) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindTemplateObj", ts, id)
-	ret0, _ := ret[0].(template.TemplateObject)
+	ret := m.ctrl.Call(m, "AddProduct", ts, product)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindTemplateObj indicates an expected call of FindTemplateObj.
-func (mr *MockTemplateMockRecorder) FindTemplateObj(ts, id interface{}) *gomock.Call {
+// AddProduct indicates an expected call of AddProduct.
+func (mr *MockProductMockRecorder) AddProduct(ts, product interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindTemplateObj", reflect.TypeOf((*MockTemplate)(nil).FindTemplateObj), ts, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProduct", reflect.TypeOf((*MockProduct)(nil).AddProduct), ts, product)
 }
 
-// LoadAllTemplateObj mocks base method.
-func (m *MockTemplate) LoadAllTemplateObj(ts transaction.Session) ([]template.TemplateObject, error) {
+// AddProductInStock mocks base method.
+func (m *MockProduct) AddProductInStock(ts transaction.Session, p stock.ProductInStockParams) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoadAllTemplateObj", ts)
-	ret0, _ := ret[0].([]template.TemplateObject)
+	ret := m.ctrl.Call(m, "AddProductInStock", ts, p)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// LoadAllTemplateObj indicates an expected call of LoadAllTemplateObj.
-func (mr *MockTemplateMockRecorder) LoadAllTemplateObj(ts interface{}) *gomock.Call {
+// AddProductInStock indicates an expected call of AddProductInStock.
+func (mr *MockProductMockRecorder) AddProductInStock(ts, p interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadAllTemplateObj", reflect.TypeOf((*MockTemplate)(nil).LoadAllTemplateObj), ts)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProductInStock", reflect.TypeOf((*MockProduct)(nil).AddProductInStock), ts, p)
+}
+
+// AddProductPrice mocks base method.
+func (m *MockProduct) AddProductPrice(ts transaction.Session, p product.ProductPriceParams) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddProductPrice", ts, p)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddProductPrice indicates an expected call of AddProductPrice.
+func (mr *MockProductMockRecorder) AddProductPrice(ts, p interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProductPrice", reflect.TypeOf((*MockProduct)(nil).AddProductPrice), ts, p)
+}
+
+// AddProductVariantList mocks base method.
+func (m *MockProduct) AddProductVariantList(ts transaction.Session, productID int, variant product.Variant) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddProductVariantList", ts, productID, variant)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddProductVariantList indicates an expected call of AddProductVariantList.
+func (mr *MockProductMockRecorder) AddProductVariantList(ts, productID, variant interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProductVariantList", reflect.TypeOf((*MockProduct)(nil).AddProductVariantList), ts, productID, variant)
+}
+
+// CheckExists mocks base method.
+func (m *MockProduct) CheckExists(ts transaction.Session, p product.ProductPriceParams) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckExists", ts, p)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckExists indicates an expected call of CheckExists.
+func (mr *MockProductMockRecorder) CheckExists(ts, p interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckExists", reflect.TypeOf((*MockProduct)(nil).CheckExists), ts, p)
+}
+
+// CheckProductInStock mocks base method.
+func (m *MockProduct) CheckProductInStock(ts transaction.Session, p stock.ProductInStockParams) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckProductInStock", ts, p)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckProductInStock indicates an expected call of CheckProductInStock.
+func (mr *MockProductMockRecorder) CheckProductInStock(ts, p interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckProductInStock", reflect.TypeOf((*MockProduct)(nil).CheckProductInStock), ts, p)
+}
+
+// FindCurrentPrice mocks base method.
+func (m *MockProduct) FindCurrentPrice(ts transaction.Session, variantID int) (float64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindCurrentPrice", ts, variantID)
+	ret0, _ := ret[0].(float64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindCurrentPrice indicates an expected call of FindCurrentPrice.
+func (mr *MockProductMockRecorder) FindCurrentPrice(ts, variantID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindCurrentPrice", reflect.TypeOf((*MockProduct)(nil).FindCurrentPrice), ts, variantID)
+}
+
+// FindPrice mocks base method.
+func (m *MockProduct) FindPrice(ts transaction.Session, variantID int) (float64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindPrice", ts, variantID)
+	ret0, _ := ret[0].(float64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindPrice indicates an expected call of FindPrice.
+func (mr *MockProductMockRecorder) FindPrice(ts, variantID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindPrice", reflect.TypeOf((*MockProduct)(nil).FindPrice), ts, variantID)
+}
+
+// FindProductListByTag mocks base method.
+func (m *MockProduct) FindProductListByTag(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindProductListByTag", ts, tag, limit)
+	ret0, _ := ret[0].([]product.ProductInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindProductListByTag indicates an expected call of FindProductListByTag.
+func (mr *MockProductMockRecorder) FindProductListByTag(ts, tag, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProductListByTag", reflect.TypeOf((*MockProduct)(nil).FindProductListByTag), ts, tag, limit)
+}
+
+// FindProductVariantList mocks base method.
+func (m *MockProduct) FindProductVariantList(ts transaction.Session, productID int) ([]product.Variant, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindProductVariantList", ts, productID)
+	ret0, _ := ret[0].([]product.Variant)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindProductVariantList indicates an expected call of FindProductVariantList.
+func (mr *MockProductMockRecorder) FindProductVariantList(ts, productID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProductVariantList", reflect.TypeOf((*MockProduct)(nil).FindProductVariantList), ts, productID)
+}
+
+// FindSaleListByFilters mocks base method.
+func (m *MockProduct) FindSaleListByFilters(ts transaction.Session, sq product.SaleQueryParam) ([]product.Sale, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindSaleListByFilters", ts, sq)
+	ret0, _ := ret[0].([]product.Sale)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindSaleListByFilters indicates an expected call of FindSaleListByFilters.
+func (mr *MockProductMockRecorder) FindSaleListByFilters(ts, sq interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSaleListByFilters", reflect.TypeOf((*MockProduct)(nil).FindSaleListByFilters), ts, sq)
+}
+
+// FindSaleListOnlyBySoldDate mocks base method.
+func (m *MockProduct) FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDateParam) ([]product.Sale, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindSaleListOnlyBySoldDate", ts, sq)
+	ret0, _ := ret[0].([]product.Sale)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindSaleListOnlyBySoldDate indicates an expected call of FindSaleListOnlyBySoldDate.
+func (mr *MockProductMockRecorder) FindSaleListOnlyBySoldDate(ts, sq interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSaleListOnlyBySoldDate", reflect.TypeOf((*MockProduct)(nil).FindSaleListOnlyBySoldDate), ts, sq)
+}
+
+// FindStockListByProductId mocks base method.
+func (m *MockProduct) FindStockListByProductId(ts transaction.Session, productID int) ([]stock.Stock, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindStockListByProductId", ts, productID)
+	ret0, _ := ret[0].([]stock.Stock)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindStockListByProductId indicates an expected call of FindStockListByProductId.
+func (mr *MockProductMockRecorder) FindStockListByProductId(ts, productID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindStockListByProductId", reflect.TypeOf((*MockProduct)(nil).FindStockListByProductId), ts, productID)
+}
+
+// FindStocksVariantList mocks base method.
+func (m *MockProduct) FindStocksVariantList(ts transaction.Session, storageID int) ([]stock.ProductInStockParams, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindStocksVariantList", ts, storageID)
+	ret0, _ := ret[0].([]stock.ProductInStockParams)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindStocksVariantList indicates an expected call of FindStocksVariantList.
+func (mr *MockProductMockRecorder) FindStocksVariantList(ts, storageID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindStocksVariantList", reflect.TypeOf((*MockProduct)(nil).FindStocksVariantList), ts, storageID)
+}
+
+// InStorages mocks base method.
+func (m *MockProduct) InStorages(ts transaction.Session, variantID int) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InStorages", ts, variantID)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InStorages indicates an expected call of InStorages.
+func (mr *MockProductMockRecorder) InStorages(ts, variantID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InStorages", reflect.TypeOf((*MockProduct)(nil).InStorages), ts, variantID)
+}
+
+// LoadProductInfo mocks base method.
+func (m *MockProduct) LoadProductInfo(ts transaction.Session, productID int) (product.ProductInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadProductInfo", ts, productID)
+	ret0, _ := ret[0].(product.ProductInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadProductInfo indicates an expected call of LoadProductInfo.
+func (mr *MockProductMockRecorder) LoadProductInfo(ts, productID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadProductInfo", reflect.TypeOf((*MockProduct)(nil).LoadProductInfo), ts, productID)
+}
+
+// LoadProductList mocks base method.
+func (m *MockProduct) LoadProductList(ts transaction.Session, limit int) ([]product.ProductInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadProductList", ts, limit)
+	ret0, _ := ret[0].([]product.ProductInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadProductList indicates an expected call of LoadProductList.
+func (mr *MockProductMockRecorder) LoadProductList(ts, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadProductList", reflect.TypeOf((*MockProduct)(nil).LoadProductList), ts, limit)
+}
+
+// LoadStockList mocks base method.
+func (m *MockProduct) LoadStockList(ts transaction.Session) ([]stock.Stock, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadStockList", ts)
+	ret0, _ := ret[0].([]stock.Stock)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadStockList indicates an expected call of LoadStockList.
+func (mr *MockProductMockRecorder) LoadStockList(ts interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadStockList", reflect.TypeOf((*MockProduct)(nil).LoadStockList), ts)
+}
+
+// SaveSale mocks base method.
+func (m *MockProduct) SaveSale(ts transaction.Session, s product.SaleParams) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveSale", ts, s)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SaveSale indicates an expected call of SaveSale.
+func (mr *MockProductMockRecorder) SaveSale(ts, s interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSale", reflect.TypeOf((*MockProduct)(nil).SaveSale), ts, s)
+}
+
+// UpdateProductInstock mocks base method.
+func (m *MockProduct) UpdateProductInstock(ts transaction.Session, p stock.ProductInStockParams) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProductInstock", ts, p)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateProductInstock indicates an expected call of UpdateProductInstock.
+func (mr *MockProductMockRecorder) UpdateProductInstock(ts, p interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProductInstock", reflect.TypeOf((*MockProduct)(nil).UpdateProductInstock), ts, p)
+}
+
+// UpdateProductPrice mocks base method.
+func (m *MockProduct) UpdateProductPrice(ts transaction.Session, p product.ProductPriceParams, id int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProductPrice", ts, p, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateProductPrice indicates an expected call of UpdateProductPrice.
+func (mr *MockProductMockRecorder) UpdateProductPrice(ts, p, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProductPrice", reflect.TypeOf((*MockProduct)(nil).UpdateProductPrice), ts, p, id)
 }

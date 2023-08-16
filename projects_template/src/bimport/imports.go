@@ -1,6 +1,6 @@
 package bimport
 
-import "projects_template/tools/datefunctions"
+import "product_storage/tools/datefunctions"
 
 type BridgeImports struct {
 	Bridge Bridge

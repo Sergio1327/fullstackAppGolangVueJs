@@ -2,7 +2,7 @@ package compare_test
 
 import (
 	"fmt"
-	"projects_template/tools/compare"
+	"product_storage/tools/compare"
 	"testing"
 
 	"github.com/stretchr/testify/require"

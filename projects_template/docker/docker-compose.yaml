@@ -2,17 +2,17 @@ version: "3.9"
 
 services:
   db:
-    image: postgres:14.5-alpine
+    image: postgres:15.3
     environment:
-      POSTGRES_USER: project_template
-      POSTGRES_PASSWORD: project_template
-      POSTGRES_DB: project_template
+      POSTGRES_USER: test_db
+      POSTGRES_PASSWORD: test_db
+      POSTGRES_DB: test_db
       PGDATA: /data
       TZ: 'GMT+5'
     volumes:
        - ./volumes/pg/data:/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U project_template"]
+      test: ["CMD-SHELL", "pg_isready -U test_db"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -24,30 +24,27 @@ services:
         condition: service_healthy
     image: migrate/migrate
     volumes:
-        - ./volumes/migrate:/migrations
-    command: ["-path", "/migrations", "-database",  "postgres://project_template:project_template@db:5432/project_template?sslmode=disable", "up", "1"]
-  cache:
-    image: redis:latest
-    command: redis-server --save 20 1 --loglevel warning 
-    ports:
-      - "6379:6379"
-    volumes: 
-      - ./volumes/redis:/data
-  cron:
-    image: project_template:${VERSION}
+        - ./migrate:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://test_db:test_db@db:5432/test_db?sslmode=disable", "up"]
+  web:
+    image: ${NAME}:${VERSION}
     build: 
       context: ..
       dockerfile: ./docker/Dockerfile
       args:
         VERSION: ${VERSION}
-        NAME: project_template
-    command: /app/project_template
+        NAME: ${NAME}
     environment:
-      TZ: 'Asia/Tashkent'
       DEBUG: 'true'
+      SERVER_IP_PORT: 127.0.0.1:9000
+      PG_URL: postgresql://test_db:test_db@db:5432/test_db?sslmode=disable
       VERSION: ${VERSION}
-    volumes: 
-      - ./volumes/log:/app/log
-      - ../src/config/conf.yaml:/app/conf.yaml
-      - ../src/config/oracle_connect:/app/oracle_connect
+      CONF_PATH: ""
+    volumes:
+      - ./volumes/web/log:/app/log
+    depends_on:
+      db:
+        condition: service_healthy
     stop_grace_period: 2s
+    ports:
+      - "9000:9000"

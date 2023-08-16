@@ -1,7 +1,7 @@
 package log
 
 import (
-	"projects_template/tools/sqlnull"
+	"product_storage/tools/sqlnull"
 	"time"
 )
 

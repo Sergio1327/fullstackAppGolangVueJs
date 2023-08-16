@@ -1,7 +1,7 @@
 package bimport
 
 import (
-	"projects_template/internal/bridge"
+	"product_storage/internal/bridge"
 
 	"github.com/golang/mock/gomock"
 )

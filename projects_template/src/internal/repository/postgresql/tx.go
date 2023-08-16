@@ -1,7 +1,7 @@
 package postgresql
 
 import (
-	"projects_template/internal/transaction"
+	"product_storage/internal/transaction"
 
 	"github.com/jmoiron/sqlx"
 )

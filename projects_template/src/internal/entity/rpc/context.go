@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"mime/multipart"
-	"projects_template/internal/entity/global"
+	"product_storage/internal/entity/global"
 	"strings"
 
 	"github.com/gin-gonic/gin"

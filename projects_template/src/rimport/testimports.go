@@ -3,9 +3,9 @@ package rimport
 import (
 	"log"
 	"os"
-	"projects_template/config"
-	"projects_template/internal/repository"
-	"projects_template/internal/transaction"
+	"product_storage/config"
+	"product_storage/internal/repository"
+	"product_storage/internal/transaction"
 
 	"github.com/golang/mock/gomock"
 )
@@ -30,8 +30,8 @@ func NewTestRepositoryImports(
 		Config:         config,
 		SessionManager: transaction.NewMockSessionManager(ctrl),
 		MockRepository: MockRepository{
-			Logger:   repository.NewMockLogger(ctrl),
-			Template: repository.NewMockTemplate(ctrl),
+			Logger:  repository.NewMockLogger(ctrl),
+			Product: repository.NewMockProduct(ctrl),
 		},
 	}
 }
@@ -58,8 +58,8 @@ func (t *TestRepositoryImports) RepositoryImports() RepositoryImports {
 		SessionManager: t.SessionManager,
 		Config:         t.Config,
 		Repository: Repository{
-			Logger:   t.MockRepository.Logger,
-			Template: t.MockRepository.Template,
+			Logger:  t.MockRepository.Logger,
+			Product: t.MockRepository.Product,
 		},
 	}
 }

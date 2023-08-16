@@ -1,13 +1,13 @@
 package rimport
 
-import "projects_template/internal/repository"
+import "product_storage/internal/repository"
 
 type Repository struct {
-	Logger   repository.Logger
-	Template repository.Template
+	Logger  repository.Logger
+	Product repository.Product
 }
 
 type MockRepository struct {
-	Logger   *repository.MockLogger
-	Template *repository.MockTemplate
+	Logger  *repository.MockLogger
+	Product *repository.MockProduct
 }

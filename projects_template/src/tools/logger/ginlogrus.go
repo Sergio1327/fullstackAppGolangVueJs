@@ -3,8 +3,8 @@ package logger
 import (
 	"fmt"
 	"os"
-	"projects_template/internal/entity/global"
-	"projects_template/internal/entity/rpc"
+	"product_storage/internal/entity/global"
+	"product_storage/internal/entity/rpc"
 	"time"
 
 	"io"

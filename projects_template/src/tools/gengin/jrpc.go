@@ -2,10 +2,10 @@ package gengin
 
 import (
 	"fmt"
-	"projects_template/internal/entity/global"
-	"projects_template/internal/entity/rpc"
-	"projects_template/internal/transaction"
-	"projects_template/tools/logger"
+	"product_storage/internal/entity/global"
+	"product_storage/internal/entity/rpc"
+	"product_storage/internal/transaction"
+	"product_storage/tools/logger"
 
 	"github.com/sirupsen/logrus"
 )

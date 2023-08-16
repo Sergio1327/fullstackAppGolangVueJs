@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 	"path"
-	"projects_template/internal/usecase"
-	"projects_template/rimport"
+	"product_storage/internal/usecase"
+	"product_storage/rimport"
 	"runtime"
 	"strings"
 

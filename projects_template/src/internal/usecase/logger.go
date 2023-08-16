@@ -1,36 +1,34 @@
 package usecase
 
 import (
-	"projects_template/internal/entity/log"
-	"projects_template/rimport"
-	"projects_template/tools/sqlnull"
-
 	"github.com/sirupsen/logrus"
+	"product_storage/internal/entity/log"
+	"product_storage/rimport"
 )
 
-type LoggerUsecase struct {
+type Logger struct {
 	log *logrus.Logger
 	ri  rimport.RepositoryImports
 }
 
 func NewLogger(log *logrus.Logger,
 	ri rimport.RepositoryImports,
-) *LoggerUsecase {
-	return &LoggerUsecase{
+) *Logger {
+	return &Logger{
 		log: log,
 		ri:  ri,
 	}
 }
 
-func (u *LoggerUsecase) logPrefix() string {
+func (u *Logger) logPrefix() string {
 	return "[logger_usecase]"
 }
 
-func (u *LoggerUsecase) SpecialFields() []string {
-	return []string{"c_id", "se_id", "oper_login"}
+func (u *Logger) SpecialFields() []string {
+	return []string{"product_id", "variant_id", "stock_id"}
 }
 
-func (u *LoggerUsecase) SaveLog(row log.Row) error {
+func (u *Logger) SaveLog(row log.Row) error {
 	ts := u.ri.SessionManager.CreateSession()
 	if err := ts.Start(); err != nil {
 		u.log.Errorln(u.logPrefix(), "не удается стартовать транзакцию", err)
@@ -38,32 +36,8 @@ func (u *LoggerUsecase) SaveLog(row log.Row) error {
 	}
 	defer ts.Rollback()
 
-	var (
-		contractID sqlnull.NullInt64
-		seID       sqlnull.NullInt64
-		operLogin  sqlnull.NullString
-	)
-
-	if data, exists := row.SpecialFields["c_id"]; exists {
-		if data.Type == "int" {
-			contractID.Scan(data.Value)
-		}
-	}
-
-	if data, exists := row.SpecialFields["se_id"]; exists {
-		if data.Type == "int" {
-			seID.Scan(data.Value)
-		}
-	}
-
-	if data, exists := row.SpecialFields["oper_login"]; exists {
-		if data.Type == "string" {
-			operLogin.Scan(data.Value)
-		}
-	}
-
 	if row.Details != nil && len(row.Details) > 0 {
-		logID, err := u.ri.Repository.Logger.SaveLogWithReturnID(ts, row, contractID, seID, operLogin)
+		logID, err := u.ri.Repository.Logger.SaveLogWithReturnID(ts, row)
 		if err != nil {
 			u.log.Errorln(u.logPrefix(), "не удается сохранить данные в лог", err)
 			return err
@@ -75,7 +49,7 @@ func (u *LoggerUsecase) SaveLog(row log.Row) error {
 		}
 
 	} else {
-		if err := u.ri.Repository.Logger.SaveLog(ts, row, contractID, seID, operLogin); err != nil {
+		if err := u.ri.Repository.Logger.SaveLog(ts, row); err != nil {
 			u.log.Errorln(u.logPrefix(), "не удается сохранить данные в детали лога", err)
 			return err
 		}

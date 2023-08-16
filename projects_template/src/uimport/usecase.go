@@ -1,8 +1,10 @@
 package uimport
 
-import "projects_template/internal/usecase"
+import (
+	"product_storage/internal/usecase"
+)
 
 type Usecase struct {
-	Logger   *usecase.LoggerUsecase
-	Template *usecase.TemplateUsecase
+	Logger  *usecase.Logger
+	Product *usecase.ProductUseCase
 }

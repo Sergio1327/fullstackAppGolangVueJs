@@ -1,6 +1,6 @@
 package bimport
 
-import "projects_template/internal/bridge"
+import "product_storage/internal/bridge"
 
 type Bridge struct {
 	Date bridge.Date

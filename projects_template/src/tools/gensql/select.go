@@ -3,7 +3,7 @@ package gensql
 import (
 	"database/sql"
 	"math"
-	"projects_template/internal/entity/global"
+	"product_storage/internal/entity/global"
 
 	"github.com/jmoiron/sqlx"
 )
