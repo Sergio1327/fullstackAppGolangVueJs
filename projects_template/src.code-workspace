@@ -11,6 +11,10 @@
 		},
 		{
 			"path": "frontend"
+		},
+		{
+			"name": "projects_template",
+			"path": "."
 		}
 	]
 }
