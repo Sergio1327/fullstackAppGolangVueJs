@@ -26,7 +26,6 @@ coverage
 .grunt
 
 # Bower dependency directory (https://bower.io/)
-bower_components
 
 # node-waf configuration
 .lock-wscript
@@ -72,7 +71,6 @@ typings/
 dist
 
 # vuepress build output
-.vuepress/dist
 
 # Serverless directories
 .serverless

@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "../old"
+		},
+		{
+			"path": "frontend"
 		}
 	]
 }
