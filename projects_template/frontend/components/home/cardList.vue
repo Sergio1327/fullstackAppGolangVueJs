@@ -18,19 +18,22 @@ export default {
                     id: 1,
                     title: "Продукты",
                     descr: "описание страницы продуктов",
-                    imgLink: "@assets/productList.jpg"
+                    imgLink: require("@/assets/productList.jpg"),
+                    link: "/productList"
                 },
                 {
                     id: 2,
                     title: "Склады",
                     descr: "описание страницы складов",
-                    imgLink: "@assets/stockList.jpg"
+                    imgLink: require("@/assets/stockList.jpg"),
+                    link: "/stockList"
                 },
                 {
                     id: 3,
                     title: "Продажи",
                     descr: "описание страницы продаж",
-                    imgLink: "@assets/saleList.png"
+                    imgLink: require("@/assets/saleList.png"),
+                    link: "/saleList"
                 }
             ]
         }
