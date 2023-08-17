@@ -2,26 +2,23 @@ package response
 
 import "github.com/gin-gonic/gin"
 
-type Response struct {
-	Success bool        // успешно ли выполнилась операция
-	Error   string      //	текст ошибки
-	Data    interface{} //	данные которые нужно вывести
+type ErrResponse struct {
+	Error string // текст ошибки
+}
+type SuccessResponse struct {
+	Data interface{}
 }
 
 // NewErrorResponse возвращает статус и ошибку
-func NewErrorResponse(err error) Response {
-	return Response{
-		Success: false,
-		Error:   err.Error(),
-		Data:    nil,
+func NewErrorResponse(err error) ErrResponse {
+	return ErrResponse{
+		Error: err.Error(),
 	}
 }
 
 // NewSuccessResponse возвращает статус и данные
-func NewSuccessResponse(data interface{}, idType string) Response {
-	return Response{
-		Success: true,
-		Error:   "null",
+func NewSuccessResponse(data interface{}, idType string) SuccessResponse {
+	return SuccessResponse{
 		Data: gin.H{
 			idType: data,
 		},

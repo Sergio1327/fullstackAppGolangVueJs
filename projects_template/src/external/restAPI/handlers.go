@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"log"
 	"net/http"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
@@ -227,8 +228,14 @@ func (e *GinServer) FindSaleList(c *gin.Context) {
 	var saleQuery product.SaleQueryParam
 
 	if err := c.ShouldBindJSON(&saleQuery); err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))
 		return
+	}
+	log.Println(saleQuery)
+	
+	if saleQuery.ProductName.String == "" {
+		saleQuery.ProductName.Valid = false
 	}
 
 	saleList, err := e.Usecase.Product.FindSaleList(ts, saleQuery)

@@ -20,15 +20,12 @@
   
 <style>
 .footer {
-  position: absolute;
-  width: 100%;
+  margin-top: 210px;
   bottom: 0;
   left: 0;
   padding: 20px 0;
-  /* Добавьте небольшой отступ сверху и снизу */
   background-color: rgb(255, 188, 63);
   color: white;
-  /* Цвет текста */
 }
 
 .name {

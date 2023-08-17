@@ -25,6 +25,20 @@ func NewGinServer(log, dblog *logrus.Logger, U uimport.UsecaseImports) *GinServe
 func (e *GinServer) Run() {
 	e.server = gin.Default()
 
+	e.server.Use(func(c *gin.Context) {
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // Замените * на список разрешенных доменов, если это необходимо
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(204)
+            return
+        }
+
+        c.Next()
+    })
+
 	e.server.POST("/product/add", e.addProduct)
 	e.server.POST("/product/price", e.addProductPrice)
 	e.server.POST("/product/add/stock", e.addProductInStock)
@@ -33,6 +47,7 @@ func (e *GinServer) Run() {
 	e.server.GET("/stock", e.findProductListInStock)
 	e.server.POST("/buy", e.SaveSale)
 	e.server.POST("/sales", e.FindSaleList)
+
 
 	e.server.Run(":9000")
 }

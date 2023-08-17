@@ -1,11 +1,11 @@
 <template>
   <section>
-    <cardListVue></cardListVue>
+    <cardListVue class="card_list"></cardListVue>
   </section>
 </template>
 
 <script>
-import cardListVue from '~/components/home/cardList.vue'
+import cardListVue from '~/components/cardList.vue'
 
 
 export default {
@@ -15,3 +15,8 @@ export default {
   },
 }
 </script>
+
+
+<style>
+
+</style>
