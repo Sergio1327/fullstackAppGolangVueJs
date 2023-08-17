@@ -8,7 +8,7 @@
         <div>ID склада : <strong> {{ data.storage_id }}</strong></div>
         <div>Продано в : <strong> {{ data.SoldAt }}</strong></div>
         <div>Кол-во : <strong> {{ data.quantity }}</strong></div>
-        <div>Общая цена : <strong> {{ data.TotalPrice }}</strong></div>
+        <div>Общая цена : <strong> {{ data.TotalPrice }}$</strong></div>
       </div>
       <div class="image is-128x128">
         <img src="@/assets/saleList.png" class="is-img" alt="">
