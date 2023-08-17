@@ -3,8 +3,10 @@
     <div class="container">
       <div class="content has-text-centered">
         <p>
-          <strong>Created</strong> by <a class="name has-text-white" href="https://github.com/Sergio1327">SergioAnGo</a>.
-          The website content owner is <a class="name has-text-white" href="https://github.com/Sergio1327">SergioAnGo</a>.
+          <strong>Created</strong> <span class="has-text-dark">by </span><a class="name has-text-white"
+            href="https://github.com/Sergio1327">SergioAnGo</a>.
+          <span class="has-text-dark">The website content owner is</span> <a class="name has-text-white"
+            href="https://github.com/Sergio1327">SergioAnGo</a>.
         </p>
         <p>
           <a class="icon" href="https://github.com/Sergio1327">
@@ -30,6 +32,10 @@
 }
 
 .name {
+  font-weight: 600;
+}
+
+.content>p span {
   font-weight: 600;
 }
 </style>
