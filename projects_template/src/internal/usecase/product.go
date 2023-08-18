@@ -472,3 +472,26 @@ func (u *ProductUseCase) LoadStockList(ts transaction.Session) (stockList []stoc
 	u.log.WithFields(lf).Info("успешно получен список складов")
 	return stockList, nil
 }
+
+func (u *ProductUseCase) AddStock(ts transaction.Session, storage stock.StockParams) (stockID int, err error) {
+	lf := storage.Log()
+
+	if storage.StorageName == "" {
+		err = errors.New("название склада не может быть пустым")
+		return
+	}
+
+	storage.Added_at.Scan(time.Now())
+
+	stockID, err = u.Repository.Product.AddStock(ts, storage)
+	if err != nil {
+		u.log.WithFields(lf).Error("не удалось добавить склад ", err)
+		err = global.ErrInternalError
+		return
+	}
+
+	lf["stockID"] = stockID
+
+	u.log.WithFields(lf).Info("склад успешно добавлен")
+	return stockID, err
+}

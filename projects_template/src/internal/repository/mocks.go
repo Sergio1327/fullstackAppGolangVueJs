@@ -162,6 +162,21 @@ func (mr *MockProductMockRecorder) AddProductVariantList(ts, productID, variant 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddProductVariantList", reflect.TypeOf((*MockProduct)(nil).AddProductVariantList), ts, productID, variant)
 }
 
+// AddStock mocks base method.
+func (m *MockProduct) AddStock(ts transaction.Session, storage stock.StockParams) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddStock", ts, storage)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddStock indicates an expected call of AddStock.
+func (mr *MockProductMockRecorder) AddStock(ts, storage interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddStock", reflect.TypeOf((*MockProduct)(nil).AddStock), ts, storage)
+}
+
 // CheckExists mocks base method.
 func (m *MockProduct) CheckExists(ts transaction.Session, p product.ProductPriceParams) (int, error) {
 	m.ctrl.T.Helper()

@@ -1,6 +1,11 @@
 package response
 
-import "github.com/gin-gonic/gin"
+import (
+	"product_storage/internal/entity/global"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+)
 
 type ErrResponse struct {
 	Error string // текст ошибки
@@ -11,8 +16,11 @@ type SuccessResponse struct {
 
 // NewErrorResponse возвращает статус и ошибку
 func NewErrorResponse(err error) ErrResponse {
+	log := logrus.New()
+	log.Error(err)
+
 	return ErrResponse{
-		Error: err.Error(),
+		Error: global.ErrInternalError.Error(),
 	}
 }
 

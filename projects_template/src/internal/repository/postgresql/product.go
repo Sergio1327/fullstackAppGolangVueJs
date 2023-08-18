@@ -262,3 +262,14 @@ func (r *productRepository) FindSaleListByFilters(ts transaction.Session, saleFi
 
 	return gensql.SelectNamed[product.Sale](SqlxTx(ts), query, params)
 }
+
+func (r productRepository) AddStock(ts transaction.Session, storage stock.StockParams) (stockID int, err error) {
+	query := `
+	insert into storages
+	(name, added_at)
+	values ($1, $2)
+	returning storage_id
+	`
+	err = SqlxTx(ts).QueryRow(query, storage.StorageName, storage.Added_at).Scan(&stockID)
+	return stockID, err
+}

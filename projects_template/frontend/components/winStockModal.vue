@@ -5,7 +5,7 @@
             <div class="field">
                 <label class="label">Название склада</label>
                 <div class="control">
-                    <input v-model="formData.stockName" class="input" type="text">
+                    <input v-model="formData.stockName" class="input" type="text" required>
                 </div>
             </div>
 
@@ -32,7 +32,7 @@ export default {
         async submitModalData() {
 
             const requestData = {
-                StorageName: this.formData.stockName
+                storage_name: this.formData.stockName
             }
 
             try {
@@ -45,7 +45,8 @@ export default {
                 })
 
                 const responseData = await response.json()
-                this.resp = "склад успешно добавлена, ID склада - " + responseData.Data.StorageID
+                console.log(responseData)
+                this.resp = "склад успешно добавлена, ID склада - " + responseData.Data.stockID
 
             } catch (error) {
                 console.error("Ошибка при отправке запроса:", error);

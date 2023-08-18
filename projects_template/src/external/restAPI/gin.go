@@ -48,6 +48,7 @@ func (e *GinServer) Run() {
 	e.server.POST("/buy", e.SaveSale)
 	e.server.POST("/sales", e.FindSaleList)
 	e.server.GET("/stock_list", e.LoadStockList)
+	e.server.POST("/stock/add",e.AddStock)
 
 	e.server.Run(":9000")
 }

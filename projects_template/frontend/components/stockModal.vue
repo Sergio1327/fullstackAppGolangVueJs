@@ -1,6 +1,6 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-flex-end">
-        <button class="btn" @click="openModal" value="" type="submit">Добавить склад</button>
+        <button class="btn mb-5" @click="openModal" value="" type="submit">Добавить склад</button>
         <stockModalWinVue v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
     </div>
 </template>

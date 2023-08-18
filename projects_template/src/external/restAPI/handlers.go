@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // addProduct добавление товара
@@ -264,5 +265,42 @@ func (e *GinServer) LoadStockList(c *gin.Context) {
 		return
 	}
 
+	if err := ts.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
+		return
+	}
+
 	c.JSON(http.StatusOK, response.NewSuccessResponse(stockList, "stock_list"))
+}
+
+func (e *GinServer) AddStock(c *gin.Context) {
+	ts := e.SessionManager.CreateSession()
+	err := ts.Start()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
+		return
+	}
+	defer ts.Rollback()
+
+	var stockParams stock.StockParams
+	lg:=logrus.New()
+	if err := c.ShouldBindJSON(&stockParams); err != nil {
+		lg.Error(err)
+		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))
+		return
+	}
+
+	stockID, err := e.Usecase.Product.AddStock(ts, stockParams)
+	if err != nil {
+		lg.Error(err)
+		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
+		return
+	}
+
+	if err := ts.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.NewSuccessResponse(stockID, "stockID"))
 }

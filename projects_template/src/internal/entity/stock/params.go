@@ -2,6 +2,7 @@ package stock
 
 import (
 	"errors"
+	"product_storage/tools/sqlnull"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -32,4 +33,18 @@ func (p ProductInStockParams) IsNullFields() error {
 		return errors.New("поля: variant_id, storage_id, added_at, quantity не должны быть пустыми")
 	}
 	return nil
+}
+
+type StockParams struct {
+	StorageID   int              `db:"storage_id" json:"storage_id"`
+	StorageName string           `db:"name" json:"storage_name"`
+	Added_at    sqlnull.NullTime `db:"added_at" json:"added_at"`
+}
+
+func (s StockParams) Log() logrus.Fields {
+	return logrus.Fields{
+		"Storage_ID":  s.StorageID,
+		"StorageName": s.StorageName,
+		"Added_at":    s.Added_at,
+	}
 }
