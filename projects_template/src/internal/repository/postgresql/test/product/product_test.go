@@ -170,7 +170,7 @@ func TestAddProductPrice(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(priceID)
 
-	var productPrice product.ProductPriceParams 
+	var productPrice product.ProductPriceParams
 	err = postgresql.SqlxTx(ts).Get(&productPrice,
 		`select variant_id, price
 		 from product_prices
@@ -626,4 +626,21 @@ func TestFindSaleListByFilters(t *testing.T) {
 
 	r.NoError(err)
 	r.NotEmpty(data3)
+}
+
+func TestLoadStockList(t *testing.T) {
+	r := require.New(t)
+
+	db := pgdb.SqlxDB("dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable")
+	defer db.Close()
+	sm := transaction.NewSQLSessionManager(db)
+	repo := rimport.NewRepositoryImports(sm)
+
+	ts := sm.CreateSession()
+	ts.Start()
+	defer ts.Rollback()
+
+	stockList, err := repo.Repository.Product.LoadStockList(ts)
+	r.NoError(err)
+	r.NotEmpty(stockList)
 }
