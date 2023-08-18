@@ -1,15 +1,21 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-flex-end">
-        <button class="btn" @click="openModal" value="" type="submit">Добавить продажу</button>
-        <SaleModal v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
+        <button class="btn" @click="openModal" value="" type="submit">Добавить склад</button>
+        <stockModalWinVue v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
     </div>
 </template>
 
 <script>
-import SaleModal from './SaleModal.vue';
+import stockModalWinVue from './winStockModal.vue';
 export default {
+
     components: {
-        SaleModal
+        stockModalWinVue
+    },
+    data() {
+        return {
+            modalVisible: false,
+        }
     },
     methods: {
         openModal() {
@@ -23,16 +29,12 @@ export default {
             this.modalVisible = false;
         },
     },
-    data() {
-        return {
-            modalVisible: false,
-        }
-    }
+
 }
 </script>
 
 <style>
-.btn{
+.btn {
     padding: 14px 28px;
     background-color: rgb(255, 190, 70) !important;
     border-radius: 5px;

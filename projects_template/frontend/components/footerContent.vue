@@ -20,7 +20,7 @@
   
 <style>
 .footer {
-  margin-top: 210px;
+  margin-top: 250px;
   bottom: 0;
   left: 0;
   padding: 20px 0;

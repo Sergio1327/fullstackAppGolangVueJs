@@ -22,6 +22,7 @@ export default {
 
 <template>
     <div>
+        <h1 class="label is-text-center mb-5">Продажи</h1>
         <btnModal />
         <formVue @data="handleData" />
         <saleList :saleList="saleListData" />
