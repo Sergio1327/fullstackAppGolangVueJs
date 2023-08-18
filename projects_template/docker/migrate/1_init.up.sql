@@ -36,7 +36,7 @@ create table storages(
 CREATE TABLE products_in_storage (
     pis_id serial primary key,
     variant_id int references product_variants(variant_id),
-    storage_id int references storages(storage_id),
+    storage_id int references storages(storage_id) ON DELETE CASCADE,
     added_at timestamptz not null default now(),
     removed_at timestamptz,
     quantity int not null
@@ -45,7 +45,7 @@ CREATE TABLE products_in_storage (
 create table sales (
     sales_id serial primary key,
     variant_id int references product_variants(variant_id),
-    storage_id int references storages(storage_id),
+    storage_id int references storages(storage_id) ON DELETE CASCADE,
     sold_at timestamptz not null default now(),
     quantity int,
     total_price decimal(10, 2) not null

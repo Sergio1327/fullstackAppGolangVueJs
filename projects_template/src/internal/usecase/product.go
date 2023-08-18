@@ -2,13 +2,15 @@ package usecase
 
 import (
 	"errors"
-	"github.com/sirupsen/logrus"
+	"fmt"
 	"product_storage/internal/entity/global"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/transaction"
 	"product_storage/rimport"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type ProductUseCase struct {
@@ -501,6 +503,7 @@ func (u *ProductUseCase) DeleteStock(ts transaction.Session, storage stock.Stock
 
 	err = u.Repository.Product.DeleteStock(ts, storage)
 	if err != nil {
+		fmt.Println(1111)
 		u.log.WithFields(lf).Error("не удалось удалить склад ", err)
 		err = global.ErrInternalError
 		return

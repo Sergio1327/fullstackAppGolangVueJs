@@ -1,12 +1,12 @@
 package postgresql
 
 import (
+	"log"
 	"product_storage/internal/entity/product"
 	"product_storage/internal/entity/stock"
 	"product_storage/internal/repository"
 	"product_storage/internal/transaction"
 	"product_storage/tools/gensql"
-
 )
 
 type productRepository struct {
@@ -276,6 +276,8 @@ func (r *productRepository) AddStock(ts transaction.Session, storage stock.Stock
 }
 
 func (r *productRepository) DeleteStock(ts transaction.Session, storage stock.StockParams) error {
+	log.Println(storage)
+
 	query := `
 	delete from storages
 	where name = $1 and storage_id = $2

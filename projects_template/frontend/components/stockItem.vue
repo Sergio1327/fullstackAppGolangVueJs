@@ -6,7 +6,7 @@
                     <div>ID склада : <strong> {{ stock.StorageID }}</strong></div>
                     <div>Название склада : <strong> {{ stock.StorageName }}</strong></div>
                 </div>
-                <div class="image is-32x32 mx-4">
+                <div @click="deleteStock" class="image is-32x32 mx-4">
                     <img class="is-img trash" src="@/assets/trash.png" alt="">
                 </div>
                 <div class="image is-128x128 is-flex is-align-items-center">
@@ -37,7 +37,7 @@ export default {
     methods: {
         async deleteStock() {
             const requestData = {
-                storage_id: this.stock.StorageID,
+                storage_id: parseInt(this.stock.StorageID),
                 storage_name: this.stock.StorageName
             }
             try {
@@ -59,6 +59,9 @@ export default {
                 } else {
                     this.msg = response
                 }
+
+                const responseData = await response.json()
+                console.log(responseData)
             } catch (error) {
                 console.log(error)
                 this.msg = error

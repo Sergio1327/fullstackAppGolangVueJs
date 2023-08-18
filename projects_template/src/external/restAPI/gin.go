@@ -27,7 +27,7 @@ func (e *GinServer) Run() {
 
 	e.server.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // Замените * на список разрешенных доменов, если это необходимо
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 
@@ -48,7 +48,8 @@ func (e *GinServer) Run() {
 	e.server.POST("/buy", e.SaveSale)
 	e.server.POST("/sales", e.FindSaleList)
 	e.server.GET("/stock_list", e.LoadStockList)
-	e.server.POST("/stock/add",e.AddStock)
+	e.server.POST("/stock/add", e.AddStock)
+	e.server.DELETE("/stock/delete", e.DeleteStock)
 
 	e.server.Run(":9000")
 }

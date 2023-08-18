@@ -316,6 +316,12 @@ func (e *GinServer) DeleteStock(c *gin.Context) {
 		return
 	}
 
+	err = e.Usecase.Product.DeleteStock(ts, stockParams)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
+		return
+	}
+
 	if err := ts.Commit(); err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return
