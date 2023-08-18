@@ -26,18 +26,18 @@ func (e *GinServer) Run() {
 	e.server = gin.Default()
 
 	e.server.Use(func(c *gin.Context) {
-        c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // Замените * на список разрешенных доменов, если это необходимо
-        c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-        c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // Замените * на список разрешенных доменов, если это необходимо
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
 
-        c.Next()
-    })
+		c.Next()
+	})
 
 	e.server.POST("/product/add", e.addProduct)
 	e.server.POST("/product/price", e.addProductPrice)
@@ -47,7 +47,7 @@ func (e *GinServer) Run() {
 	e.server.GET("/stock", e.findProductListInStock)
 	e.server.POST("/buy", e.SaveSale)
 	e.server.POST("/sales", e.FindSaleList)
-
+	e.server.GET("/stock_list", e.LoadStockList)
 
 	e.server.Run(":9000")
 }

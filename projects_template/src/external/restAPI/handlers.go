@@ -248,3 +248,21 @@ func (e *GinServer) FindSaleList(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.NewSuccessResponse(saleList, "sale_list"))
 }
+
+func (e *GinServer) LoadStockList(c *gin.Context) {
+	ts := e.SessionManager.CreateSession()
+	err := ts.Start()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
+		return
+	}
+	defer ts.Rollback()
+
+	stockList, err := e.Usecase.Product.LoadStockList(ts)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.NewSuccessResponse(stockList, "stock_list"))
+}

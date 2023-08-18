@@ -455,3 +455,20 @@ func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq product.SaleQue
 	u.log.WithFields(lf).Info("успешно получены продажи по заданным фильтрам")
 	return saleList, err
 }
+
+func (u *ProductUseCase) LoadStockList(ts transaction.Session) (stockList []stock.Stock, err error) {
+	stockList, err = u.Repository.Product.LoadStockList(ts)
+	lf := logrus.Fields{"stockList": stockList}
+
+	switch err {
+	case nil:
+	case global.ErrNoData:
+		return stockList, nil
+	default:
+		u.log.WithFields(lf).Error("не удалось найти склады ", err)
+		return nil, global.ErrInternalError
+	}
+
+	u.log.WithFields(lf).Info("успешно получен список складов")
+	return stockList, nil
+}

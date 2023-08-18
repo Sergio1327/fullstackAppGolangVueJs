@@ -44,4 +44,5 @@ type Product interface {
 
 	FindSaleListOnlyBySoldDate(ts transaction.Session, sq product.SaleQueryOnlyBySoldDateParam) ([]product.Sale, error)
 	FindSaleListByFilters(ts transaction.Session, sq product.SaleQueryParam) ([]product.Sale, error)
+
 }
