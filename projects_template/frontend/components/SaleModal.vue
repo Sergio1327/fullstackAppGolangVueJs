@@ -3,25 +3,25 @@
         <div class="modal-background"></div>
         <div class="modal-content box">
             <div class="field">
-                <label class="label">Variant ID</label>
+                <label class="label">ID варианта продукта</label>
                 <div class="control">
                     <input v-model="formData.variant_id" class="input" type="number">
                 </div>
             </div>
             <div class="field">
-                <label class="label">Storage ID</label>
+                <label class="label">ID склада</label>
                 <div class="control">
                     <input v-model="formData.storage_id" class="input" type="number">
                 </div>
             </div>
             <div class="field">
-                <label class="label">Quantity</label>
+                <label class="label">Кол-во продуктов</label>
                 <div class="control">
                     <input v-model="formData.quantity" class="input" type="number">
                 </div>
             </div>
             <div class="label"> {{ resp }}</div>
-            <button class="button is-primary" @click="submitModalData">Создать запрос</button>
+            <button class="button is-primary" @click="submitModalData">добавить продажу</button>
             <button class="button" @click="closeModal">Закрыть</button>
         </div>
         <button class="modal-close is-large" aria-label="Закрыть" @click="closeModal"></button>
