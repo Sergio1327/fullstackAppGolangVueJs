@@ -495,3 +495,17 @@ func (u *ProductUseCase) AddStock(ts transaction.Session, storage stock.StockPar
 	u.log.WithFields(lf).Info("склад успешно добавлен")
 	return stockID, err
 }
+
+func (u *ProductUseCase) DeleteStock(ts transaction.Session, storage stock.StockParams) (err error) {
+	lf := storage.Log()
+
+	err = u.Repository.Product.DeleteStock(ts, storage)
+	if err != nil {
+		u.log.WithFields(lf).Error("не удалось удалить склад ", err)
+		err = global.ErrInternalError
+		return
+	}
+
+	u.log.WithFields(lf).Info("склад успешно удален")
+	return err
+}

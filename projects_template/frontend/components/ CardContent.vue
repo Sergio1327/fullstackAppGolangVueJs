@@ -34,7 +34,7 @@ export default {
 }
 </script>
 
-<style   >
+<style scoped   >
 .card {
     transition: 200ms linear !important;
 }

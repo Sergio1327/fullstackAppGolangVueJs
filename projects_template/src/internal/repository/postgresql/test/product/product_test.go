@@ -644,3 +644,46 @@ func TestLoadStockList(t *testing.T) {
 	r.NoError(err)
 	r.NotEmpty(stockList)
 }
+
+func TestAddStock(t *testing.T) {
+	r := require.New(t)
+
+	db := pgdb.SqlxDB("dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable")
+	defer db.Close()
+	sm := transaction.NewSQLSessionManager(db)
+	repo := rimport.NewRepositoryImports(sm)
+
+	ts := sm.CreateSession()
+	ts.Start()
+	defer ts.Rollback()
+
+	stockParams := stock.StockParams{
+		StorageName: "sasa",
+		Added_at:    sqlnull.NewNullTime(time.Now()),
+	}
+
+	stockID, err := repo.Repository.Product.AddStock(ts, stockParams)
+	r.NoError(err)
+	r.NotZero(stockID)
+}
+
+func TestDelete(t *testing.T) {
+	r := require.New(t)
+
+	db := pgdb.SqlxDB("dbname=test_db user=test_db password=test_db host=127.0.0.1 port=5432 sslmode=disable")
+	defer db.Close()
+	sm := transaction.NewSQLSessionManager(db)
+	repo := rimport.NewRepositoryImports(sm)
+
+	ts := sm.CreateSession()
+	ts.Start()
+	defer ts.Rollback()
+
+	stockParams := stock.StockParams{
+		StorageName: "sasa",
+		StorageID:   1,
+	}
+
+	err := repo.Repository.Product.DeleteStock(ts, stockParams)
+	r.NoError(err)
+}

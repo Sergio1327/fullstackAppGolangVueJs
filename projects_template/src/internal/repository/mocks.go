@@ -207,6 +207,20 @@ func (mr *MockProductMockRecorder) CheckProductInStock(ts, p interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckProductInStock", reflect.TypeOf((*MockProduct)(nil).CheckProductInStock), ts, p)
 }
 
+// DeleteStock mocks base method.
+func (m *MockProduct) DeleteStock(ts transaction.Session, storage stock.StockParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteStock", ts, storage)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteStock indicates an expected call of DeleteStock.
+func (mr *MockProductMockRecorder) DeleteStock(ts, storage interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteStock", reflect.TypeOf((*MockProduct)(nil).DeleteStock), ts, storage)
+}
+
 // FindCurrentPrice mocks base method.
 func (m *MockProduct) FindCurrentPrice(ts transaction.Session, variantID int) (float64, error) {
 	m.ctrl.T.Helper()

@@ -35,7 +35,7 @@ export default {
     },
     async mounted() {
         await this.fetchStockList();
-        setInterval(this.fetchStockList, 2000)
+        setInterval(this.fetchStockList, 5000)
     }
 } 
 </script>

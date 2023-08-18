@@ -46,4 +46,5 @@ type Product interface {
 	FindSaleListByFilters(ts transaction.Session, sq product.SaleQueryParam) ([]product.Sale, error)
 
 	AddStock(ts transaction.Session, storage stock.StockParams) (stockID int, err error)
+	DeleteStock(ts transaction.Session, storage stock.StockParams) error
 }

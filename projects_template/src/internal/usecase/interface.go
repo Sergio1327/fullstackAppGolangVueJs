@@ -17,4 +17,5 @@ type Product interface {
 	FindSaleList(ts transaction.Session, sq product.SaleQueryParam) ([]product.Sale, error)
 	LoadStockList(ts transaction.Session) ([]stock.Stock, error)
 	AddStock(ts transaction.Session, storage stock.StockParams) (stockID int, err error)
+	DeleteStock(ts transaction.Session, storage stock.StockParams) error
 }

@@ -6,6 +6,7 @@ import (
 	"product_storage/internal/repository"
 	"product_storage/internal/transaction"
 	"product_storage/tools/gensql"
+
 )
 
 type productRepository struct {
@@ -263,7 +264,7 @@ func (r *productRepository) FindSaleListByFilters(ts transaction.Session, saleFi
 	return gensql.SelectNamed[product.Sale](SqlxTx(ts), query, params)
 }
 
-func (r productRepository) AddStock(ts transaction.Session, storage stock.StockParams) (stockID int, err error) {
+func (r *productRepository) AddStock(ts transaction.Session, storage stock.StockParams) (stockID int, err error) {
 	query := `
 	insert into storages
 	(name, added_at)
@@ -272,4 +273,13 @@ func (r productRepository) AddStock(ts transaction.Session, storage stock.StockP
 	`
 	err = SqlxTx(ts).QueryRow(query, storage.StorageName, storage.Added_at).Scan(&stockID)
 	return stockID, err
+}
+
+func (r *productRepository) DeleteStock(ts transaction.Session, storage stock.StockParams) error {
+	query := `
+	delete from storages
+	where name = $1 and storage_id = $2
+	`
+	_, err := SqlxTx(ts).Exec(query, storage.StorageName, storage.StorageID)
+	return err
 }
