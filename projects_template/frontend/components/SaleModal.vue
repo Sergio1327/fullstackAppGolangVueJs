@@ -5,26 +5,27 @@
             <div class="field">
                 <label class="label">Variant ID</label>
                 <div class="control">
-                    <input class="input" type="number" v-model="formData.variant_id">
+                    <input v-model="formData.variant_id" class="input" type="number">
                 </div>
             </div>
             <div class="field">
                 <label class="label">Storage ID</label>
                 <div class="control">
-                    <input class="input" type="number" v-model="formData.storage_id">
+                    <input v-model="formData.storage_id" class="input" type="number">
                 </div>
             </div>
             <div class="field">
                 <label class="label">Quantity</label>
                 <div class="control">
-                    <input class="input" type="number" v-model="formData.quantity">
+                    <input v-model="formData.quantity" class="input" type="number">
                 </div>
             </div>
-            <button @click="submitModalData" class="button is-primary">Создать запрос</button>
-            <button @click="closeModal" class="button">Закрыть</button>
+            <div class="label"> {{ resp }}</div>
+            <button class="button is-primary" @click="submitModalData">Создать запрос</button>
+            <button class="button" @click="closeModal">Закрыть</button>
         </div>
-        <button @click="closeModal" class="modal-close is-large" aria-label="Закрыть"></button>
-        <div class="resp">{{ resp }}</div>
+        <button class="modal-close is-large" aria-label="Закрыть" @click="closeModal"></button>
+
     </div>
 </template>
 
@@ -41,12 +42,16 @@ export default {
         };
     },
     methods: {
-        async submitModalData() {
+        async submitModalData(e) {
+
+
+
             const requestData = {
                 variant_id: parseInt(this.formData.variant_id),
                 storage_id: parseInt(this.formData.storage_id),
                 quantity: parseInt(this.formData.quantity)
             }
+
             try {
                 const response = await fetch("http://127.0.0.1:9000/buy", {
                     method: "POST",
@@ -55,18 +60,17 @@ export default {
                     },
                     body: JSON.stringify(requestData),
                 })
+
                 const responseData = await response.json()
-                console.log(responseData)
+                this.resp = "Продажа успешно добавлена, ID продажи - " + responseData.Data.sale_id
 
             } catch (error) {
                 console.error("Ошибка при отправке запроса:", error);
                 console.log(error)
+
                 this.resp = error
             }
 
-
-
-            this.closeModal();
         },
         closeModal() {
             this.$emit('closeModal');

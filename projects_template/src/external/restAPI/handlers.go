@@ -7,6 +7,7 @@ import (
 	"product_storage/internal/entity/stock"
 	"product_storage/tools/response"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -200,6 +201,7 @@ func (e *GinServer) SaveSale(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response.NewErrorResponse(err))
 		return
 	}
+	sale.SoldAt = time.Now()
 
 	saleID, err := e.Usecase.Product.SaveSale(ts, sale)
 	if err != nil {
@@ -233,7 +235,7 @@ func (e *GinServer) FindSaleList(c *gin.Context) {
 		return
 	}
 	log.Println(saleQuery)
-	
+
 	if saleQuery.ProductName.String == "" {
 		saleQuery.ProductName.Valid = false
 	}

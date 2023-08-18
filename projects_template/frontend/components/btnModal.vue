@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <button @click="openModal" value="" type="submit">Добавить продажу</button>
+    <div class="is-flex is-align-items-center is-justify-content-flex-end">
+        <button class="btn" @click="openModal" value="" type="submit">Добавить продажу</button>
         <SaleModal v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
     </div>
 </template>
@@ -31,3 +31,11 @@ export default {
     }
 }
 </script>
+
+<style>
+.btn{
+    padding: 14px 28px;
+    background-color: rgb(255, 190, 70) !important;
+    border-radius: 5px;
+}
+</style>
