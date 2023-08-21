@@ -42,7 +42,7 @@ export default {
         };
     },
     methods: {
-        async submitModalData(e) {
+        async submitModalData() {
 
 
 
