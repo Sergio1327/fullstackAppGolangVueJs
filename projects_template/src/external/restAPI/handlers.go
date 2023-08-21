@@ -140,13 +140,14 @@ func (e *GinServer) findProductList(c *gin.Context) {
 	defer ts.Rollback()
 
 	tag := c.Query("tag")
+	productName := c.Query("name")
 	limitstr := c.Query("limit")
 	limit, err := strconv.Atoi(limitstr)
 	if err != nil {
 		limit = 3
 	}
 
-	productList, err := e.Usecase.Product.FindProductList(ts, tag, limit)
+	productList, err := e.Usecase.Product.FindProductList(ts, tag, productName, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, response.NewErrorResponse(err))
 		return

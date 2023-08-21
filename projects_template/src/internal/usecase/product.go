@@ -211,20 +211,37 @@ func (u *ProductUseCase) FindProductInfoById(ts transaction.Session, productID i
 }
 
 // FindProductList логика получения списка продуктов по тегу и лимиту
-func (u *ProductUseCase) FindProductList(ts transaction.Session, tag string, limit int) (products []product.ProductInfo, err error) {
-	lf := logrus.Fields{"tag": tag, "limit": limit}
+func (u *ProductUseCase) FindProductList(ts transaction.Session, tag, name string, limit int) (products []product.ProductInfo, err error) {
+	lf := logrus.Fields{"tag": tag, "limit": limit, "productName": name}
 	// если лимит не указан или некорректен то по умолчанию устанавливается 3
 	if limit == 0 || limit < 0 {
 		limit = 3
 	}
 
 	// если пользователь ввел тег продукта произойдет поиск продуктов по данному тегу
-	if tag != "" {
-		products, err = u.Repository.Product.FindProductListByTag(ts, tag, limit)
-		if err != nil {
-			u.log.WithFields(lf).Error("не удалось найти продукты по данному тегу", err)
-			err = global.ErrInternalError
-			return
+	if tag != "" || name != "" {
+
+		if tag != "" {
+			products, err = u.Repository.Product.FindProductListByTag(ts, tag, limit)
+			if err != nil {
+				u.log.WithFields(lf).Error("не удалось найти продукты по данному тегу", err)
+				err = global.ErrInternalError
+				return
+			}
+		} else if name != "" {
+			products, err = u.Repository.Product.FindProductListByName(ts, name, limit)
+			if err != nil {
+				u.log.WithFields(lf).Error("не удалось найти продукты по данному тегу", err)
+				err = global.ErrInternalError
+				return
+			}
+		} else {
+			products, err = u.Repository.Product.FindProductListByTagAndName(ts, tag, name, limit)
+			if err != nil {
+				u.log.WithFields(lf).Error("не удалось найти продукты по данному тегу", err)
+				err = global.ErrInternalError
+				return
+			}
 		}
 
 		// поиск вариантов продука

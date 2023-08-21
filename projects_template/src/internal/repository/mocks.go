@@ -251,6 +251,21 @@ func (mr *MockProductMockRecorder) FindPrice(ts, variantID interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindPrice", reflect.TypeOf((*MockProduct)(nil).FindPrice), ts, variantID)
 }
 
+// FindProductListByName mocks base method.
+func (m *MockProduct) FindProductListByName(ts transaction.Session, name string, limit int) ([]product.ProductInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindProductListByName", ts, name, limit)
+	ret0, _ := ret[0].([]product.ProductInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindProductListByName indicates an expected call of FindProductListByName.
+func (mr *MockProductMockRecorder) FindProductListByName(ts, name, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProductListByName", reflect.TypeOf((*MockProduct)(nil).FindProductListByName), ts, name, limit)
+}
+
 // FindProductListByTag mocks base method.
 func (m *MockProduct) FindProductListByTag(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error) {
 	m.ctrl.T.Helper()
@@ -264,6 +279,21 @@ func (m *MockProduct) FindProductListByTag(ts transaction.Session, tag string, l
 func (mr *MockProductMockRecorder) FindProductListByTag(ts, tag, limit interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProductListByTag", reflect.TypeOf((*MockProduct)(nil).FindProductListByTag), ts, tag, limit)
+}
+
+// FindProductListByTagAndName mocks base method.
+func (m *MockProduct) FindProductListByTagAndName(ts transaction.Session, tag, name string, limit int) ([]product.ProductInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindProductListByTagAndName", ts, tag, name, limit)
+	ret0, _ := ret[0].([]product.ProductInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindProductListByTagAndName indicates an expected call of FindProductListByTagAndName.
+func (mr *MockProductMockRecorder) FindProductListByTagAndName(ts, tag, name, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindProductListByTagAndName", reflect.TypeOf((*MockProduct)(nil).FindProductListByTagAndName), ts, tag, name, limit)
 }
 
 // FindProductVariantList mocks base method.

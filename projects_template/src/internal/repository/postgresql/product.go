@@ -164,6 +164,28 @@ func (r *productRepository) FindProductListByTag(ts transaction.Session, tag str
 	return gensql.Select[product.ProductInfo](SqlxTx(ts), query, tag, limit)
 }
 
+func (r *productRepository) FindProductListByName(ts transaction.Session, name string, limit int) (productList []product.ProductInfo, err error) {
+	query := `
+	select product_id, name, description
+	from products
+	where name = $1 
+	limit $2
+	`
+	return gensql.Select[product.ProductInfo](SqlxTx(ts), query, name, limit)
+}
+
+func (r *productRepository) FindProductListByTagAndName(ts transaction.Session, tag, name string, limit int) (productList []product.ProductInfo, err error) {
+	query := `
+	select product_id, name ,description
+	from products
+	where name = $1
+	and $2 = any (string_to_array(tags,','))
+	limit $3
+	`
+
+	return gensql.Select[product.ProductInfo](SqlxTx(ts), query, name, tag, limit)
+}
+
 // LoadProductList получение списка продуктов с лимитом
 func (r *productRepository) LoadProductList(ts transaction.Session, limit int) (productList []product.ProductInfo, err error) {
 	query := `

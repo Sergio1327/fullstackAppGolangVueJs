@@ -33,6 +33,8 @@ type Product interface {
 	InStorages(ts transaction.Session, variantID int) ([]int, error)
 
 	FindProductListByTag(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error)
+	FindProductListByName(ts transaction.Session, name string, limit int) ([]product.ProductInfo, error)
+	FindProductListByTagAndName(ts transaction.Session, tag, name string, limit int) ([]product.ProductInfo, error)
 	LoadProductList(ts transaction.Session, limit int) ([]product.ProductInfo, error)
 
 	LoadStockList(ts transaction.Session) ([]stock.Stock, error)
