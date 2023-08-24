@@ -1,0 +1,12 @@
+ <div>Варианты продукта :
+                    <div v-for="v in productInfo.VariantList" :key="v.variant_id">
+                        <div>ID варианта : {{ v.variant_id }}</div>
+                        <div>Объем : {{ v.weight }}</div>
+                        <div>Единица измерения : {{ v.unit }}</div>
+                        <div>Цена : {{ v.price }}</div>
+                        <div>В каких складах есть продукт :</div>
+                        <div v-for="st in v.in_storages" :key="st.StorageID">
+                            <div>Название склада : {{ st.StorageName }}</div>
+                        </div>
+                    </div>
+                </div>

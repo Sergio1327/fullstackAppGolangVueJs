@@ -221,14 +221,14 @@ func (u *ProductUseCase) FindProductList(ts transaction.Session, tag, name strin
 	// если пользователь ввел тег продукта произойдет поиск продуктов по данному тегу
 	if tag != "" || name != "" {
 
-		if tag != "" {
+		if tag != "" && name == "" {
 			products, err = u.Repository.Product.FindProductListByTag(ts, tag, limit)
 			if err != nil {
 				u.log.WithFields(lf).Error("не удалось найти продукты по данному тегу", err)
 				err = global.ErrInternalError
 				return
 			}
-		} else if name != "" {
+		} else if name != "" && tag == "" {
 			products, err = u.Repository.Product.FindProductListByName(ts, name, limit)
 			if err != nil {
 				u.log.WithFields(lf).Error("не удалось найти продукты по данному тегу", err)

@@ -30,7 +30,7 @@ type Product interface {
 	LoadProductInfo(ts transaction.Session, productID int) (product.ProductInfo, error)
 	FindProductVariantList(ts transaction.Session, productID int) ([]product.Variant, error)
 	FindCurrentPrice(ts transaction.Session, variantID int) (float64, error)
-	InStorages(ts transaction.Session, variantID int) ([]int, error)
+	InStorages(ts transaction.Session, variantID int) ([]product.VarStorage, error)
 
 	FindProductListByTag(ts transaction.Session, tag string, limit int) ([]product.ProductInfo, error)
 	FindProductListByName(ts transaction.Session, name string, limit int) ([]product.ProductInfo, error)

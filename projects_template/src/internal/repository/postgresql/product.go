@@ -144,13 +144,14 @@ func (r *productRepository) FindCurrentPrice(ts transaction.Session, variantID i
 }
 
 // InStorages нахождение id складов в которых находится продукт
-func (r *productRepository) InStorages(ts transaction.Session, varantID int) (inStorages []int, err error) {
+func (r *productRepository) InStorages(ts transaction.Session, varantID int) (inStorages []product.VarStorage, err error) {
 	query := `
-	SELECT storage_id 
-	FROM products_in_storage 
-    WHERE variant_id = $1`
+	SELECT s.storage_id, s.name
+	FROM products_in_storage pis
+	JOIN storages s ON pis.storage_id = s.storage_id
+    WHERE pis.variant_id = $1`
 
-	return gensql.Select[int](SqlxTx(ts), query, varantID)
+	return gensql.Select[product.VarStorage](SqlxTx(ts), query, varantID)
 }
 
 // FindProductListByTag  поиск информации о продукте по его тегу

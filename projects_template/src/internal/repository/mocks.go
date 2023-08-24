@@ -372,10 +372,10 @@ func (mr *MockProductMockRecorder) FindStocksVariantList(ts, storageID interface
 }
 
 // InStorages mocks base method.
-func (m *MockProduct) InStorages(ts transaction.Session, variantID int) ([]int, error) {
+func (m *MockProduct) InStorages(ts transaction.Session, variantID int) ([]product.VarStorage, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InStorages", ts, variantID)
-	ret0, _ := ret[0].([]int)
+	ret0, _ := ret[0].([]product.VarStorage)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -7,15 +7,18 @@ import (
 
 // Variant структура варианта, продукта представляем с собой информацию о продукте который нужно внести в базу
 type Variant struct {
-	ProductID    int       `json:"product_id" db:"product_id"` // id продука
-	VariantID    int       `json:"variant_id" db:"variant_id"` // id конкретного варианта продукта
-	Weight       int       `json:"weight" db:"weight"`         // масса или вес продукта
-	Unit         string    `json:"unit" db:"unit"`             // единица измерения
-	AddedAt      time.Time `json:"added_at" db:"added_at"`     // дата добавления определенного варианта
-	CurrentPrice float64   `json:"price" db:"price"`           // актуальная цена
-	InStorages   []int     `json:"in_storages"`                // список id складов в которых есть этот вариант
+	ProductID    int          `json:"product_id" db:"product_id"` // id продука
+	VariantID    int          `json:"variant_id" db:"variant_id"` // id конкретного варианта продукта
+	Weight       int          `json:"weight" db:"weight"`         // масса или вес продукта
+	Unit         string       `json:"unit" db:"unit"`             // единица измерения
+	AddedAt      time.Time    `json:"added_at" db:"added_at"`     // дата добавления определенного варианта
+	CurrentPrice float64      `json:"price" db:"price"`           // актуальная цена
+	InStorages   []VarStorage `json:"in_storages"`                // список названий складов в которых есть этот вариант
 }
-
+type VarStorage struct {
+	StorageID   int    `db:"storage_id"`
+	StorageName string `db:"name"`
+}
 
 // ProductInfo структура информации о продукте о котором нужно получить информацию
 type ProductInfo struct {
@@ -35,5 +38,3 @@ type Sale struct {
 	Quantity    int                `json:"quantity" db:"quantity"`     // кол-во проданного продукта
 	TotalPrice  float64            `db:"total_price"`                  // общая стоимость с учетом кол-ва продукта
 }
-
-
