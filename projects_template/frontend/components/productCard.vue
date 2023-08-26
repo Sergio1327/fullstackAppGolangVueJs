@@ -9,7 +9,7 @@
                     <button class="button is-link" @click="viewDetails">
                         {{ showDetails ? 'Скрыть детали' : 'Просмотр деталей' }}
                     </button>
-                    <button class="button is-link ml-4 ">Добавить цены</button>
+                    <button @click="toggleModal" class="button is-link ml-4 ">Добавить цены</button>
                     <button class="button is-link ml-4 ">Добавить продукт на склад</button>
                 </div>
                 <div class="details py-5" v-for="v in variantList" :key="v.variant_id">
@@ -27,11 +27,16 @@
                 <img src="@/assets/productList.jpg" class="is-img" alt="">
             </div>
         </div>
+        <priceModal :showPriceModal="showPriceModal" @closeModal="closeModal" />
     </div>
 </template>
     
 <script>
+import priceModal from './priceModal.vue';
 export default {
+    components: {
+        priceModal
+    },
     props: {
         productInfo: {
             type: Object,
@@ -41,7 +46,12 @@ export default {
     data() {
         return {
             variantList: [],
-            showDetails: false
+            showDetails: false,
+            showPriceModal: false,
+            variantID: 0,
+            startDate: null,
+            price: 0,
+            resp: ""
         }
     },
     methods: {
@@ -71,7 +81,17 @@ export default {
         },
         toggleDetails() {
             this.showDetails = !this.showDetails
-        }
+        },
+        toggleModal() {
+            this.showPriceModal = !this.showPriceModal
+        },
+        closeModal() {
+            this.showPriceModal = false;
+            this.productPrice = 0;
+            this.variantID = 0;
+            this.startDate = '';
+            this.resp = '';
+        },
     }
 };
 </script>
