@@ -10,7 +10,7 @@
                         {{ showDetails ? 'Скрыть детали' : 'Просмотр деталей' }}
                     </button>
                     <button @click="toggleModal" class="button is-link ml-4 ">Добавить цены</button>
-                    <button class="button is-link ml-4 ">Добавить продукт на склад</button>
+                    <button @click="stockModalToggle" class="button is-link ml-4 ">Добавить продукт на склад</button>
                 </div>
                 <div class="details py-5" v-for="v in variantList" :key="v.variant_id">
                     <div>ID варианта : {{ v.variant_id }}</div>
@@ -28,14 +28,17 @@
             </div>
         </div>
         <priceModal :showPriceModal="showPriceModal" @closeModal="closeModal" />
+        <AddInStockModal :showStockModal="showStockModal" @closeModal="closeModal" />
     </div>
 </template>
     
 <script>
 import priceModal from './priceModal.vue';
+import AddInStockModal from './AddInStockModal.vue';
 export default {
     components: {
-        priceModal
+        priceModal,
+        AddInStockModal
     },
     props: {
         productInfo: {
@@ -48,6 +51,7 @@ export default {
             variantList: [],
             showDetails: false,
             showPriceModal: false,
+            showStockModal: false,
             variantID: 0,
             startDate: null,
             price: 0,
@@ -84,6 +88,9 @@ export default {
         },
         toggleModal() {
             this.showPriceModal = !this.showPriceModal
+        },
+        stockModalToggle() {
+            this.showStockModal = !this.showStockModal
         },
         closeModal() {
             this.showPriceModal = false;
