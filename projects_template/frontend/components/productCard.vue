@@ -27,8 +27,8 @@
                 <img src="@/assets/productList.jpg" class="is-img" alt="">
             </div>
         </div>
-        <priceModal :showPriceModal="showPriceModal" @closeModal="closeModal" />
-        <AddInStockModal :showStockModal="showStockModal" @closeModal="closeModal" />
+        <priceModal :showPriceModal="showPriceModal" @closeModal="closePriceModal" />
+        <AddInStockModal :showStockModal="showStockModal" @closeModal="closeStockModal" />
     </div>
 </template>
     
@@ -92,13 +92,16 @@ export default {
         stockModalToggle() {
             this.showStockModal = !this.showStockModal
         },
-        closeModal() {
+        closePriceModal() {
             this.showPriceModal = false;
-            this.productPrice = 0;
             this.variantID = 0;
-            this.startDate = '';
             this.resp = '';
         },
+        closeStockModal(){
+            this.showStockModal = false;
+            this.variantID = 0;          
+            this.resp = '';
+        }
     }
 };
 </script>
