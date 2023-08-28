@@ -51,7 +51,6 @@ export default {
 
                 const responseData = await response.json()
                 const productData = responseData.Data.product_list
-                console.log(productData)
                 this.$emit("productData", productData)
 
             } catch (error) {

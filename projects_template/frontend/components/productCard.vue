@@ -61,7 +61,6 @@ export default {
     methods: {
         async viewDetails() {
             if (this.showDetails) {
-                // Если детали уже показаны, то просто скрываем их
                 this.variantList = [];
                 this.showDetails = false;
             } else {

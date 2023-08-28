@@ -16,7 +16,6 @@ export default {
             this.modalVisible = true;
         },
         submitModalData() {
-            // Здесь можно обновить список данных
             this.modalVisible = false;
         },
         closeModal() {
