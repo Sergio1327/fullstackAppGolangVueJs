@@ -118,7 +118,7 @@ func (u *ProductUseCase) AddProductInStock(ts transaction.Session, p stock.Produ
 	if err := p.IsNullFields(); err != nil {
 		return 0, err
 	}
-
+	p.AddedAt = time.Now()
 	// проверка есть ли уже продукт на складе
 	isExist, err := u.Repository.Product.CheckProductInStock(ts, p)
 	if err != nil {

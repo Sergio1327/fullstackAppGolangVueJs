@@ -15,13 +15,7 @@
                 </div>
             </div>
             <div class="field">
-                <label class="label">Дата добавления продукта на склад</label>
-                <div class="control">
-                    <input class="input" type="datetime-local" v-model="req.added_at">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Кол-во</label>
+                <label class="label">Колличество</label>
                 <div class="control">
                     <input class="input" type="number" v-model="req.quantity">
                 </div>

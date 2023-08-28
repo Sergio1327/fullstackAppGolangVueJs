@@ -15,6 +15,12 @@
                 </div>
             </div>
             <div class="field">
+                <label class="label">Дата окончания цены</label>
+                <div class="control">
+                    <input class="input" type="datetime-local" v-model="req.end_date">
+                </div>
+            </div>
+            <div class="field">
                 <label class="label">Цена продукта</label>
                 <div class="control">
                     <input class="input" type="number" v-model="req.price">
@@ -42,6 +48,7 @@ export default {
             req: {
                 variant_id: "",
                 start_date: null,
+                end_date: null,
                 price: ""
             },
             resp: ""
@@ -50,12 +57,23 @@ export default {
     methods: {
         async submitModalData() {
             try {
+                let requestData = {}
+                if (this.req.end_date == null) {
+                    requestData = {
+                        variant_id: parseInt(this.req.variant_id),
+                        start_date: this.formatDate(this.req.start_date),
+                        price: parseFloat(this.req.price)
+                    }
 
-                const requestData = {
-                    variant_id: parseInt(this.req.variant_id),
-                    start_date: this.formatDate(this.req.start_date),
-                    price: parseFloat(this.req.price)
+                } else {
+                    requestData = {
+                        variant_id: parseInt(this.req.variant_id),
+                        start_date: this.formatDate(this.req.start_date),
+                        end_date: this.formatDate(this.req.end_date),
+                        price: parseFloat(this.req.price)
+                    }
                 }
+
 
                 const response = await fetch("http://127.0.0.1:9000/product/price", {
                     method: "POST",
