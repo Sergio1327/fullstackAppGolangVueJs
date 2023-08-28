@@ -12,12 +12,12 @@
 
 <script>
 import HeaderNavbar from '~/components/HeaderNavbar.vue';
-import footerContent from '~/components/footerContent.vue';
+import FooterContent from '~/components/FooterContent.vue';
 export default {
   name: 'DefaultLayout',
   components: {
     HeaderNavbar,
-    footerContent
+    FooterContent
   },
   data() {
     return {

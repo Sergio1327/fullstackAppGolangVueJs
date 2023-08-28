@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import stockItem from './stockItem.vue';
+import stockItem from './StockItem.vue';
 
 export default {
     components: {

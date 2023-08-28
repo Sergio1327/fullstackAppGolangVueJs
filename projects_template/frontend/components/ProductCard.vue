@@ -33,11 +33,11 @@
 </template>
     
 <script>
-import priceModal from './priceModal.vue';
+import PriceModal from './PriceModal.vue';
 import AddInStockModal from './AddInStockModal.vue';
 export default {
     components: {
-        priceModal,
+        PriceModal,
         AddInStockModal
     },
     props: {

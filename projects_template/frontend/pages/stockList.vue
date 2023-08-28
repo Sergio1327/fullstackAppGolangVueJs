@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import stockListVue from '~/components/stockList.vue'
-import stockModal from '~/components/stockModal.vue';
+import stockListVue from '~/components/StockList.vue'
+import stockModal from '~/components/StockModal.vue';
 
 export default {
     data() {

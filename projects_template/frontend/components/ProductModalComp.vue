@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import productModal from './productModal.vue';
+import productModal from './ProductModal.vue';
 export default {
     components: {
         productModal

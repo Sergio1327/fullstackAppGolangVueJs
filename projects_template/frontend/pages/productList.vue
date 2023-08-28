@@ -8,9 +8,9 @@
 
 <script>
 
-import productForm from '~/components/productForm.vue';
-import productModalComp from '~/components/productModalComp.vue';
-import productCardList from '~/components/productCardList.vue';
+import productForm from '~/components/ProductForm.vue';
+import productModalComp from '~/components/ProductModalComp.vue';
+import productCardList from '~/components/ProductCardList.vue';
 
 export default {
     components: {

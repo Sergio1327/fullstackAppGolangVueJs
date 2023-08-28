@@ -1,16 +1,16 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-flex-end">
         <button class="btn mb-5" @click="openModal" value="" type="submit">Добавить склад</button>
-        <stockModalWinVue v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
+        <AddStockForm v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
     </div>
 </template>
 
 <script>
-import stockModalWinVue from './winStockModal.vue';
+import AddStockForm from './AddStockForm.vue';
 export default {
 
     components: {
-        stockModalWinVue
+        AddStockForm
     },
     data() {
         return {
