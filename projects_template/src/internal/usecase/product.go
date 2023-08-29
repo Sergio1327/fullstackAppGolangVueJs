@@ -36,7 +36,7 @@ func (u *ProductUseCase) AddProduct(ts transaction.Session, product product.Prod
 		err = errors.New("имя продукта не может быть пустым")
 		return
 	}
-
+	product.AddetAt = time.Now()
 	// добавляется продукт в базу
 	productID, err = u.Repository.Product.AddProduct(ts, product)
 	if err != nil {

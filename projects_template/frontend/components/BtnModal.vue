@@ -6,10 +6,10 @@
 </template>
 
 <script>
-import addSaleForm from './addSaleForm.vue';
+import AddSaleForm from './AddSaleForm.vue';
 export default {
     components: {
-        addSaleForm
+        AddSaleForm
     },
     methods: {
         openModal() {

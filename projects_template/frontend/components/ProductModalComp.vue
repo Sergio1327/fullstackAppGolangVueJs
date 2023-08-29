@@ -1,15 +1,15 @@
 <template>
     <div>
         <button class="py-3 px-5 btn" @click="openModal" value="" type="submit">Добавить продукт</button>
-        <productModal v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
+        <AddProductForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
     </div>
 </template>
 
 <script>
-import productModal from './ProductModal.vue';
+import AddProductForm from './AddProductForm.vue';
 export default {
     components: {
-        productModal
+        AddProductForm
     }, methods: {
         openModal() {
             this.modalVisible = true;
