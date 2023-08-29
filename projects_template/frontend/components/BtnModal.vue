@@ -1,15 +1,15 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-flex-end">
         <button class="btn" @click="openModal" value="" type="submit">Добавить продажу</button>
-        <SaleModal v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
+        <addSaleForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
     </div>
 </template>
 
 <script>
-import SaleModal from './SaleModal.vue';
+import addSaleForm from './addSaleForm.vue';
 export default {
     components: {
-        SaleModal
+        addSaleForm
     },
     methods: {
         openModal() {
@@ -31,7 +31,7 @@ export default {
 </script>
 
 <style>
-.btn{
+.btn {
     padding: 14px 28px;
     background-color: rgb(255, 190, 70) !important;
     border-radius: 5px;
