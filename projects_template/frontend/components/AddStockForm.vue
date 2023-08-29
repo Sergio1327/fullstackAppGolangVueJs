@@ -1,64 +1,72 @@
 <template>
-    <div class="modal is-active">
-        <div class="modal-background"></div>
-        <div class="modal-content box">
-            <div class="field">
-                <label class="label">Название склада</label>
-                <div class="control">
-                    <input v-model="formData.stockName" class="input" type="text" required>
-                </div>
+    <section>
+        <b-modal v-model="isComponentModalActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
+            aria-label="Добавление склада" close-button-aria-label="Закрыть" aria-modal>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Добавление склада</p>
+                    <button type="button" class="delete" @click="closeModal"></button>
+                </header>
+                <section class="modal-card-body">
+                    <b-field label="Название склада">
+                        <b-input v-model="formData.stockName" type="text" placeholder="Введите название склада"
+                            required></b-input>
+                    </b-field>
+                </section>
+                <footer class="modal-card-foot">
+                    <b-button label="Закрыть" @click="closeModal" />
+                    <b-button label="Добавить" type="is-primary" @click="submitModalData" />
+                    <div>{{ resp }}</div>
+                </footer>
+
             </div>
-
-            <div class="label"> {{ resp }}</div>
-            <button class="button is-primary" @click="submitModalData">добавить склад</button>
-            <button class="button" @click="closeModal">Закрыть</button>
-        </div>
-        <button class="modal-close is-large" aria-label="Закрыть" @click="closeModal"></button>
-
-    </div>
+        </b-modal>
+    </section>
 </template>
-
+  
 <script>
 export default {
     data() {
         return {
+            isComponentModalActive: this.modalVisible,
             formData: {
-                stockName: ""
+                stockName: ''
             },
             resp: ""
-        };
+        }
+    },
+    props: {
+        modalVisible: {
+            type: Boolean,
+            required: true
+        }
     },
     methods: {
         async submitModalData() {
-
-            const requestData = {
-                storage_name: this.formData.stockName
-            }
-
             try {
-                const response = await fetch("http://127.0.0.1:9000/stock/add", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(requestData),
-                })
+                const requestData = {
+                    storage_name: this.formData.stockName
+                };
 
-                const responseData = await response.json()
-                console.log(responseData)
-                this.resp = "склад успешно добавлена, ID склада - " + responseData.Data.stockID
+                const response = await fetch('http://127.0.0.1:9000/stock/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const responseData = await response.json();
+                console.log(responseData);
+                this.resp = `склад успешно добавлен, ID склада - ${responseData.Data.stockID}`
 
             } catch (error) {
-                console.error("Ошибка при отправке запроса:", error);
-                console.log(error)
-
-                this.resp = error
+                console.error('Ошибка при отправке запроса:', error);
             }
-
         },
         closeModal() {
-            this.$emit('closeModal');
-        },
-    },
-}
+            this.$emit("closeModal")
+        }
+    }
+};
 </script>

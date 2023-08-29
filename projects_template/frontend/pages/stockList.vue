@@ -1,22 +1,38 @@
 <template>
     <div>
         <stockModal />
-        <stockListVue :stockList="stockList" />
+        <b-table class="mt-6" :data="stockList" :hoverable="isHoverable" :striped="isStriped" :columns="columns"></b-table>
     </div>
 </template>
 
 <script>
-import stockListVue from '~/components/StockList.vue'
 import stockModal from '~/components/StockModal.vue';
 
 export default {
     data() {
         return {
-            stockList: []
+            stockList: [],
+            columns: [
+                {
+                    field: "StorageID",
+                    label: "ID склада",
+                    centered: true,
+                    width: 200,
+                    height: 300
+                },
+                {
+                    field: "StorageName",
+                    label: "Название склада",
+                    centered: true
+                },
+            ],
+            isBordered: true,
+            isHoverable: true,
+            isStriped: true
         }
+
     },
     components: {
-        stockListVue,
         stockModal
 
     },
@@ -27,7 +43,7 @@ export default {
                 const responseData = await response.json();
 
                 this.stockList = responseData.Data.stock_list
-
+                console.log(this.stockList)
             } catch (error) {
                 console.error('Error fetching warehouses:', error);
             }

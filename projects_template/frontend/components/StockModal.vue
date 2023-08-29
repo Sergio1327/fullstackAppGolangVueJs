@@ -1,7 +1,7 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-flex-end">
         <button class="btn mb-5" @click="openModal" value="" type="submit">Добавить склад</button>
-        <AddStockForm v-if="modalVisible" @dataSubmitted="submitModalData" @closeModal="closeModal" />
+        <AddStockForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
     </div>
 </template>
 
