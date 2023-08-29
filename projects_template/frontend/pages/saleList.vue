@@ -1,12 +1,10 @@
 <script>
 import formVue from "~/components/SaleForm.vue";
-import saleList from "~/components/SaleList.vue";
 import btnModal from "~/components/BtnModal.vue";
 
 export default {
     components: {
         formVue,
-        saleList,
         btnModal
     }, methods: {
         handleData(data) {
@@ -14,7 +12,38 @@ export default {
         }
     }, data() {
         return {
-            saleListData: []
+            saleListData: [],
+            columns: [
+                {
+                    field: "SaleID",
+                    label: "ID Продажи"
+                },
+                {
+                    field: "ProductName",
+                    label: "Название продукта"
+                },
+                {
+                    field: "variant_id",
+                    label: "ID варианта"
+                },
+                {
+                    field: "storage_id",
+                    label: "ID склада"
+                },
+                {
+                    field: "SoldAt",
+                    label: "дата продажи"
+                },
+                {
+                    field: "quantity",
+                    label: "Колличество продукта"
+                },
+                {
+                    field: "TotalPrice",
+                    label: "Общая цена продажи"
+                }
+
+            ]
         }
     }
 }
@@ -25,6 +54,6 @@ export default {
         <h1 class="label is-text-center mb-5">Продажи</h1>
         <btnModal />
         <formVue @data="handleData" />
-        <saleList :saleList="saleListData" />
+        <b-table class="mt-6" :data="saleListData" :columns="columns"></b-table>
     </div>
 </template>

@@ -87,6 +87,7 @@ export default {
 
         const responseData = await response.json();
         const data = responseData.Data.sale_list
+        console.log(data)
         this.$emit("data", data)
 
       } catch (error) {
