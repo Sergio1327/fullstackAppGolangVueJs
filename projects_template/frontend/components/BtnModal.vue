@@ -1,7 +1,7 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-flex-end">
-        <button class="btn" @click="openModal" value="" type="submit">Добавить продажу</button>
-        <addSaleForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
+        <button class="btn" type="submit" @click="openModal">Добавить продажу</button>
+        <addSaleForm v-if="modalVisible" :modalVisible="modalVisible" @closeModal="closeModal" />
     </div>
 </template>
 
@@ -10,6 +10,11 @@ import AddSaleForm from './AddSaleForm.vue';
 export default {
     components: {
         AddSaleForm
+    },
+    data() {
+        return {
+            modalVisible: false,
+        }
     },
     methods: {
         openModal() {
@@ -21,11 +26,6 @@ export default {
         closeModal() {
             this.modalVisible = false;
         },
-    },
-    data() {
-        return {
-            modalVisible: false,
-        }
     }
 }
 </script>
