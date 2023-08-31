@@ -21,7 +21,8 @@
                             class="py-2 button is-primary px-3">Просмотрдеталей</button></td>
                     <td><button @click="openPriceDetails(p.ProductID)" class="py-2 button is-warning px-3">Добавить
                             цены</button></td>
-                    <td><button @click="closeStockModal" class="py-2 button is-light px-3">Добавить на склад</button></td>
+                    <td><button @click="OpenStockModal(p.ProductID)" class="py-2 button is-light px-3">Добавить на
+                            склад</button></td>
                 </tr>
             </tbody>
 
@@ -30,16 +31,20 @@
             @closeModal="closeDetailsModal" />
         <ProductPriceModal v-if="showPriceModal" :modalVisible="showPriceModal" :options="VariantIDs"
             @closeModal="closePriceModal" />
+        <ProductStockModal v-if="showStockModal" :modalVisible="showStockModal" :options="VariantIDs"
+            @closeModal="closeStockModal" :storage-options="stockList" />
     </div>
 </template>
 
 <script>
 import ProductDetailsModal from './ProductDetailsModal.vue'
 import ProductPriceModal from './ProductPriceModal.vue'
+import ProductStockModal from './ProductStockModal.vue'
 export default {
     components: {
         ProductDetailsModal,
-        ProductPriceModal
+        ProductPriceModal,
+        ProductStockModal
     },
     props: {
         productList: {
@@ -108,7 +113,49 @@ export default {
             } catch (error) {
                 console.error(error)
             }
+        },
+        async OpenStockModal(ProductID) {
+            const url = `http://127.0.0.1:9000/product/${ProductID}`
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                const responseData = await response.json()
+
+                const data = responseData.Data.product_info.VariantList
+                this.VariantIDs = data.map(e => {
+                    return {
+                        Value: e.variant_id,
+                        Option: e.variant_id
+                    }
+                })
+
+                const response2 = await fetch("http://127.0.0.1:9000/stock_list", {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                })
+                const responseData2 = await response2.json()
+                const data2 = responseData2.Data.stock_list
+                console.log(data2)
+                this.stockList = data2.map(e => {
+                    return {
+                        Option: e.StorageID,
+                        Value: e.StorageID
+                    }
+                })
+                this.showStockModal = true
+            } catch (error) {
+                console.error(error)
+            }
         }
+
     }
 }
 

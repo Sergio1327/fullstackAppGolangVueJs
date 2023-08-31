@@ -3,12 +3,6 @@
         <productModalComp class="is-flex is-align-items-center is-justify-content-flex-end" />
         <productForm @productData="handleData" />
         <ProductTable :product-list="productList" />
-        <!-- <productCardList :productList="productList" /> -->
-
-        <!-- <div class="">
-            <b-table :data="productList" :columns="columns"></b-table>
-        </div> -->
-
     </div>
 </template>
 
@@ -16,13 +10,11 @@
 import ProductTable from '~/components/ProductTable.vue';
 import productForm from '~/components/ProductForm.vue';
 import productModalComp from '~/components/ProductModalComp.vue';
-// import productCardList from '~/components/ProductCardList.vue';
 
 export default {
     components: {
         productForm,
         productModalComp,
-        // productCardList,
         ProductTable
     },
     data() {

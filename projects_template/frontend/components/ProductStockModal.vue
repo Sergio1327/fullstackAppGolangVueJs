@@ -1,7 +1,7 @@
 <template>
     <section>
         <b-modal v-model="isActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
-            aria-label="Добавление цены" close-button-aria-label="Закрыть" aria-modal>
+            aria-label="Добавление продукта на склад" close-button-aria-label="Закрыть" aria-modal>
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">Добавление цены</p>
@@ -14,8 +14,15 @@
                             </option>
                         </b-select>
                     </b-field>
-                    <b-field label="Цена продукта">
-                        <b-input type="number" v-model="formData.price" placeholder="Введите цену" required></b-input>
+                    <b-field label="ID склада">
+                        <b-select v-model="formData.storage_id" type="text" placeholder="Введите вариант продукта" required>
+                            <option v-for="s in stockOptions" :value="s.Value" :key="s.Option">{{ s.Option }}
+                            </option>
+                        </b-select>
+                    </b-field>
+                    <b-field label="Колличество">
+                        <b-input type="number" v-model="formData.quantity" placeholder="Введите колличество продукта"
+                            required></b-input>
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">
@@ -34,10 +41,12 @@ export default {
         return {
             formData: {
                 variant_id: "",
-                price: ""
+                storage_id: "",
+                quantity: ""
             },
             isActive: this.modalVisible,
             variantOptions: this.options,
+            stockOptions: this.storageOptions,
             resp: ""
         }
     }, props: {
@@ -48,6 +57,10 @@ export default {
         options: {
             Type: Array,
             required: true
+        },
+        storageOptions: {
+            Type: Array,
+            required: true
         }
     },
     methods: {
@@ -55,12 +68,15 @@ export default {
             this.$emit("closeModal")
         },
         async submitModalData() {
+
             const requestData = {
                 variant_id: parseInt(this.formData.variant_id),
-                price: parseFloat(this.formData.price)
+                storage_id: parseInt(this.formData.storage_id),
+                quantity: parseInt(this.formData.quantity)
             }
+
             try {
-                const response = await fetch("http://127.0.0.1:9000/product/price", {
+                const response = await fetch("http://127.0.0.1:9000/product/add/stock", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -70,7 +86,7 @@ export default {
                 console.log(JSON.stringify(requestData))
                 const responseData = await response.json()
                 console.log(responseData)
-                this.resp = `Цена успешно добавлениа, priceID - ${responseData.Data.price_id}`
+                this.resp = `Продукт успешно добавлен на склад,ID операции  - ${responseData.Data.product_stock_ID}`
             } catch (error) {
                 console.error(error)
             }

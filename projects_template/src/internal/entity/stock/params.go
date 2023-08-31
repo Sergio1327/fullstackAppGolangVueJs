@@ -29,7 +29,7 @@ func (p ProductInStockParams) Log() logrus.Fields {
 
 // IsNullFields проверка полей на нулевые значения
 func (p ProductInStockParams) IsNullFields() error {
-	if p.StorageID == 0 || p.VariantID == 0 || p.AddedAt == (time.Time{}) || p.Quantity == 0 {
+	if p.StorageID == 0 || p.VariantID == 0 || p.Quantity == 0 {
 		return errors.New("поля: variant_id, storage_id, added_at, quantity не должны быть пустыми")
 	}
 	return nil
