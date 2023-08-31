@@ -75,7 +75,7 @@ func (u *ProductUseCase) AddProductPrice(ts transaction.Session, p product.Produ
 	if err := p.IsNullFields(); err != nil {
 		return 0, err
 	}
-
+	p.StartDate = time.Now()
 	// проверка имеется ли запись уже в базе с заданным id продукта и дата начала цены
 	isExistsID, err := u.Repository.Product.CheckExists(ts, p)
 	switch err {

@@ -17,23 +17,29 @@
                     <td>{{ p.Name }}</td>
                     <td>{{ p.Descr }}</td>
 
-                    <td><button @click="openDetailsModal(p.ProductID)" class="py-2 px-3">Просмотр деталей</button></td>
-                    <td><button class="py-2 px-3">Добавить цены</button></td>
-                    <td><button class="py-2 px-3">Добавить на склад</button></td>
+                    <td><button @click="openDetailsModal(p.ProductID)"
+                            class="py-2 button is-primary px-3">Просмотрдеталей</button></td>
+                    <td><button @click="openPriceDetails(p.ProductID)" class="py-2 button is-warning px-3">Добавить
+                            цены</button></td>
+                    <td><button @click="closeStockModal" class="py-2 button is-light px-3">Добавить на склад</button></td>
                 </tr>
             </tbody>
 
         </table>
         <ProductDetailsModal v-if="showModalDetails" :modalVisible="showModalDetails" :variantList="variantList"
             @closeModal="closeDetailsModal" />
+        <ProductPriceModal v-if="showPriceModal" :modalVisible="showPriceModal" :options="VariantIDs"
+            @closeModal="closePriceModal" />
     </div>
 </template>
 
 <script>
 import ProductDetailsModal from './ProductDetailsModal.vue'
+import ProductPriceModal from './ProductPriceModal.vue'
 export default {
     components: {
-        ProductDetailsModal
+        ProductDetailsModal,
+        ProductPriceModal
     },
     props: {
         productList: {
@@ -44,13 +50,23 @@ export default {
     data() {
         return {
             showModalDetails: false,
+            showPriceModal: false,
+            showStockModal: false,
             resp: "",
-            variantList: []
+            variantList: [],
+            VariantIDs: [],
+            stockList: []
         }
     },
     methods: {
         closeDetailsModal() {
             this.showModalDetails = false
+        },
+        closePriceModal() {
+            this.showPriceModal = false
+        },
+        closeStockModal() {
+            this.showStockModal = false
         },
         async openDetailsModal(ProductID) {
             this.showModalDetails = true
@@ -63,8 +79,31 @@ export default {
                     },
                 })
                 const responseData = await response.json()
-                console.log(responseData.Data.product_info.VariantList)
                 this.variantList = responseData.Data.product_info.VariantList
+
+            } catch (error) {
+                console.error(error)
+            }
+        },
+        async openPriceDetails(ProductID) {
+            const url = `http://127.0.0.1:9000/product/${ProductID}`
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                const responseData = await response.json()
+
+                const data = responseData.Data.product_info.VariantList
+                this.VariantIDs = data.map(e => {
+                    return {
+                        Value: e.variant_id,
+                        Option: e.variant_id
+                    }
+                })
+                this.showPriceModal = true
 
             } catch (error) {
                 console.error(error)

@@ -1,0 +1,80 @@
+<template>
+    <section>
+        <b-modal v-model="isActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
+            aria-label="Добавление склада" close-button-aria-label="Закрыть" aria-modal>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Добавление цены</p>
+                    <button type="button" class="delete" @click="closeModal"></button>
+                </header>
+                <section class="modal-card-body">
+                    <b-field label="ID варианта продукта">
+                        <b-select v-model="formData.variant_id" type="text" placeholder="Введите вариант продукта" required>
+                            <option v-for="opt in variantOptions" :value="opt.Value" :key="opt.Option">{{ opt.Option }}
+                            </option>
+                        </b-select>
+                    </b-field>
+                    <b-field label="Цена продукта">
+                        <b-input type="number" v-model="formData.price" placeholder="Введите цену" required></b-input>
+                    </b-field>
+                </section>
+                <footer class="modal-card-foot">
+                    <b-button label="Закрыть" @click="closeModal" />
+                    <b-button label="Добавить" type="is-primary" @click="submitModalData" />
+                    <div>{{ resp }}</div>
+                </footer>
+            </div>
+        </b-modal>
+    </section>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            formData: {
+                variant_id: "",
+                price: ""
+            },
+            isActive: this.modalVisible,
+            variantOptions: this.options,
+            resp: ""
+        }
+    }, props: {
+        modalVisible: {
+            Type: Boolean,
+            required: true
+        },
+        options: {
+            Type: Array,
+            required: true
+        }
+    },
+    methods: {
+        closeModal() {
+            this.$emit("closeModal")
+        },
+        async submitModalData() {
+            const requestData = {
+                variant_id: parseInt(this.formData.variant_id),
+                price: parseFloat(this.formData.price)
+            }
+            try {
+                const response = await fetch("http://127.0.0.1:9000/product/price", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                console.log(JSON.stringify(requestData))
+                const responseData = await response.json()
+                console.log(responseData)
+                this.resp = `Цена успешно добавлениа, priceID - ${responseData.Data.price_id}`
+            } catch (error) {
+                console.error(error)
+            }
+        }
+    }
+}
+</script>

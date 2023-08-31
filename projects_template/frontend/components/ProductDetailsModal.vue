@@ -23,7 +23,7 @@
                     </b-field>
                 </section>
                 <footer class="modal-card-foot">
-                    <b-button label="Закрыть" @click="closeModal" />
+                    <b-button class="button is-danger" label="Закрыть" @click="closeModal" />
                 </footer>
 
             </div>

@@ -37,7 +37,7 @@ func (p ProductPriceParams) Log() logrus.Fields {
 }
 
 func (p ProductPriceParams) IsNullFields() error {
-	if p.VariantID == 0 || p.Price == 0 || p.StartDate == (time.Time{}) {
+	if p.VariantID == 0 || p.Price == 0 {
 		return errors.New("id варианта или цена или дата начала не могут быть пустыми")
 	}
 	return nil
