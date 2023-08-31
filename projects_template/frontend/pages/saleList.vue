@@ -1,6 +1,6 @@
 <script>
 import formVue from "~/components/SaleForm.vue";
-import btnModal from "~/components/BtnModal.vue";
+import btnModal from "~/components/AddSaleModal.vue";
 
 export default {
     components: {

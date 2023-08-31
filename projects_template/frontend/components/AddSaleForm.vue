@@ -9,12 +9,14 @@
                 </header>
                 <section class="modal-card-body">
                     <b-field label="ID варианта продукта">
-                        <b-input v-model="formData.variant_id" type="text" placeholder="Введите вариант продукта"
-                            required></b-input>
+                        <b-select v-model="formData.variant_id" type="text" placeholder="Введите вариант продукта" required>
+                            <option v-for="v in vOptions " :value="v.Option" :key="v.Value">{{ v.Option }}</option>
+                        </b-select>
                     </b-field>
                     <b-field label="ID склада">
-                        <b-input v-model="formData.storage_id" type="text" placeholder="Введите ID склада"
-                            required></b-input>
+                        <b-select v-model="formData.storage_id" type="text" placeholder="Введите ID склада" required>
+                            <option v-for="s in stockOptions" :value="s.Option" :key="s.Value">{{ s.Option }}</option>
+                        </b-select>
                     </b-field>
                     <b-field label="Колличество продуктов">
                         <b-input v-model="formData.quantity" type="text" placeholder="Введите колличество продуктов"
@@ -37,6 +39,7 @@ export default {
     data() {
         return {
             isComponentModalActive: this.modalVisible,
+            vOptions: this.variantOptions,
             formData: {
                 variant_id: "",
                 storage_id: "",
@@ -48,6 +51,14 @@ export default {
     props: {
         modalVisible: {
             type: Boolean,
+            required: true
+        },
+        variantOptions: {
+            type: Array,
+            required: true
+        },
+        stockOptions: {
+            type: Array,
             required: true
         }
     },
@@ -78,7 +89,9 @@ export default {
             }
         },
         closeModal() {
+            this.vOptions = []
             this.$emit("closeModal")
+
         }
     }
 };

@@ -83,7 +83,7 @@ export default {
                     },
                     body: JSON.stringify(requestData)
                 })
-                console.log(JSON.stringify(requestData))
+                
                 const responseData = await response.json()
                 console.log(responseData)
                 this.resp = `Продукт успешно добавлен на склад,ID операции  - ${responseData.Data.product_stock_ID}`

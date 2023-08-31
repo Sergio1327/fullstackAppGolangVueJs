@@ -17,8 +17,8 @@
                     <td>{{ p.Name }}</td>
                     <td>{{ p.Descr }}</td>
 
-                    <td><button @click="openDetailsModal(p.ProductID)"
-                            class="py-2 button is-primary px-3">Просмотрдеталей</button></td>
+                    <td><button @click="openDetailsModal(p.ProductID)" class="py-2 button is-primary px-3">Просмотр
+                            деталей</button></td>
                     <td><button @click="openPriceDetails(p.ProductID)" class="py-2 button is-warning px-3">Добавить
                             цены</button></td>
                     <td><button @click="OpenStockModal(p.ProductID)" class="py-2 button is-light px-3">Добавить на
@@ -143,7 +143,7 @@ export default {
                 })
                 const responseData2 = await response2.json()
                 const data2 = responseData2.Data.stock_list
-                console.log(data2)
+
                 this.stockList = data2.map(e => {
                     return {
                         Option: e.StorageID,
