@@ -108,6 +108,7 @@ export default {
                         Option: e.variant_id
                     }
                 })
+                this.VariantIDs.sort((a, b) => a.Option - b.Option)
                 this.showPriceModal = true
 
             } catch (error) {
@@ -133,6 +134,8 @@ export default {
                         Option: e.variant_id
                     }
                 })
+
+                this.VariantIDs.sort((a, b) => a.Option - b.Option)
 
                 const response2 = await fetch("http://127.0.0.1:9000/stock_list", {
                     method: "GET",

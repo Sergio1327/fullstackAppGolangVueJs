@@ -22,7 +22,7 @@ export default {
     methods: {
         async openModal() {
             try {
-                
+
                 const response = await fetch("http://127.0.0.1:9000/stock_list", {
                     method: "GET",
                     headers: {
@@ -52,11 +52,11 @@ export default {
                     product.VariantList.forEach(variant => {
                         this.variantIDs.push({
                             Option: variant.variant_id,
-                            Value:variant.variant_id
+                            Value: variant.variant_id
                         });
                     });
                 });
-
+                this.variantIDs.sort((a, b) => a.Option - b.Option)
                 this.modalVisible = true;
 
             } catch (error) {
@@ -72,6 +72,7 @@ export default {
             this.modalVisible = false;
         },
         closeModal() {
+            this.variantIDs = []
             this.modalVisible = false;
         },
     }
