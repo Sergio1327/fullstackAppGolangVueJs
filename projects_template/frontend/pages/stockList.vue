@@ -1,16 +1,21 @@
 <template>
     <div>
-        <stockModal />
+        <div class="is-flex is-align-items-center is-justify-content-flex-end">
+            <button class="btn mb-5" @click="openModal" value="" type="submit">Добавить склад</button>
+            <AddStockForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
+        </div>
+
         <b-table class="mt-6" :data="stockList" :hoverable="isHoverable" :striped="isStriped" :columns="columns"></b-table>
     </div>
 </template>
 
 <script>
-import stockModal from '~/components/StockModal.vue';
+import AddStockForm from '~/components/AddStockForm.vue';
 
 export default {
     data() {
         return {
+            modalVisible: false,
             stockList: [],
             columns: [
                 {
@@ -33,7 +38,7 @@ export default {
 
     },
     components: {
-        stockModal
+        AddStockForm
 
     },
     methods: {
@@ -48,6 +53,12 @@ export default {
                 console.error('Error fetching warehouses:', error);
             }
         },
+        openModal() {
+            this.modalVisible = true
+        },
+        closeModal() {
+            this.modalVisible = false
+        }
     },
     async mounted() {
         await this.fetchStockList();
