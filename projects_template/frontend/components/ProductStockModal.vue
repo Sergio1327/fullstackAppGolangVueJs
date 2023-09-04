@@ -7,6 +7,7 @@
                     <p class="modal-card-title">Добавление цены</p>
                     <button type="button" class="delete" @click="closeModal"></button>
                 </header>
+
                 <section class="modal-card-body">
                     <b-field label="ID варианта продукта">
                         <b-select v-model="formData.variant_id" type="text" placeholder="Введите вариант продукта" required>
@@ -25,6 +26,7 @@
                             required></b-input>
                     </b-field>
                 </section>
+
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
@@ -44,9 +46,11 @@ export default {
                 storage_id: "",
                 quantity: ""
             },
+
             isActive: this.modalVisible,
             variantOptions: this.options,
             stockOptions: this.storageOptions,
+
             resp: ""
         }
     }, props: {
@@ -54,10 +58,12 @@ export default {
             Type: Boolean,
             required: true
         },
+
         options: {
             Type: Array,
             required: true
         },
+
         storageOptions: {
             Type: Array,
             required: true
@@ -85,8 +91,8 @@ export default {
                 })
                 
                 const responseData = await response.json()
-                console.log(responseData)
                 this.resp = `Продукт успешно добавлен на склад,ID операции  - ${responseData.Data.product_stock_ID}`
+                
             } catch (error) {
                 console.error(error)
             }

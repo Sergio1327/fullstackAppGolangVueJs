@@ -7,6 +7,7 @@
                     <p class="modal-card-title">Добавление цены</p>
                     <button type="button" class="delete" @click="closeModal"></button>
                 </header>
+
                 <section class="modal-card-body">
                     <b-field label="ID варианта продукта">
                         <b-select v-model="formData.variant_id" type="text" placeholder="Введите вариант продукта" required>
@@ -18,6 +19,7 @@
                         <b-input type="number" v-model="formData.price" placeholder="Введите цену" required></b-input>
                     </b-field>
                 </section>
+
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
@@ -36,8 +38,10 @@ export default {
                 variant_id: "",
                 price: ""
             },
+
             isActive: this.modalVisible,
             variantOptions: this.options,
+
             resp: ""
         }
     }, props: {
@@ -45,6 +49,7 @@ export default {
             Type: Boolean,
             required: true
         },
+
         options: {
             Type: Array,
             required: true
@@ -59,6 +64,7 @@ export default {
                 variant_id: parseInt(this.formData.variant_id),
                 price: parseFloat(this.formData.price)
             }
+
             try {
                 const response = await fetch("http://127.0.0.1:9000/product/price", {
                     method: 'POST',
@@ -67,10 +73,9 @@ export default {
                     },
                     body: JSON.stringify(requestData)
                 })
-                console.log(JSON.stringify(requestData))
+
                 const responseData = await response.json()
-                console.log(responseData)
-                this.resp = `Цена успешно добавлениа, priceID - ${responseData.Data.price_id}`
+                this.resp = `Цена успешно добавлена, priceID - ${responseData.Data.price_id}`
             } catch (error) {
                 console.error(error)
             }

@@ -57,7 +57,9 @@ export default {
             showModalDetails: false,
             showPriceModal: false,
             showStockModal: false,
+
             resp: "",
+
             variantList: [],
             VariantIDs: [],
             stockList: []
@@ -67,12 +69,15 @@ export default {
         closeDetailsModal() {
             this.showModalDetails = false
         },
+
         closePriceModal() {
             this.showPriceModal = false
         },
+
         closeStockModal() {
             this.showStockModal = false
         },
+        
         async openDetailsModal(ProductID) {
             this.showModalDetails = true
             const url = `http://127.0.0.1:9000/product/${ProductID}`

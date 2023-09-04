@@ -56,7 +56,7 @@ export default {
                 const responseData = await response.json();
 
                 this.stockList = responseData.Data.stock_list
-                console.log(this.stockList)
+                
             } catch (error) {
                 console.error('Error fetching warehouses:', error);
             }

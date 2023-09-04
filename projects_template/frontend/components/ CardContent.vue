@@ -8,7 +8,6 @@
                             <img :src="card.imgLink" alt="Placeholder image">
                         </figure>
                     </div>
-
                 </div>
                 <div class="media-content">
                     <p class="title is-4 m-0">{{ card.title }}</p>

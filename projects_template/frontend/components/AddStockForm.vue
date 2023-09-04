@@ -7,12 +7,14 @@
                     <p class="modal-card-title">Добавление склада</p>
                     <button type="button" class="delete" @click="closeModal"></button>
                 </header>
+
                 <section class="modal-card-body">
                     <b-field label="Название склада">
                         <b-input v-model="formData.stockName" type="text" placeholder="Введите название склада"
                             required></b-input>
                     </b-field>
                 </section>
+
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
@@ -29,9 +31,11 @@ export default {
     data() {
         return {
             isComponentModalActive: this.modalVisible,
+
             formData: {
                 stockName: ''
             },
+
             resp: ""
         }
     },
@@ -57,9 +61,10 @@ export default {
                 });
 
                 const responseData = await response.json();
-                console.log(responseData);
+
                 this.resp = `склад успешно добавлен, ID склада - ${responseData.Data.stockID}`
                 this.$emit("fetchStockList")
+
             } catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
             }

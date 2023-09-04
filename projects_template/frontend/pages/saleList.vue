@@ -127,7 +127,7 @@ export default {
 
             startDate: new Date("2020-08-20T00:00:00"),
             endDate: new Date("2029-08-20T00:00:00"),
-            limit: 1,
+            limit: 2,
             productName: "",
             storageId: 1,
 
@@ -138,7 +138,7 @@ export default {
             columns: [
                 {
                     field: "SaleID",
-                    label: "ID Продажи"
+                    label: "ID Продажи",
                 },
                 {
                     field: "ProductName",
@@ -154,11 +154,11 @@ export default {
                 },
                 {
                     field: "SoldAt",
-                    label: "дата продажи"
+                    label: "Дата продажи"
                 },
                 {
                     field: "quantity",
-                    label: "Колличество продукта"
+                    label: "Колличество"
                 },
                 {
                     field: "TotalPrice",

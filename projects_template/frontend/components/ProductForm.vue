@@ -39,8 +39,9 @@ export default {
     },
     methods: {
         async GetProductList() {
-          const  limitProductList = parseInt(this.limit)
+            const limitProductList = parseInt(this.limit)
             const url = `http://127.0.0.1:9000/product_list?name=${this.productName}&tag=${this.tag}&limit=${limitProductList}`
+          
             try {
                 const response = await fetch(url, {
                     method: "GET",

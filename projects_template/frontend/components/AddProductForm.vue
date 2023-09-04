@@ -7,6 +7,7 @@
                     <p class="modal-card-title">Добавление продукта</p>
                     <button type="button" class="delete" @click="closeModal"></button>
                 </header>
+
                 <section class="modal-card-body">
                     <b-field label="Название продукта">
                         <b-input v-model="formData.productName" type="text" placeholder="Введите название продукта"
@@ -30,6 +31,7 @@
                         <b-button label="добавить вариант" @click="addVariant"></b-button>
                     </b-field>
                 </section>
+
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
@@ -46,6 +48,7 @@ export default {
     data() {
         return {
             isComponentModalActive: this.modalVisible,
+
             formData: {
                 productName: "",
                 descr: "",
@@ -56,6 +59,7 @@ export default {
                     unit: ""
                 }]
             },
+
             resp: ""
         }
     },
@@ -69,6 +73,7 @@ export default {
         addVariant() {
             this.formData.productVariants.push({})
         },
+
         async submitModalData() {
             const formatedVariants = this.formData.productVariants.map(v => ({
                 weight: parseInt(v.weight),
@@ -81,7 +86,7 @@ export default {
                 tags: this.formData.tags,
                 variants: formatedVariants
             }
-            console.log(JSON.stringify(requestData))
+
             try {
                 const response = await fetch("http://127.0.0.1:9000/product/add", {
                     method: "POST",
@@ -92,11 +97,9 @@ export default {
                 })
 
                 const responseData = await response.json()
-                console.log(responseData.Data)
                 this.resp = "продукт успешно добавлен в базу , ID продукта = " + responseData.Data.product_id
             } catch (error) {
                 console.error("Ошибка при отправке запроса:", error);
-                console.log(error)
             }
         },
         closeModal() {

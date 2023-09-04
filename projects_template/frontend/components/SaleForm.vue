@@ -75,6 +75,7 @@ export default {
         product_name: this.productName,
         storage_id: parseInt(this.storageId)
       };
+
       console.log(requestData)
       try {
         const response = await fetch("http://127.0.0.1:9000/sales", {
@@ -87,7 +88,6 @@ export default {
 
         const responseData = await response.json();
         const data = responseData.Data.sale_list
-        console.log(data)
         this.$emit("data", data)
 
       } catch (error) {

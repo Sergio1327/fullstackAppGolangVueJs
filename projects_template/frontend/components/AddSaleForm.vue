@@ -7,6 +7,7 @@
                     <p class="modal-card-title">Добавление продажи</p>
                     <button type="button" class="delete" @click="closeModal"></button>
                 </header>
+
                 <section class="modal-card-body">
                     <b-field label="ID варианта продукта">
                         <b-select v-model="formData.variant_id" type="text" placeholder="Введите вариант продукта" required>
@@ -23,6 +24,7 @@
                             required></b-input>
                     </b-field>
                 </section>
+
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
@@ -40,11 +42,13 @@ export default {
         return {
             isComponentModalActive: this.modalVisible,
             vOptions: this.variantOptions,
+
             formData: {
                 variant_id: "",
                 storage_id: "",
                 quantity: ""
             },
+
             resp: ""
         }
     },
@@ -53,10 +57,12 @@ export default {
             type: Boolean,
             required: true
         },
+
         variantOptions: {
             type: Array,
             required: true
         },
+
         stockOptions: {
             type: Array,
             required: true
@@ -70,7 +76,7 @@ export default {
                     storage_id: parseInt(this.formData.storage_id),
                     quantity: parseInt(this.formData.quantity)
                 };
-                console.log(JSON.stringify(requestData))
+
                 const response = await fetch('http://127.0.0.1:9000/buy', {
                     method: 'POST',
                     headers: {
@@ -80,7 +86,6 @@ export default {
                 });
 
                 const responseData = await response.json();
-                console.log(responseData);
                 this.resp = `продажа успешно добавлен, ID продажи - ${responseData.Data.sale_id}`
 
             } catch (error) {

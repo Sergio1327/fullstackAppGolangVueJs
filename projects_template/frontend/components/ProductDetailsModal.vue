@@ -7,6 +7,7 @@
                     <p class="modal-card-title">Варианты продукта</p>
                     <button type="button" class="delete" @click="closeModal"></button>
                 </header>
+
                 <section class="modal-card-body">
                     <b-field class="is-flex is-flex-direction-column">
                         <div class="variant is-flex is-flex-direction-column p-2" v-for="v in variantList"
@@ -22,6 +23,7 @@
                         </div>
                     </b-field>
                 </section>
+
                 <footer class="modal-card-foot">
                     <b-button class="button is-danger" label="Закрыть" @click="closeModal" />
                 </footer>
@@ -43,6 +45,7 @@ export default {
             type: Boolean,
             required: true
         },
+        
         variantList: {
             type: Array,
             required: true
