@@ -1,38 +1,40 @@
 <template>
-    <div>
-        <table border="2">
-            <thead>
-                <tr>
-                    <th>ID продукта</th>
-                    <th>Название продукта</th>
-                    <th>Описание продукта</th>
-                    <th>Детали</th>
-                    <th>Цены</th>
-                    <th>Добавить на склад</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="p in productList" :key="p.ProductID">
-                    <td>{{ p.ProductID }}</td>
-                    <td>{{ p.Name }}</td>
-                    <td>{{ p.Descr }}</td>
+    <div class="table-container">
+        <div class="table  is-striped is-narrow is-hoverable is-fullwidth">
+            <table border="0">
+                <thead>
+                    <tr>
+                        <th>ID продукта</th>
+                        <th>Название продукта</th>
+                        <th>Описание продукта</th>
+                        <th>Детали</th>
+                        <th>Цены</th>
+                        <th>Добавить на склад</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="p in productList" :key="p.ProductID">
+                        <td>{{ p.ProductID }}</td>
+                        <td>{{ p.Name }}</td>
+                        <td>{{ p.Descr }}</td>
 
-                    <td><button @click="openDetailsModal(p.ProductID)" class="py-2 button is-primary px-3">Просмотр
-                            деталей</button></td>
-                    <td><button @click="openPriceDetails(p.ProductID)" class="py-2 button is-warning px-3">Добавить
-                            цены</button></td>
-                    <td><button @click="OpenStockModal(p.ProductID)" class="py-2 button is-light px-3">Добавить на
-                            склад</button></td>
-                </tr>
-            </tbody>
+                        <td><button @click="openDetailsModal(p.ProductID)" class=" button is-primary ">Просмотр
+                                деталей</button></td>
+                        <td><button @click="openPriceDetails(p.ProductID)" class=" button is-warning ">Добавить
+                                цены</button></td>
+                        <td><button @click="OpenStockModal(p.ProductID)" class=" button is-light ">Добавить на
+                                склад</button></td>
+                    </tr>
+                </tbody>
 
-        </table>
-        <ProductDetailsModal v-if="showModalDetails" :modalVisible="showModalDetails" :variantList="variantList"
-            @closeModal="closeDetailsModal" />
-        <ProductPriceModal v-if="showPriceModal" :modalVisible="showPriceModal" :options="VariantIDs"
-            @closeModal="closePriceModal" />
-        <ProductStockModal v-if="showStockModal" :modalVisible="showStockModal" :options="VariantIDs"
-            @closeModal="closeStockModal" :storage-options="stockList" />
+            </table>
+            <ProductDetailsModal v-if="showModalDetails" :modalVisible="showModalDetails" :variantList="variantList"
+                @closeModal="closeDetailsModal" />
+            <ProductPriceModal v-if="showPriceModal" :modalVisible="showPriceModal" :options="VariantIDs"
+                @closeModal="closePriceModal" />
+            <ProductStockModal v-if="showStockModal" :modalVisible="showStockModal" :options="VariantIDs"
+                @closeModal="closeStockModal" :storage-options="stockList" />
+        </div>
     </div>
 </template>
 
@@ -77,7 +79,7 @@ export default {
         closeStockModal() {
             this.showStockModal = false
         },
-        
+
         async openDetailsModal(ProductID) {
             this.showModalDetails = true
             const url = `http://127.0.0.1:9000/product/${ProductID}`
@@ -174,10 +176,24 @@ th,
 td {
     text-align: center !important;
     padding: 1% 2%;
+
 }
 
 table {
     margin-top: 50px;
     width: 100%;
 }
+
+/* .table {
+    width: 100% !important;
+    overflow-x: auto;
+}
+
+@media (max-width:1230px) {
+
+    th,
+    td button {
+        font-size: 12px !important;
+    }
+} */
 </style>
