@@ -1,7 +1,7 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-flex-end">
         <button class="btn" type="submit" @click="openModal">Добавить продажу</button>
-        <addSaleForm v-if="modalVisible" :stockOptions="stockList" :variantOptions="variantIDs" :modalVisible="modalVisible"
+        <AddSaleForm v-if="modalVisible" :stockOptions="stockList" :variantOptions="variantIDs" :modalVisible="modalVisible"
             @closeModal="closeModal" />
     </div>
 </template>
@@ -68,9 +68,7 @@ export default {
 
 
         },
-        submitModalData() {
-            this.modalVisible = false;
-        },
+
         closeModal() {
             this.variantIDs = []
             this.modalVisible = false;

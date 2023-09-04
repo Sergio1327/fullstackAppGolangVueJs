@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div>
         <CardContent v-for="card in cards" :key="card.id" :card="card" />
     </div>
 </template>

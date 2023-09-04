@@ -1,11 +1,13 @@
 <template>
     <div>
-        <div class="is-flex is-align-items-center is-justify-content-flex-end">
+        <div class="mt-6 is-flex is-align-items-center is-justify-content-flex-end">
             <button class="btn mb-5" @click="openModal" value="" type="submit">Добавить склад</button>
-            <AddStockForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
+            <AddStockForm v-if="modalVisible" @fetchStockList="fetchStockList" @closeModal="closeModal"
+                :modalVisible="modalVisible" />
         </div>
 
-        <b-table class="mt-6" :data="stockList" :hoverable="isHoverable" :striped="isStriped" :columns="columns"></b-table>
+        <b-table class="mt-6 table" :data="stockList" :hoverable="isHoverable" :striped="isStriped"
+            :columns="columns"></b-table>
     </div>
 </template>
 
@@ -44,7 +46,12 @@ export default {
     methods: {
         async fetchStockList() {
             try {
-                const response = await fetch('http://localhost:9000/stock_list');
+                const response = await fetch('http://localhost:9000/stock_list', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
                 const responseData = await response.json();
 
                 this.stockList = responseData.Data.stock_list
@@ -62,8 +69,14 @@ export default {
     },
     async mounted() {
         await this.fetchStockList();
-        setInterval(this.fetchStockList, 5000)
     }
 } 
 </script>
 
+
+<style scoped >
+.table {
+    margin-top: 100px !important;
+    margin-bottom: 350px !important;
+}
+</style>

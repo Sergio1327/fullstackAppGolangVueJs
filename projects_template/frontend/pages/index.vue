@@ -1,22 +1,45 @@
 <template>
   <section>
-    <cardListVue class="card_list"></cardListVue>
+    <CardContent class="mt-6" v-for="card in cards" :key="card.id" :card="card" />
   </section>
 </template>
 
 <script>
-import cardListVue from '~/components/CardList.vue'
-
+import CardContent from '~/components/ CardContent.vue';
 
 export default {
-  name: 'IndexPage',
+  data() {
+    return {
+      cards: [
+        {
+          id: 1,
+          title: "Продукты",
+          descr: "описание страницы продуктов",
+          imgLink: require("@/assets/productList.jpg"),
+          link: "/productList"
+        },
+        {
+          id: 2,
+          title: "Склады",
+          descr: "описание страницы складов",
+          imgLink: require("@/assets/stockList.jpg"),
+          link: "/stockList"
+        },
+        {
+          id: 3,
+          title: "Продажи",
+          descr: "описание страницы продаж",
+          imgLink: require("@/assets/saleList.png"),
+          link: "/saleList"
+        }
+      ]
+    }
+  },
   components: {
-    cardListVue
+    CardContent,
   },
 }
 </script>
 
 
-<style>
-
-</style>
+<style></style>

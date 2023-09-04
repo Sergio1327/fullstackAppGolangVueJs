@@ -59,7 +59,7 @@ export default {
                 const responseData = await response.json();
                 console.log(responseData);
                 this.resp = `склад успешно добавлен, ID склада - ${responseData.Data.stockID}`
-
+                this.$emit("fetchStockList")
             } catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
             }
