@@ -1,21 +1,24 @@
 <template>
     <div>
-        <productModalComp class="is-flex is-align-items-center is-justify-content-flex-end" />
+        <div class="is-flex is-align-items-center is-justify-content-flex-end" >
+            <button class="py-3 px-5 btn" @click="openModal" value="" type="submit">Добавить продукт</button>
+            <AddProductForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
+        </div>
         <productForm @productData="handleData" />
         <ProductTable :product-list="productList" />
     </div>
 </template>
 
 <script>
+import AddProductForm from '~/components/AddProductForm.vue';
 import ProductTable from '~/components/ProductTable.vue';
 import productForm from '~/components/ProductForm.vue';
-import productModalComp from '~/components/ProductModalComp.vue';
 
 export default {
     components: {
         productForm,
-        productModalComp,
-        ProductTable
+        ProductTable,
+        AddProductForm
     },
     data() {
         return {
@@ -33,10 +36,17 @@ export default {
                     field: "Descr",
                     label: "Описание продукта"
                 },
-            ]
+            ],
+            modalVisible: false
         }
     },
     methods: {
+        openModal() {
+            this.modalVisible = true
+        },
+        closeModal() {
+            this.modalVisible = false
+        },
         handleData(productData) {
             this.productList = productData
         },
