@@ -1,17 +1,18 @@
 <template>
-    <div>
+    <section>
         <h1 class="label is-text-center mb-5">Продажи</h1>
 
         <div class="is-flex is-align-items-center is-justify-content-flex-end">
-            <button class="btn" type="submit" @click="openModal">Добавить продажу</button>
+            <button class="button py-3 px-5 is-warning" type="submit" @click="openModal">Добавить продажу</button>
             <AddSaleForm v-if="modalVisible" :stockOptions="stockList" :variantOptions="variantIDs"
                 :modalVisible="modalVisible" @closeModal="closeModal" />
 
         </div>
 
         <formVue @data="handleData" />
-        <b-table class="mt-6" :data="saleListData" :columns="columns"></b-table>
-    </div>
+        <b-table class="mt-6" :data="saleListData" :hoverable="isHoverable" :striped="isStriped"
+            :columns="columns"></b-table>
+    </section>
 </template>
 
 
@@ -131,6 +132,8 @@ export default {
             storageId: 1,
 
             saleListData: [],
+            isStriped: true,
+            isHoverable: true,
 
             columns: [
                 {

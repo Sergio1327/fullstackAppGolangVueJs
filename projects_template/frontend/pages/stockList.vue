@@ -1,14 +1,15 @@
 <template>
-    <div>
+    <section>
         <div class="mt-6 is-flex is-align-items-center is-justify-content-flex-end">
-            <button class="btn mb-5" @click="openModal" value="" type="submit">Добавить склад</button>
+            <button class="button py-3 px-5 is-warning mb-5" @click="openModal" value="" type="submit">Добавить
+                склад</button>
             <AddStockForm v-if="modalVisible" @fetchStockList="fetchStockList" @closeModal="closeModal"
                 :modalVisible="modalVisible" />
         </div>
 
         <b-table class="mt-6 table" :data="stockList" :hoverable="isHoverable" :striped="isStriped"
             :columns="columns"></b-table>
-    </div>
+    </section>
 </template>
 
 <script>

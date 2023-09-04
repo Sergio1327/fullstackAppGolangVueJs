@@ -1,12 +1,13 @@
 <template>
-    <div>
-        <div class="is-flex is-align-items-center is-justify-content-flex-end" >
-            <button class="py-3 px-5 btn" @click="openModal" value="" type="submit">Добавить продукт</button>
+    <section>
+        <div class="is-flex is-align-items-center is-justify-content-flex-end">
+            <button class="button is-warning py-3 px-5" @click="openModal" value="" type="submit">Добавить продукт</button>
             <AddProductForm v-if="modalVisible" @closeModal="closeModal" :modalVisible="modalVisible" />
         </div>
+
         <productForm @productData="handleData" />
         <ProductTable :product-list="productList" />
-    </div>
+    </section>
 </template>
 
 <script>
