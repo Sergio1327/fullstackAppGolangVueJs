@@ -204,9 +204,7 @@ func (u *ProductUseCase) FindProductInfoById(ts transaction.Session, productID i
 
 		productInfo.VariantList[i].InStorages = inStorages
 	}
-	lf["product_info"] = productInfo
 
-	u.log.WithFields(lf).Info("успешно получена информация о продукте")
 	return productInfo, err
 }
 
@@ -332,9 +330,6 @@ func (u *ProductUseCase) FindProductList(ts transaction.Session, tag, name strin
 		}
 	}
 
-	lf["product_list"] = products
-
-	u.log.WithFields(lf).Info("успешно получен список продуктов")
 	return products, err
 }
 
@@ -471,7 +466,6 @@ func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq product.SaleQue
 		}
 	}
 
-	u.log.WithFields(lf).Info("успешно получены продажи по заданным фильтрам")
 	return saleList, err
 }
 
@@ -488,7 +482,6 @@ func (u *ProductUseCase) LoadStockList(ts transaction.Session) (stockList []stoc
 		return nil, global.ErrInternalError
 	}
 
-	u.log.WithFields(lf).Info("успешно получен список складов")
 	return stockList, nil
 }
 
