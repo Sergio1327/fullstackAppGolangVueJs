@@ -18,7 +18,6 @@
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
-                    <div>{{ resp }}</div>
                 </footer>
 
             </div>
@@ -36,7 +35,7 @@ export default {
                 stockName: ''
             },
 
-            resp: ""
+
         }
     },
     props: {
@@ -62,16 +61,19 @@ export default {
 
                 const responseData = await response.json();
 
-                this.resp = `склад успешно добавлен, ID склада - ${responseData.Data.stockID}`
                 this.$emit("fetchStockList")
+                this.closeModal()
+                this.$buefy.snackbar.open(`склад успешно добавлен, ID склада - ${responseData.Data.stockID}`)
+
 
             } catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
+                this.$buefy.snackbar.open(error)
             }
         },
         closeModal() {
             this.$emit("closeModal")
-        }
+        },
     }
 };
 </script>

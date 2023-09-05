@@ -30,7 +30,6 @@
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
-                    <div>{{ resp }}</div>
                 </footer>
             </div>
         </b-modal>
@@ -51,7 +50,6 @@ export default {
             variantOptions: this.options,
             stockOptions: this.storageOptions,
 
-            resp: ""
         }
     }, props: {
         modalVisible: {
@@ -89,12 +87,14 @@ export default {
                     },
                     body: JSON.stringify(requestData)
                 })
-                
+
                 const responseData = await response.json()
-                this.resp = `Продукт успешно добавлен на склад,ID операции  - ${responseData.Data.product_stock_ID}`
-                
+                this.$buefy.snackbar.open(`Продукт успешно добавлен на склад,ID операции  - ${responseData.Data.product_stock_ID}`)
+                this.closeModal()
             } catch (error) {
+                this.$buefy.snackbar.open(error)
                 console.error(error)
+
             }
         }
     }

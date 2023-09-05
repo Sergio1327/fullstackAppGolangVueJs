@@ -35,7 +35,6 @@
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
-                    <div>{{ resp }}</div>
                 </footer>
 
             </div>
@@ -60,7 +59,6 @@ export default {
                 }]
             },
 
-            resp: ""
         }
     },
     props: {
@@ -97,8 +95,11 @@ export default {
                 })
 
                 const responseData = await response.json()
-                this.resp = "продукт успешно добавлен в базу , ID продукта = " + responseData.Data.product_id
+                this.$buefy.snackbar.open(`Продук успешно добавлен в базу, ID продукта - ${responseData.Data.product_id}`)
+                this.closeModal()
+
             } catch (error) {
+                this.$buefy.snackbar.open(error)
                 console.error("Ошибка при отправке запроса:", error);
             }
         },

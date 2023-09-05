@@ -23,7 +23,6 @@
                 <footer class="modal-card-foot">
                     <b-button label="Закрыть" @click="closeModal" />
                     <b-button label="Добавить" type="is-primary" @click="submitModalData" />
-                    <div>{{ resp }}</div>
                 </footer>
             </div>
         </b-modal>
@@ -41,8 +40,6 @@ export default {
 
             isActive: this.modalVisible,
             variantOptions: this.options,
-
-            resp: ""
         }
     }, props: {
         modalVisible: {
@@ -75,8 +72,11 @@ export default {
                 })
 
                 const responseData = await response.json()
-                this.resp = `Цена успешно добавлена, priceID - ${responseData.Data.price_id}`
+
+                this.$buefy.snackbar.open(`Цена успешно добавлена, priceID - ${responseData.Data.price_id}`)
+                this.closeModal()
             } catch (error) {
+                this.$buefy.snackbar.open(error)
                 console.error(error)
             }
         }
