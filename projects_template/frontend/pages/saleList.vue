@@ -41,7 +41,8 @@ export default {
                 this.stockList = data.map(e => {
                     return {
                         Option: e.StorageID,
-                        Value: e.StorageID
+                        Value: e.StorageID,
+                        StorageName: e.StorageName
                     }
                 })
 
@@ -56,10 +57,13 @@ export default {
 
                 responseData2.Data.product_list.forEach(product => {
                     product.VariantList.forEach(variant => {
-                        this.variantIDs.push({
+                        const newItem = {
+                            ProductName: product.Name,
                             Option: variant.variant_id,
-                            Value: variant.variant_id
-                        });
+                            Weight: variant.weight,
+                            Unit: variant.unit
+                        };
+                        this.variantIDs.push(newItem);
                     });
                 });
 

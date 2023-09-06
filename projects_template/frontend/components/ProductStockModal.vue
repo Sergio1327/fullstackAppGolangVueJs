@@ -9,15 +9,16 @@
                 </header>
 
                 <section class="modal-card-body">
-                    <b-field label="ID варианта продукта">
-                        <b-select v-model="formData.variant_id" type="text" placeholder="Введите вариант продукта" required>
-                            <option v-for="opt in variantOptions" :value="opt.Value" :key="opt.Option">{{ opt.Option }}
+                    <b-field label="Объем продукта">
+                        <b-select v-model="formData.variant_id" type="text" placeholder="Выберите объем продукта" required>
+                            <option v-for="opt in variantOptions" :value="opt.Value" :key="opt.Option">{{ opt.weight }}{{
+                                opt.unit }}
                             </option>
                         </b-select>
                     </b-field>
-                    <b-field label="ID склада">
-                        <b-select v-model="formData.storage_id" type="text" placeholder="Введите вариант продукта" required>
-                            <option v-for="s in stockOptions" :value="s.Value" :key="s.Option">{{ s.Option }}
+                    <b-field label="Название склада">
+                        <b-select v-model="formData.storage_id" type="text" placeholder="Выберите склад склад" required>
+                            <option v-for="s in stockOptions" :value="s.Value" :key="s.Option">{{ s.StorageName }}
                             </option>
                         </b-select>
                     </b-field>

@@ -30,9 +30,9 @@
             </table>
             <ProductDetailsModal v-if="showModalDetails" :modalVisible="showModalDetails" :variantList="variantList"
                 @closeModal="closeDetailsModal" />
-            <ProductPriceModal v-if="showPriceModal" :modalVisible="showPriceModal" :options="VariantIDs"
+            <ProductPriceModal v-if="showPriceModal" :modalVisible="showPriceModal" :options="variantIDs"
                 @closeModal="closePriceModal" />
-            <ProductStockModal v-if="showStockModal" :modalVisible="showStockModal" :options="VariantIDs"
+            <ProductStockModal v-if="showStockModal" :modalVisible="showStockModal" :options="variantIDs"
                 @closeModal="closeStockModal" :storage-options="stockList" />
         </div>
     </div>
@@ -63,7 +63,7 @@ export default {
             resp: "",
 
             variantList: [],
-            VariantIDs: [],
+            variantIDs: [],
             stockList: []
         }
     },
@@ -109,13 +109,15 @@ export default {
                 const responseData = await response.json()
 
                 const data = responseData.Data.product_info.VariantList
-                this.VariantIDs = data.map(e => {
+                this.variantIDs = data.map(e => {
                     return {
                         Value: e.variant_id,
-                        Option: e.variant_id
+                        Option: e.variant_id,
+                        weight: e.weight,
+                        unit: e.unit
                     }
                 })
-                this.VariantIDs.sort((a, b) => a.Option - b.Option)
+                this.variantIDs.sort((a, b) => a.Option - b.Option)
                 this.showPriceModal = true
 
             } catch (error) {
@@ -135,14 +137,16 @@ export default {
                 const responseData = await response.json()
 
                 const data = responseData.Data.product_info.VariantList
-                this.VariantIDs = data.map(e => {
+                this.variantIDs = data.map(e => {
                     return {
                         Value: e.variant_id,
-                        Option: e.variant_id
+                        Option: e.variant_id,
+                        weight: e.weight,
+                        unit: e.unit
                     }
                 })
 
-                this.VariantIDs.sort((a, b) => a.Option - b.Option)
+                this.variantIDs.sort((a, b) => a.Option - b.Option)
 
                 const response2 = await fetch("http://127.0.0.1:9000/stock_list", {
                     method: "GET",
@@ -156,8 +160,9 @@ export default {
 
                 this.stockList = data2.map(e => {
                     return {
+                        StorageName: e.StorageName,
                         Option: e.StorageID,
-                        Value: e.StorageID
+                        Value: e.StorageID,
                     }
                 })
                 this.showStockModal = true
