@@ -144,7 +144,7 @@ export default {
 
                 const responseData = await response.json()
                 this.saleListData = responseData.Data.sale_list
-
+                this.formateDate(this.saleListData)
             } catch (error) {
                 console.error(error)
             }
@@ -170,6 +170,7 @@ export default {
                 const responseData = await response.json();
                 const data = responseData.Data.sale_list
                 this.saleListData = data
+                this.formateDate(this.saleListData)
 
             } catch (error) {
                 console.error("Ошибка при отправке запроса:", error);
@@ -180,6 +181,22 @@ export default {
             this.variantIDs = []
             this.modalVisible = false;
         },
+        formateDate(data) {
+            const userLocale = "ru-RU"; // Укажите нужную локаль пользователя
+            const options = {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                timeZoneName: "short",
+            };
+            data.forEach(sale => {
+                const soldAtDate = new Date(sale.SoldAt)
+                sale.SoldAt = soldAtDate.toLocaleString(userLocale, options)
+            })
+        }
     },
     data() {
         return {
