@@ -86,12 +86,12 @@ export default {
 
                 const responseData = await response.json();
 
-                this.closeModal()
                 this.$buefy.snackbar.open(`продажа успешно добавлена, ID продажи - ${responseData.Data.sale_id}`)
-
             } catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
                 this.$buefy.snackbar.open(error)
+            } finally {
+                this.closeModal()
             }
         },
         closeModal() {

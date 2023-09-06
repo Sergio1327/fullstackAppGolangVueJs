@@ -74,10 +74,11 @@ export default {
                 const responseData = await response.json()
 
                 this.$buefy.snackbar.open(`Цена успешно добавлена, priceID - ${responseData.Data.price_id}`)
-                this.closeModal()
             } catch (error) {
                 this.$buefy.snackbar.open(error)
                 console.error(error)
+            } finally {
+                this.closeModal()
             }
         }
     }

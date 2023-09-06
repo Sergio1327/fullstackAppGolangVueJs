@@ -96,11 +96,11 @@ export default {
 
                 const responseData = await response.json()
                 this.$buefy.snackbar.open(`Продук успешно добавлен в базу, ID продукта - ${responseData.Data.product_id}`)
-                this.closeModal()
-
             } catch (error) {
                 this.$buefy.snackbar.open(error)
                 console.error("Ошибка при отправке запроса:", error);
+            } finally {
+                this.closeModal()
             }
         },
         closeModal() {

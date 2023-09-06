@@ -62,13 +62,12 @@ export default {
                 const responseData = await response.json();
 
                 this.$emit("fetchStockList")
-                this.closeModal()
                 this.$buefy.snackbar.open(`склад успешно добавлен, ID склада - ${responseData.Data.stockID}`)
-
-
             } catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
                 this.$buefy.snackbar.open(error)
+            } finally {
+                this.closeModal()
             }
         },
         closeModal() {
