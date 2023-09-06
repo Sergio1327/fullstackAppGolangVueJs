@@ -95,6 +95,7 @@ export default {
 
             } catch (error) {
                 console.error(error)
+                this.$buefy.snackbar.open(error)
             }
         },
         async openPriceDetails(ProductID) {
@@ -121,6 +122,7 @@ export default {
                 this.showPriceModal = true
 
             } catch (error) {
+                this.$buefy.snackbar.open(error)
                 console.error(error)
             }
         },
@@ -167,6 +169,7 @@ export default {
                 })
                 this.showStockModal = true
             } catch (error) {
+                this.$buefy.snackbar.open(error)
                 console.error(error)
             }
         }
