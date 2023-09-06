@@ -73,9 +73,9 @@ export default {
         async submitModalData() {
             try {
                 const requestData = {
-                    variant_id: parseInt(this.formData.variant_id),
-                    storage_id: parseInt(this.formData.storage_id),
-                    quantity: parseInt(this.formData.quantity)
+                    variant_id: +this.formData.variant_id,
+                    storage_id: +this.formData.storage_id,
+                    quantity: +this.formData.quantity
                 };
 
                 const response = await fetch('http://127.0.0.1:9000/buy', {

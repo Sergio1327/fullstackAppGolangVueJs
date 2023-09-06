@@ -71,9 +71,9 @@ export default {
       const requestData = {
         start_date: formattedStartDate,
         end_date: formattedEndDate,
-        limit: parseInt(this.limit),
+        limit: +this.limit,
         product_name: this.productName,
-        storage_id: parseInt(this.storageId)
+        storage_id: +this.storageId
       };
 
       console.log(requestData)

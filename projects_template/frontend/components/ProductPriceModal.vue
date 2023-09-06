@@ -59,8 +59,8 @@ export default {
         },
         async submitModalData() {
             const requestData = {
-                variant_id: parseInt(this.formData.variant_id),
-                price: parseFloat(this.formData.price)
+                variant_id: +this.formData.variant_id,
+                price: +this.formData.price
             }
 
             try {

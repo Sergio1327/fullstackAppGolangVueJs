@@ -75,9 +75,9 @@ export default {
         async submitModalData() {
 
             const requestData = {
-                variant_id: parseInt(this.formData.variant_id),
-                storage_id: parseInt(this.formData.storage_id),
-                quantity: parseInt(this.formData.quantity)
+                variant_id: +this.formData.variant_id,
+                storage_id: +this.formData.storage_id,
+                quantity: +this.formData.quantity
             }
 
             try {

@@ -74,7 +74,7 @@ export default {
 
         async submitModalData() {
             const formatedVariants = this.formData.productVariants.map(v => ({
-                weight: parseInt(v.weight),
+                weight: +v.weight,
                 unit: v.unit
             }))
 
