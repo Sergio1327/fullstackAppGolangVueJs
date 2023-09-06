@@ -87,7 +87,7 @@ export default {
         this.$emit("data", data)
 
       } catch (error) {
-        this.$buefy.snackbar.open(error)
+        this.$buefy.snackbar.open(`${error}`)
         console.error("Ошибка при отправке запроса:", error);
       }
     },

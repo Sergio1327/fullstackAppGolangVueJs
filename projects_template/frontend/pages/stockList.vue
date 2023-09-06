@@ -58,7 +58,7 @@ export default {
                 this.stockList = responseData.Data.stock_list
 
             } catch (error) {
-                this.$buefy.snackbar.open(error)
+                this.$buefy.snackbar.open(`${error}`)
                 console.error('Error fetching warehouses:', error);
             }
         },

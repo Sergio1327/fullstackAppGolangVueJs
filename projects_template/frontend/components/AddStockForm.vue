@@ -65,7 +65,7 @@ export default {
                 this.$buefy.snackbar.open(`склад успешно добавлен, ID склада - ${responseData.Data.stockID}`)
             } catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
-                this.$buefy.snackbar.open(error)
+                this.$buefy.snackbar.open(`${error}`)
             } finally {
                 this.closeModal()
             }

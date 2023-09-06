@@ -146,7 +146,7 @@ export default {
                 this.saleListData = responseData.Data.sale_list
                 this.formateDate(this.saleListData)
             } catch (error) {
-                this.$buefy.snackbar.open(error)
+                this.$buefy.snackbar.open(`${error}`)
                 console.error(error)
             }
         },
@@ -174,7 +174,7 @@ export default {
                 this.formateDate(this.saleListData)
 
             } catch (error) {
-                this.$buefy.snackbar.open(error)
+                this.$buefy.snackbar.open(`${error}`)
                 console.error("Ошибка при отправке запроса:", error);
             }
         },
