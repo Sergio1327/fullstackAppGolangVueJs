@@ -17,7 +17,7 @@
                         </b-select>
                     </b-field>
                     <b-field label="Название склада">
-                        <b-select v-model="formData.storage_id" type="text" placeholder="Выберите склад склад" required>
+                        <b-select v-model="formData.storage_id" type="text" placeholder="Выберите склад" required>
                             <option v-for="s in stockOptions" :value="s.Value" :key="s.Option">{{ s.StorageName }}
                             </option>
                         </b-select>
@@ -42,8 +42,8 @@ export default {
     data() {
         return {
             formData: {
-                variant_id: "",
-                storage_id: "",
+                variant_id: null,
+                storage_id: null,
                 quantity: ""
             },
 

@@ -9,7 +9,7 @@
 
         </div>
 
-        <formVue @data="handleData" />
+        <SaleForm @data="handleData" />
         <b-table class="mt-6" :data="saleListData" :hoverable="isHoverable" :striped="isStriped"
             :columns="columns"></b-table>
     </section>
@@ -18,11 +18,11 @@
 
 
 <script>
-import formVue from "~/components/SaleForm.vue";
+import SaleForm from "~/components/SaleForm.vue";
 import AddSaleForm from "~/components/AddSaleForm.vue";
 export default {
     components: {
-        formVue,
+        SaleForm,
         AddSaleForm
     }, methods: {
         async openModal() {

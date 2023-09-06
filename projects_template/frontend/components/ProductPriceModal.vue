@@ -10,7 +10,7 @@
 
                 <section class="modal-card-body">
                     <b-field label="Объем продукта">
-                        <b-select v-model="formData.variant_id" type="text" placeholder="Выберите объем продукта" required>
+                        <b-select placeholder="Выберите объем продукта" v-model="formData.variant_id" type="text">
                             <option v-for="opt in variantOptions" :value="opt.Value" :key="opt.Option">{{ opt.weight }}{{
                                 opt.unit }}
                             </option>
@@ -35,10 +35,10 @@ export default {
     data() {
         return {
             formData: {
-                variant_id: "",
+                variant_id: null,
                 price: ""
             },
-
+            o: null,
             isActive: this.modalVisible,
             variantOptions: this.options,
         }

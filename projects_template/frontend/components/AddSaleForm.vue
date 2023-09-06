@@ -45,8 +45,8 @@ export default {
             vOptions: this.variantOptions,
 
             formData: {
-                variant_id: "",
-                storage_id: "",
+                variant_id: null,
+                storage_id: null,
                 quantity: ""
             },
 
