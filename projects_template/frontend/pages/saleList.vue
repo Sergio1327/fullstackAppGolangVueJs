@@ -8,7 +8,7 @@
                 :modalVisible="modalVisible" @closeModal="closeModal" />
         </div>
 
-        <div>
+        <div class="">
             <div class="field">
                 <label class="label">Дата начала продаж</label>
                 <div class="control">
@@ -125,33 +125,11 @@ export default {
                 console.error(error)
             }
         },
-
-        closeModal() {
-            this.variantIDs = []
-            this.modalVisible = false;
-        },
-
-
-
-        formatDate(dateTime) {
-            const date = new Date(dateTime);
-            const year = date.getUTCFullYear();
-            const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-            const day = String(date.getUTCDate()).padStart(2, "0");
-            const hours = String(date.getHours()).padStart(2, "0");
-            const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-            const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-            return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+05:00`;
-        },
-
         async LoadSales() {
             try {
-                const formattedStartDate = this.formatDate(this.startDate);
-                const formattedEndDate = this.formatDate(this.endDate);
-
                 const requestData = {
-                    start_date: formattedStartDate,
-                    end_date: formattedEndDate,
+                    start_date: this.startDate,
+                    end_date: this.endDate,
                     limit: parseInt(this.limit),
                     product_name: this.productName,
                     storage_id: parseInt(this.storageId)
@@ -172,12 +150,9 @@ export default {
             }
         },
         async sendRequest() {
-            const formattedStartDate = this.formatDate(this.req.startDate);
-            const formattedEndDate = this.formatDate(this.req.endDate);
-
             const requestData = {
-                start_date: formattedStartDate,
-                end_date: formattedEndDate,
+                start_date: this.startDate,
+                end_date: this.endDate,
                 limit: +this.req.limit,
                 product_name: this.req.productName,
                 storage_id: +this.req.storageId
@@ -201,7 +176,10 @@ export default {
                 console.log(error)
             }
         },
-
+        closeModal() {
+            this.variantIDs = []
+            this.modalVisible = false;
+        },
     },
     data() {
         return {
@@ -267,4 +245,9 @@ export default {
 }
 </script>
 
+<style>
+.sales_form {
+    max-width: 1000px !important;
+}
+</style>
 

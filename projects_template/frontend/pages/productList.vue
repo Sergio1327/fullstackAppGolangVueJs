@@ -8,13 +8,13 @@
             <div class="field">
                 <label class="label">Название продукта</label>
                 <div class="control">
-                    <input class="input" type="text" v-model="productName">
+                    <input class="input" placeholder="Введите название продукта" type="text" v-model="productName">
                 </div>
             </div>
             <div class="field">
                 <label class="label">Тег продукта</label>
                 <div class="control">
-                    <input class="input" type="text" v-model="tag">
+                    <input class="input" placeholder="Введите тег продукта" type="text" v-model="tag">
                 </div>
             </div>
             <div class="field">
