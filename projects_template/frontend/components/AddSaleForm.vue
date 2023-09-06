@@ -22,7 +22,7 @@
                         </b-select>
                     </b-field>
                     <b-field label="Введите колличество">
-                        <b-input v-model="formData.quantity" type="text" placeholder="Введите колличество продуктов"
+                        <b-input v-model="formData.quantity" type="text" placeholder="Введите колличество"
                             required></b-input>
                     </b-field>
                 </section>

@@ -9,7 +9,57 @@
 
         </div>
 
-        <SaleForm @data="handleData" />
+        <div>
+            <div class="field">
+                <label class="label">Дата начала продаж</label>
+                <div class="control">
+                    <input class="input" type="datetime-local" v-model="req.startDate">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Дата конца продаж</label>
+                <div class="control">
+                    <input class="input" type="datetime-local" v-model="req.endDate">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Лимит вывода</label>
+                <div class="control">
+                    <div class="select">
+                        <select v-model="req.limit">
+                            <option value="1">1</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Название продукта</label>
+                <div class="control">
+                    <input class="input" type="text" v-model="req.productName">
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">ID склада</label>
+                <div class="control">
+                    <input class="input" type="number" v-model="req.storageId">
+                </div>
+            </div>
+
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-link" @click="sendRequest">Найти продажи</button>
+                </div>
+            </div>
+        </div>
+
+
         <b-table class="mt-6" :data="saleListData" :hoverable="isHoverable" :striped="isStriped"
             :columns="columns"></b-table>
     </section>
@@ -18,11 +68,9 @@
 
 
 <script>
-import SaleForm from "~/components/SaleForm.vue";
 import AddSaleForm from "~/components/AddSaleForm.vue";
 export default {
     components: {
-        SaleForm,
         AddSaleForm
     }, methods: {
         async openModal() {
@@ -121,10 +169,51 @@ export default {
             } catch (error) {
                 console.error(error)
             }
-        }
+        },
+        async sendRequest() {
+
+            const formattedStartDate = this.formatDate(this.req.startDate);
+            const formattedEndDate = this.formatDate(this.req.endDate);
+
+            const requestData = {
+                start_date: formattedStartDate,
+                end_date: formattedEndDate,
+                limit: +this.req.limit,
+                product_name: this.req.productName,
+                storage_id: +this.req.storageId
+            };
+
+            console.log(requestData)
+            try {
+                const response = await fetch("http://127.0.0.1:9000/sales", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestData),
+                });
+
+                const responseData = await response.json();
+                console.log(responseData)
+                const data = responseData.Data.sale_list
+                this.saleListData = data
+
+            } catch (error) {
+                console.error("Ошибка при отправке запроса:", error);
+                console.log(error)
+            }
+        },
 
     }, data() {
         return {
+            req: {
+                startDate: null,
+                endDate: null,
+                limit: 1,
+                productName: "",
+                storageId: 1,
+            },
+
             modalVisible: false,
             stockList: [],
             variantIDs: [],

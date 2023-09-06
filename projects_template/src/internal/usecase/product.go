@@ -441,6 +441,10 @@ func (u *ProductUseCase) FindSaleList(ts transaction.Session, sq product.SaleQue
 		sq.Limit.Scan(3)
 	}
 
+	if sq.StorageID.Int64 == 0 {
+		sq.StorageID.Valid = false
+	}
+
 	// если не указано имя продукта или id склада то произойдет фильтрация только по датам
 	if !sq.ProductName.Valid && !sq.StorageID.Valid {
 		s := product.SaleQueryOnlyBySoldDateParam{
