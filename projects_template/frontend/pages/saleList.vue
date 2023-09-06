@@ -6,21 +6,23 @@
             <button class="button py-3 px-5 is-warning" type="submit" @click="openModal">Добавить продажу</button>
             <AddSaleForm v-if="modalVisible" :stockOptions="stockList" :variantOptions="variantIDs"
                 :modalVisible="modalVisible" @closeModal="closeModal" />
-
         </div>
 
         <div>
             <div class="field">
                 <label class="label">Дата начала продаж</label>
                 <div class="control">
-                    <input class="input" type="datetime-local" v-model="req.startDate">
+                    <b-datepicker v-model="req.startDate" ref="datepicker" expanded
+                        placeholder="Введите дату начала продаж">
+                    </b-datepicker>
                 </div>
             </div>
 
             <div class="field">
                 <label class="label">Дата конца продаж</label>
                 <div class="control">
-                    <input class="input" type="datetime-local" v-model="req.endDate">
+                    <b-datepicker v-model="req.endDate" ref="datepicker" expanded placeholder="Введите дату конца продаж">
+                    </b-datepicker>
                 </div>
             </div>
 
@@ -72,7 +74,8 @@ import AddSaleForm from "~/components/AddSaleForm.vue";
 export default {
     components: {
         AddSaleForm
-    }, methods: {
+    },
+    methods: {
         async openModal() {
             try {
 
@@ -128,9 +131,7 @@ export default {
             this.modalVisible = false;
         },
 
-        handleData(data) {
-            this.saleListData = data
-        },
+
 
         formatDate(dateTime) {
             const date = new Date(dateTime);
@@ -171,7 +172,6 @@ export default {
             }
         },
         async sendRequest() {
-
             const formattedStartDate = this.formatDate(this.req.startDate);
             const formattedEndDate = this.formatDate(this.req.endDate);
 
@@ -183,7 +183,6 @@ export default {
                 storage_id: +this.req.storageId
             };
 
-            console.log(requestData)
             try {
                 const response = await fetch("http://127.0.0.1:9000/sales", {
                     method: "POST",
@@ -194,7 +193,6 @@ export default {
                 });
 
                 const responseData = await response.json();
-                console.log(responseData)
                 const data = responseData.Data.sale_list
                 this.saleListData = data
 
@@ -204,8 +202,10 @@ export default {
             }
         },
 
-    }, data() {
+    },
+    data() {
         return {
+            date: null,
             req: {
                 startDate: null,
                 endDate: null,
@@ -258,7 +258,7 @@ export default {
                     label: "Общая цена продажи"
                 }
 
-            ]
+            ],
         }
     },
     async mounted() {
@@ -266,4 +266,5 @@ export default {
     }
 }
 </script>
+
 
