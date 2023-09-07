@@ -76,7 +76,10 @@ export default {
 
                 this.$buefy.snackbar.open(`Цена успешно добавлена, priceID - ${responseData.Data.price_id}`)
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             } finally {
                 this.closeModal()

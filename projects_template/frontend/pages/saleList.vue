@@ -47,12 +47,11 @@
                 </div>
             </div>
 
-            <div class="field">
-                <label class="label">ID склада</label>
-                <div class="control">
-                    <input class="input" type="number" v-model="req.storageId">
-                </div>
-            </div>
+            <b-field label="Выберите склад">
+                <b-select v-model="req.storageId" type="text" placeholder="Выберите склад" required>
+                    <option v-for="s in stockOptions" :value="s.Option" :key="s.Value">{{ s.StorageName }}</option>
+                </b-select>
+            </b-field>
 
             <div class="field is-grouped">
                 <div class="control">
@@ -122,6 +121,10 @@ export default {
                 this.modalVisible = true;
 
             } catch (error) {
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             }
         },
@@ -146,14 +149,17 @@ export default {
                 this.saleListData = responseData.Data.sale_list
                 this.formateDate(this.saleListData)
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             }
         },
         async sendRequest() {
             const requestData = {
-                start_date: this.startDate,
-                end_date: this.endDate,
+                start_date: this.req.startDate,
+                end_date: this.req.endDate,
                 limit: +this.req.limit,
                 product_name: this.req.productName,
                 storage_id: +this.req.storageId
@@ -174,10 +180,40 @@ export default {
                 this.formateDate(this.saleListData)
 
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error("Ошибка при отправке запроса:", error);
             }
         },
+        async fetchStockList() {
+            try {
+                const response = await fetch('http://localhost:9000/stock_list', {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const responseData = await response.json();
+                const data = responseData.Data.stock_list
+
+                this.stockOptions = data.map(e => {
+                    return {
+                        Option: e.StorageID,
+                        Value: e.StorageID,
+                        StorageName: e.StorageName
+                    }
+                })
+            } catch (error) {
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
+                console.error('Error fetching warehouses:', error);
+            }
+        },
+
         closeModal() {
             this.variantIDs = []
             this.modalVisible = false;
@@ -209,7 +245,7 @@ export default {
                 productName: "",
                 storageId: 1,
             },
-
+            stockOptions: [],
             modalVisible: false,
             stockList: [],
             variantIDs: [],
@@ -259,6 +295,7 @@ export default {
     },
     async mounted() {
         await this.LoadSales()
+        await this.fetchStockList()
     }
 }
 </script>

@@ -92,7 +92,10 @@ export default {
                 const responseData = await response.json()
                 this.$buefy.snackbar.open(`Продукт успешно добавлен на склад,ID операции  - ${responseData.Data.product_stock_ID}`)
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             } finally {
                 this.closeModal()

@@ -122,7 +122,10 @@ export default {
                 this.showPriceModal = true
 
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             }
         },
@@ -169,7 +172,10 @@ export default {
                 })
                 this.showStockModal = true
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             }
         }

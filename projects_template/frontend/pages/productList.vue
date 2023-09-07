@@ -94,7 +94,10 @@ export default {
                 this.productList = responseData.Data.product_list
                 console.log(this.productList)
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             }
         },
@@ -117,7 +120,10 @@ export default {
                 this.tag = ""
 
             } catch (error) {
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
                 console.error(error)
             }
         }

@@ -91,7 +91,10 @@ export default {
                 this.$buefy.snackbar.open(`продажа успешно добавлена, ID продажи - ${responseData.Data.sale_id}`)
             } catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
-                this.$buefy.snackbar.open(`${error}`)
+                this.$buefy.snackbar.open({
+                    message: `${error}`,
+                    type:"is-danger"
+                })
             } finally {
                 this.closeModal()
             }
