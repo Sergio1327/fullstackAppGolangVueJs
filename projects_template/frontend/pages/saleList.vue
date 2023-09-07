@@ -12,7 +12,7 @@
                 <label class="label">Дата начала продаж</label>
                 <div class="control">
                     <b-datepicker class="form" v-model="req.startDate" ref="datepicker" expanded
-                        placeholder="Введите дату начала продаж">
+                        placeholder="Введите дату начала продаж"  required>
                     </b-datepicker>
                 </div>
             </div>
@@ -20,7 +20,7 @@
             <div class="field">
                 <label class="label">Дата конца продаж</label>
                 <div class="control">
-                    <b-datepicker class="form" v-model="req.endDate" ref="datepicker" expanded
+                    <b-datepicker  class="form" v-model="req.endDate" ref="datepicker" expanded
                         placeholder="Введите дату конца продаж">
                     </b-datepicker>
                 </div>
@@ -30,12 +30,12 @@
                 <label class="label">Лимит вывода</label>
                 <div class="control">
                     <div class="select">
-                        <select v-model="req.limit">
+                        <b-select placeholder="Введите лимит вывода" v-model="req.limit">
                             <option value="1">1</option>
                             <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="50">50</option>
-                        </select>
+                        </b-select>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
             </div>
 
             <b-field label="Выберите склад">
-                <b-select v-model="req.storageId" type="text" placeholder="Выберите склад" required>
+                <b-select v-model="req.storageId" type="text" placeholder="Выберите склад">
                     <option v-for="s in stockOptions" :value="s.Option" :key="s.Value">{{ s.StorageName }}</option>
                 </b-select>
             </b-field>
@@ -245,9 +245,9 @@ export default {
             req: {
                 startDate: null,
                 endDate: null,
-                limit: 1,
+                limit: null,
                 productName: "",
-                storageId: 1,
+                storageId: null,
             },
 
             stockOptions: [],

@@ -21,12 +21,12 @@
                 <label class="label">Лимит вывода</label>
                 <div class="control">
                     <div class="select">
-                        <select v-model="limit">
+                        <b-select placeholder="введите лимит вывода"  v-model="limit">
                             <option value="1">1</option>
                             <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="50">50</option>
-                        </select>
+                        </b-select>
                     </div>
                 </div>
             </div>
@@ -50,7 +50,7 @@ export default {
         return {
             productName: "",
             tag: "",
-            limit: 1,
+            limit: null,
             productList: [],
             columns: [
                 {
