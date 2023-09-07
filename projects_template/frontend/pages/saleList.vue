@@ -7,12 +7,11 @@
             <AddSaleForm v-if="modalVisible" :stockOptions="stockList" :variantOptions="variantIDs"
                 :modalVisible="modalVisible" @closeModal="closeModal" />
         </div>
-
         <div class="">
             <div class="field">
                 <label class="label">Дата начала продаж</label>
                 <div class="control">
-                    <b-datepicker v-model="req.startDate" ref="datepicker" expanded
+                    <b-datepicker class="form" v-model="req.startDate" ref="datepicker" expanded
                         placeholder="Введите дату начала продаж">
                     </b-datepicker>
                 </div>
@@ -21,7 +20,8 @@
             <div class="field">
                 <label class="label">Дата конца продаж</label>
                 <div class="control">
-                    <b-datepicker v-model="req.endDate" ref="datepicker" expanded placeholder="Введите дату конца продаж">
+                    <b-datepicker class="form" v-model="req.endDate" ref="datepicker" expanded
+                        placeholder="Введите дату конца продаж">
                     </b-datepicker>
                 </div>
             </div>
@@ -43,7 +43,7 @@
             <div class="field">
                 <label class="label">Название продукта</label>
                 <div class="control">
-                    <input class="input" type="text" v-model="req.productName">
+                    <input class="input form" placeholder="Введите название продукта" type="text" v-model="req.productName">
                 </div>
             </div>
 
@@ -59,7 +59,6 @@
                 </div>
             </div>
         </div>
-
 
         <b-table class="mt-6" :data="saleListData" :hoverable="isHoverable" :striped="isStriped"
             :columns="columns"></b-table>
@@ -124,7 +123,7 @@ export default {
             } catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error(error)
             }
@@ -153,7 +152,7 @@ export default {
             } catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error(error)
             }
@@ -185,7 +184,7 @@ export default {
             } catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error("Ошибка при отправке запроса:", error);
             }
@@ -212,7 +211,7 @@ export default {
             } catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error('Error fetching warehouses:', error);
             }
@@ -250,7 +249,7 @@ export default {
                 productName: "",
                 storageId: 1,
             },
-            
+
             stockOptions: [],
             modalVisible: false,
             stockList: [],
@@ -309,6 +308,16 @@ export default {
 <style>
 .sales_form {
     max-width: 1000px !important;
+}
+
+.form {
+    width: 30% !important;
+}
+
+@media (max-width:1000px) {
+    .form {
+        width: 100% !important;
+    }
 }
 </style>
 

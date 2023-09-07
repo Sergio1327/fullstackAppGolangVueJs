@@ -140,3 +140,15 @@ export default {
 
 }
 </script>
+
+<style scoped >
+.input {
+    width: 30% !important;
+}
+
+@media (max-width:1000px) {
+    .input {
+        width: 100% !important;
+    }
+}
+</style>

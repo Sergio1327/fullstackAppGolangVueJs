@@ -75,7 +75,7 @@ export default {
             this.formData.productVariants.push({})
         },
         deleteVariant() {
-            if (this.formData.productVariants.length > 0) {
+            if (this.formData.productVariants.length > 1) {
                 this.formData.productVariants.pop()
             }
         },
