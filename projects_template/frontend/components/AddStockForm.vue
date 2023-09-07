@@ -1,28 +1,26 @@
 <template>
-    <section>
-        <b-modal v-model="isComponentModalActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
-            aria-label="Добавление склада" close-button-aria-label="Закрыть" aria-modal>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <p class="modal-card-title">Добавление склада</p>
-                    <button type="button" class="delete" @click="closeModal"></button>
-                </header>
+    <b-modal v-model="isComponentModalActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
+        aria-label="Добавление склада" close-button-aria-label="Закрыть" aria-modal>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Добавление склада</p>
+                <button type="button" class="delete" @click="closeModal"></button>
+            </header>
 
-                <section class="modal-card-body">
-                    <b-field label="Название склада">
-                        <b-input v-model="formData.stockName" type="text" placeholder="Введите название склада"
-                            required></b-input>
-                    </b-field>
-                </section>
+            <section class="modal-card-body">
+                <b-field label="Название склада">
+                    <b-input v-model="formData.stockName" type="text" placeholder="Введите название склада"
+                        required></b-input>
+                </b-field>
+            </section>
 
-                <footer class="modal-card-foot">
-                    <b-button label="Закрыть" @click="closeModal" />
-                    <b-button label="Добавить" type="is-primary" @click="submitModalData" />
-                </footer>
+            <footer class="modal-card-foot">
+                <b-button label="Закрыть" @click="closeModal" />
+                <b-button label="Добавить" type="is-primary" @click="submitModalData" />
+            </footer>
 
-            </div>
-        </b-modal>
-    </section>
+        </div>
+    </b-modal>
 </template>
   
 <script>
@@ -30,20 +28,19 @@ export default {
     data() {
         return {
             isComponentModalActive: this.modalVisible,
-
             formData: {
                 stockName: ''
             },
-
-
         }
     },
+
     props: {
         modalVisible: {
             type: Boolean,
             required: true
         }
     },
+
     methods: {
         async submitModalData() {
             try {
@@ -63,16 +60,19 @@ export default {
 
                 this.$emit("fetchStockList")
                 this.$buefy.snackbar.open(`склад успешно добавлен, ID склада - ${responseData.Data.stockID}`)
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Ошибка при отправке запроса:', error);
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
-            } finally {
+            }
+            finally {
                 this.closeModal()
             }
         },
+        
         closeModal() {
             this.$emit("closeModal")
         },

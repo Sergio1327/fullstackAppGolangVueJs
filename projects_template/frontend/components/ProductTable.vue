@@ -28,6 +28,7 @@
                 </tbody>
 
             </table>
+
             <ProductDetailsModal v-if="showModalDetails" :modalVisible="showModalDetails" :variantList="variantList"
                 @closeModal="closeDetailsModal" />
             <ProductPriceModal v-if="showPriceModal" :modalVisible="showPriceModal" :options="variantIDs"
@@ -42,18 +43,21 @@
 import ProductDetailsModal from './ProductDetailsModal.vue'
 import ProductPriceModal from './ProductPriceModal.vue'
 import ProductStockModal from './ProductStockModal.vue'
+
 export default {
     components: {
         ProductDetailsModal,
         ProductPriceModal,
         ProductStockModal
     },
+
     props: {
         productList: {
             type: Array,
             required: true
         }
     },
+
     data() {
         return {
             showModalDetails: false,
@@ -67,6 +71,7 @@ export default {
             stockList: []
         }
     },
+
     methods: {
         closeDetailsModal() {
             this.showModalDetails = false
@@ -81,8 +86,8 @@ export default {
         },
 
         async openDetailsModal(ProductID) {
-            this.showModalDetails = true
             const url = `http://127.0.0.1:9000/product/${ProductID}`
+
             try {
                 const response = await fetch(url, {
                     method: 'GET',
@@ -90,14 +95,17 @@ export default {
                         'Content-Type': 'application/json'
                     },
                 })
+
                 const responseData = await response.json()
                 this.variantList = responseData.Data.product_info.VariantList
-
-            } catch (error) {
+                this.showModalDetails = true
+            }
+            catch (error) {
                 console.error(error)
                 this.$buefy.snackbar.open(error)
             }
         },
+
         async openPriceDetails(ProductID) {
             const url = `http://127.0.0.1:9000/product/${ProductID}`
             try {
@@ -121,28 +129,30 @@ export default {
                 this.variantIDs.sort((a, b) => a.Option - b.Option)
                 this.showPriceModal = true
 
-            } catch (error) {
+            }
+            catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error(error)
             }
         },
+
         async OpenStockModal(ProductID) {
             const url = `http://127.0.0.1:9000/product/${ProductID}`
 
             try {
-                const response = await fetch(url, {
+                const variantResponse = await fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                 })
-                const responseData = await response.json()
+                const variantResponseData = await variantResponse.json()
 
-                const data = responseData.Data.product_info.VariantList
-                this.variantIDs = data.map(e => {
+                const variantData = variantResponseData.Data.product_info.VariantList
+                this.variantIDs = variantData.map(e => {
                     return {
                         Value: e.variant_id,
                         Option: e.variant_id,
@@ -153,28 +163,30 @@ export default {
 
                 this.variantIDs.sort((a, b) => a.Option - b.Option)
 
-                const response2 = await fetch("http://127.0.0.1:9000/stock_list", {
+                const stockResponse = await fetch("http://127.0.0.1:9000/stock_list", {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json'
                     },
 
                 })
-                const responseData2 = await response2.json()
-                const data2 = responseData2.Data.stock_list
+                const stockResponseData = await stockResponse.json()
+                const stockData = stockResponseData.Data.stock_list
 
-                this.stockList = data2.map(e => {
+                this.stockList = stockData.map(e => {
                     return {
                         StorageName: e.StorageName,
                         Option: e.StorageID,
                         Value: e.StorageID,
                     }
                 })
+
                 this.showStockModal = true
-            } catch (error) {
+            }
+            catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error(error)
             }
@@ -192,22 +204,9 @@ td {
     padding: 1% 2%;
 
 }
-
 table {
     margin-top: 50px;
     width: 100%;
 }
 
-/* .table {
-    width: 100% !important;
-    overflow-x: auto;
-}
-
-@media (max-width:1230px) {
-
-    th,
-    td button {
-        font-size: 12px !important;
-    }
-} */
 </style>

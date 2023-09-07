@@ -14,7 +14,7 @@
 import HeaderNavbar from '~/components/HeaderNavbar.vue';
 import FooterContent from '~/components/FooterContent.vue';
 export default {
-  name: 'DefaultLayout',
+
   components: {
     HeaderNavbar,
     FooterContent

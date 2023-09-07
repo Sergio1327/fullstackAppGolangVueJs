@@ -15,7 +15,6 @@
                         {{ card.descr }}
                     </div>
                 </div>
-
             </div>
         </nuxt-link>
     </div>
@@ -42,7 +41,8 @@ export default {
     transform: scale(1, 1.1);
     box-shadow: 1px 1px 10px orange;
 }
-.content{
+
+.content {
     color: orange !important;
 }
 </style>

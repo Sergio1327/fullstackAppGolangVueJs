@@ -45,12 +45,12 @@ export default {
         ProductTable,
         AddProductForm
     },
+
     data() {
         return {
             productName: "",
             tag: "",
             limit: 1,
-
             productList: [],
             columns: [
                 {
@@ -69,16 +69,20 @@ export default {
             modalVisible: false
         }
     },
+
     methods: {
         openModal() {
             this.modalVisible = true
         },
+
         closeModal() {
             this.modalVisible = false
         },
+
         handleData(productData) {
             this.productList = productData
         },
+
         async LoadStockList() {
             const limit = 3
             const url = `http://127.0.0.1:9000/product_list?limit=${limit}`
@@ -96,11 +100,12 @@ export default {
             } catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error(error)
             }
         },
+
         async GetProductList() {
             const limitProductList = parseInt(this.limit)
             const url = `http://127.0.0.1:9000/product_list?name=${this.productName}&tag=${this.tag}&limit=${limitProductList}`
@@ -122,12 +127,13 @@ export default {
             } catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error(error)
             }
         }
     },
+
     async mounted() {
         await this.LoadStockList()
     },

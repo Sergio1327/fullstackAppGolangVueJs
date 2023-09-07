@@ -74,6 +74,7 @@ export default {
     components: {
         AddSaleForm
     },
+
     methods: {
         async openModal() {
             try {
@@ -128,6 +129,7 @@ export default {
                 console.error(error)
             }
         },
+
         async LoadSales() {
             try {
                 const requestData = {
@@ -156,6 +158,7 @@ export default {
                 console.error(error)
             }
         },
+
         async sendRequest() {
             const requestData = {
                 start_date: this.req.startDate,
@@ -187,6 +190,7 @@ export default {
                 console.error("Ошибка при отправке запроса:", error);
             }
         },
+
         async fetchStockList() {
             try {
                 const response = await fetch('http://localhost:9000/stock_list', {
@@ -218,6 +222,7 @@ export default {
             this.variantIDs = []
             this.modalVisible = false;
         },
+
         formateDate(data) {
             const userLocale = "ru-RU"; // Укажите нужную локаль пользователя
             const options = {
@@ -245,6 +250,7 @@ export default {
                 productName: "",
                 storageId: 1,
             },
+            
             stockOptions: [],
             modalVisible: false,
             stockList: [],

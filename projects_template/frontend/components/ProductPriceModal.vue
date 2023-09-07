@@ -1,33 +1,31 @@
 <template>
-    <section>
-        <b-modal v-model="isActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
-            aria-label="Добавление цены" close-button-aria-label="Закрыть" aria-modal>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <p class="modal-card-title">Добавление цены</p>
-                    <button type="button" class="delete" @click="closeModal"></button>
-                </header>
+    <b-modal v-model="isActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
+        aria-label="Добавление цены" close-button-aria-label="Закрыть" aria-modal>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Добавление цены</p>
+                <button type="button" class="delete" @click="closeModal"></button>
+            </header>
 
-                <section class="modal-card-body">
-                    <b-field label="Объем продукта">
-                        <b-select placeholder="Выберите объем продукта" v-model="formData.variant_id" type="text">
-                            <option v-for="opt in variantOptions" :value="opt.Value" :key="opt.Option">{{ opt.weight }}{{
-                                opt.unit }}
-                            </option>
-                        </b-select>
-                    </b-field>
-                    <b-field label="Цена продукта">
-                        <b-input type="number" v-model="formData.price" placeholder="Введите цену" required></b-input>
-                    </b-field>
-                </section>
+            <section class="modal-card-body">
+                <b-field label="Объем продукта">
+                    <b-select placeholder="Выберите объем продукта" v-model="formData.variant_id" type="text">
+                        <option v-for="opt in variantOptions" :value="opt.Value" :key="opt.Option">{{ opt.weight }}{{
+                            opt.unit }}
+                        </option>
+                    </b-select>
+                </b-field>
+                <b-field label="Цена продукта">
+                    <b-input type="number" v-model="formData.price" placeholder="Введите цену" required></b-input>
+                </b-field>
+            </section>
 
-                <footer class="modal-card-foot">
-                    <b-button label="Закрыть" @click="closeModal" />
-                    <b-button label="Добавить" type="is-primary" @click="submitModalData" />
-                </footer>
-            </div>
-        </b-modal>
-    </section>
+            <footer class="modal-card-foot">
+                <b-button label="Закрыть" @click="closeModal" />
+                <b-button label="Добавить" type="is-primary" @click="submitModalData" />
+            </footer>
+        </div>
+    </b-modal>
 </template>
 
 <script>
@@ -38,11 +36,12 @@ export default {
                 variant_id: null,
                 price: ""
             },
-            o: null,
             isActive: this.modalVisible,
             variantOptions: this.options,
         }
-    }, props: {
+    },
+
+    props: {
         modalVisible: {
             Type: Boolean,
             required: true
@@ -53,10 +52,12 @@ export default {
             required: true
         }
     },
+
     methods: {
         closeModal() {
             this.$emit("closeModal")
         },
+
         async submitModalData() {
             const requestData = {
                 variant_id: +this.formData.variant_id,
@@ -75,13 +76,15 @@ export default {
                 const responseData = await response.json()
 
                 this.$buefy.snackbar.open(`Цена успешно добавлена, priceID - ${responseData.Data.price_id}`)
-            } catch (error) {
+            }
+            catch (error) {
                 this.$buefy.snackbar.open({
                     message: `${error}`,
-                    type:"is-danger"
+                    type: "is-danger"
                 })
                 console.error(error)
-            } finally {
+            }
+            finally {
                 this.closeModal()
             }
         }

@@ -1,36 +1,33 @@
 <template>
-    <section>
-        <b-modal v-model="isActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
-            aria-label="Добавление склада" close-button-aria-label="Закрыть" aria-modal>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <p class="modal-card-title">Варианты продукта</p>
-                    <button type="button" class="delete" @click="closeModal"></button>
-                </header>
+    <b-modal v-model="isActive" has-modal-card trap-focus :destroy-on-hide="false" aria-role="dialog"
+        aria-label="Добавление склада" close-button-aria-label="Закрыть" aria-modal>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Варианты продукта</p>
+                <button type="button" class="delete" @click="closeModal"></button>
+            </header>
 
-                <section class="modal-card-body">
-                    <b-field class="is-flex is-flex-direction-column">
-                        <div class="variant is-flex is-flex-direction-column p-2" v-for="v in variantList"
-                            :key="v.variant_id">
-                            <div>ID варианта : {{ v.variant_id }}</div>
-                            <div>Объем : {{ v.weight }}{{ v.unit }} </div>
-                            <div>Цена : {{ v.price }}$</div>
-                            <div class="storages">В каких складах имеется :
-                                <div v-for="s in v.in_storages" :key="s.storageID">
-                                    {{ s.StorageName }}
-                                </div>
+            <section class="modal-card-body">
+                <b-field class="is-flex is-flex-direction-column">
+                    <div class="variant is-flex is-flex-direction-column p-2" v-for="v in variantList" :key="v.variant_id">
+                        <div>ID варианта : {{ v.variant_id }}</div>
+                        <div>Объем : {{ v.weight }}{{ v.unit }} </div>
+                        <div>Цена : {{ v.price }}$</div>
+                        <div class="storages">В каких складах имеется :
+                            <div v-for="s in v.in_storages" :key="s.storageID">
+                                {{ s.StorageName }}
                             </div>
                         </div>
-                    </b-field>
-                </section>
+                    </div>
+                </b-field>
+            </section>
 
-                <footer class="modal-card-foot">
-                    <b-button class="button is-danger" label="Закрыть" @click="closeModal" />
-                </footer>
+            <footer class="modal-card-foot">
+                <b-button class="button is-danger" label="Закрыть" @click="closeModal" />
+            </footer>
 
-            </div>
-        </b-modal>
-    </section>
+        </div>
+    </b-modal>
 </template>
 
 <script>
@@ -40,17 +37,19 @@ export default {
             isActive: this.modalVisible,
         }
     },
+
     props: {
         modalVisible: {
             type: Boolean,
             required: true
         },
-        
+
         variantList: {
             type: Array,
             required: true
         }
     },
+
     methods: {
         closeModal() {
             this.$emit("closeModal")
